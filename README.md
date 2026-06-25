@@ -13,6 +13,39 @@ Skills sao slash commands customizados para o Claude Code. Ficam em `~/.claude/s
 | vps | `/vps` | Acessa e gerencia o VPS pessoal via SSH |
 | frontend-review | `/frontend-review` | Revisor de front-end/UX agnostico: screenshots multi-viewport + critica de padding/espacamento/responsividade, review de codigo do front e auditoria de a11y/consistencia. Rubric versionada que melhora a cada uso. |
 
+<<<<<<< Updated upstream
+=======
+## Politica SKILL-FIRST (todos os projetos)
+
+Em **qualquer** projeto desta maquina, a IA deve **procurar e usar skills/plugins antes**
+de fazer a tarefa na mao. Skills sao o primeiro lugar a olhar, nao o ultimo. Isso e imposto por:
+
+- **`~/.claude/CLAUDE.md`** (carrega em todo projeto) com a regra skill-first + o catalogo.
+- **Hook `UserPromptSubmit`** em `~/.claude/settings.json` que roda
+  `cat ~/.claude/skill-first-reminder.txt` e reinjeta o lembrete a cada prompt
+  (saida em JSON com `suppressOutput`, entao vai pro contexto sem poluir o transcript).
+  Revisar/desligar: comando `/hooks`.
+
+Fluxo: olhar a lista de skills + plugins -> se alguma encaixar (mesmo parcial) invocar ->
+so pular se nada for relevante -> combinar quando fizer sentido
+(ex.: `frontend-design` cria -> `frontend-review` audita -> `simplify`/`code-review` limpam -> `verify` confirma).
+
+## Plugins instalados (marketplace `claude-plugins-official`)
+
+| Plugin | Para que serve | Nota |
+|--------|----------------|------|
+| `frontend-design` | Direcao visual/estetica para **criar/redesenhar** UI nova | Par do `frontend-review`. Em app com design system travado, restrinja aos tokens; solte em telas novas |
+| `claude-md-management` | Auditar/melhorar `CLAUDE.md` + capturar aprendizados | Bom quando um `CLAUDE.md` cresce/desatualiza |
+| `security-guidance` | Review de seguranca (injecao, XSS, SSRF, segredos) | Relevante em apps que tocam dinheiro/credenciais |
+| `feature-dev` | Workflow de feature com agents (explorer/architect/reviewer) | Para itens grandes de backlog (billing, websockets, etc.) |
+
+> **Instalar plugin do jeito certo:** `claude plugin install <nome>@claude-plugins-official` (ou o menu
+> `/plugin`). **Só marcar `enabledPlugins` no JSON NAO instala** — `claude plugin list` fica "No plugins
+> installed" e a skill do plugin nao carrega. Apos instalar, **um restart limpo** (`claude` novo) carrega;
+> **`claude --resume` recarrega as skills do repo (`~/.claude/skills`) mas NAO ativa plugins recem-instalados.**
+> Conferir com `claude plugin list`.
+
+>>>>>>> Stashed changes
 ## Setup em uma maquina nova
 
 ### 1. Clonar o repositorio no lugar certo
