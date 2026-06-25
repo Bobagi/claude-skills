@@ -36,6 +36,7 @@ so pular se nada for relevante -> combinar quando fizer sentido
 | `claude-md-management` | Auditar/melhorar `CLAUDE.md` + capturar aprendizados | Bom quando um `CLAUDE.md` cresce/desatualiza |
 | `security-guidance` | Review de seguranca (injecao, XSS, SSRF, segredos) | Relevante em apps que tocam dinheiro/credenciais |
 | `feature-dev` | Workflow de feature com agents (explorer/architect/reviewer) | Para itens grandes de backlog (billing, websockets, etc.) |
+| `chrome-devtools-mcp` | Inspecao/automacao de browser ao vivo (perf/network/console/a11y) — Chrome DevTools (Google oficial) | Complementa o `frontend-review` |
 
 > **Instalar plugin do jeito certo:** `claude plugin install <nome>@claude-plugins-official` (ou o menu
 > `/plugin`). **Só marcar `enabledPlugins` no JSON NAO instala** — `claude plugin list` fica "No plugins
