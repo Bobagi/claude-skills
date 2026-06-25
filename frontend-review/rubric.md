@@ -227,3 +227,13 @@ click, drive them separately for now (interaction steps are a planned engine fea
   should `window.scrollTo(0,0)` so the page starts at the top instead of inheriting the previous page's
   scroll; do it in the shared navigate() AND on `hashchange` (covers back/forward and direct hash edits).
   A link that "goes to the right page but mid-scroll" reads as broken to users.
+- 2026-06-25 — Method (verify a 2-col→1-col reflow): always capture a viewport **just above** the
+  collapse breakpoint, not only one well below it. Below the breakpoint tells you the stack works; the
+  real risk is the *cramped two-column* band right above it (e.g. breakpoint 860 → shoot 900), where the
+  narrower column can squeeze a panel/table before it's allowed to stack. A clean 768 + 1280 pair can
+  hide a broken 900. Add the breakpoint+~40px width to the viewport list for any split-hero/2-col layout.
+- 2026-06-25 — a11y (decorative product-demo panel): when a hero's signature is a faux UI that **restates
+  the copy's claims** (a fake console/dashboard/log, no real controls), mark the **whole panel
+  `aria-hidden="true"`** so screen-reader users don't hear a confusing duplicate of the headline/subtitle.
+  The textual claim already lives in the real copy beside it; SVG/icons inside then need no alt. (Only do
+  this when the panel carries no information that's *absent* from the surrounding text.)
