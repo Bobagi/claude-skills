@@ -13,8 +13,6 @@ Skills sao slash commands customizados para o Claude Code. Ficam em `~/.claude/s
 | vps | `/vps` | Acessa e gerencia o VPS pessoal via SSH |
 | frontend-review | `/frontend-review` | Revisor de front-end/UX agnostico: screenshots multi-viewport + critica de padding/espacamento/responsividade, review de codigo do front e auditoria de a11y/consistencia. Rubric versionada que melhora a cada uso. |
 
-<<<<<<< Updated upstream
-=======
 ## Politica SKILL-FIRST (todos os projetos)
 
 Em **qualquer** projeto desta maquina, a IA deve **procurar e usar skills/plugins antes**
@@ -45,7 +43,6 @@ so pular se nada for relevante -> combinar quando fizer sentido
 > **`claude --resume` recarrega as skills do repo (`~/.claude/skills`) mas NAO ativa plugins recem-instalados.**
 > Conferir com `claude plugin list`.
 
->>>>>>> Stashed changes
 ## Setup em uma maquina nova
 
 ### 1. Clonar o repositorio no lugar certo
