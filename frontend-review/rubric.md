@@ -237,3 +237,27 @@ click, drive them separately for now (interaction steps are a planned engine fea
   `aria-hidden="true"`** so screen-reader users don't hear a confusing duplicate of the headline/subtitle.
   The textual claim already lives in the real copy beside it; SVG/icons inside then need no alt. (Only do
   this when the panel carries no information that's *absent* from the surrounding text.)
+- 2026-06-26 — a11y (cheap, high-value code check): **grep whether the app has a global
+  `:focus-visible` for its shared button class** (`.button:focus-visible` / `button:focus-visible`). A
+  missing keyboard focus ring is **invisible in screenshots** (hover/mouse look fine) but fails every
+  keyboard user, and it's common for a design system to style `input:focus` yet forget buttons. If absent,
+  the fix is one global rule using the existing focus-ring token — it lifts the whole app, not one screen.
+  Pair it with: links/buttons on a **dark** surface need an explicit focus style (the UA default outline is
+  often near-invisible on dark). Added as a recurring Pillar-3 grep.
+- 2026-06-26 — a11y (consent/cookie/notification bars): a **non-blocking** bottom bar that traps no focus
+  should be `role="region"` + `aria-label`, **not** `role="dialog" aria-modal="false"` — `dialog` implies a
+  focus-managed widget it isn't. Reserve `role="dialog"`+`aria-modal="true"`+focus-trap+initial-focus for a
+  bar that actually blocks the page. General rule: match the ARIA role to whether the thing blocks/traps,
+  not to the word "banner/popup".
+- 2026-06-26 — Method (verify a consent-gated third-party script end-to-end): when the task is "load
+  script X only after cookie consent", a screenshot can't prove it — **drive it with the browser**: assert
+  the gated `<script src*="...">` is **absent before any choice**, **present only after Accept-all**,
+  **never after Essential-only**, and **present on a return visit** (cookie already set). Click the bar's
+  buttons with `getByRole('button',{name})`, **not** `getByText` — `getByText` can match a wrapping
+  text/whitespace node or trip strict-mode and silently click the wrong thing (cost me two false test
+  failures until I switched). Read the persisted cookie via the browser context, not `document.cookie` string-matching.
+- 2026-06-26 — Consistency/correctness worth a grep on any privacy-touching change: **does the privacy
+  policy match what the site actually loads?** A real case here — the policy claimed "no third-party
+  analytics" while an analytics `<script>` loaded unconditionally in `app.html`. When reviewing a
+  cookie/consent/analytics change, diff the *claims* in the legal copy against the *actual* network/script
+  tags; a stale honest-looking policy is a compliance bug, not just a wording nit.
