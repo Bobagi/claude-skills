@@ -69,10 +69,31 @@ ou `bash <repo>/sync.sh`. Depois, **reinicie o Claude** (um `claude` novo) para 
 
 ### Settings & hooks (`config/`)
 - **`config/settings.json`** → `~/.claude/settings.json`: `model: opus`, `effortLevel: xhigh`,
-  `theme: dark`, `permissions.defaultMode: auto`, os 5 plugins habilitados e o **hook `UserPromptSubmit`**.
+  `theme: dark`, `permissions.defaultMode: auto`, os 5 plugins habilitados e **três hooks**:
+  `UserPromptSubmit` (skill-first), `SessionStart` (auto-pull) e `SessionEnd` (aviso de drift) —
+  ver **Auto-sync** abaixo.
 - **`config/skill-first-reminder.txt`** → `~/.claude/skill-first-reminder.txt`: payload JSON que o hook
   injeta a cada prompt (com `suppressOutput`), reforçando a política skill-first.
 - **`config/CLAUDE.md`** → `~/.claude/CLAUDE.md`: instruções globais (carregam em todo projeto).
+
+---
+
+## 🔄 Auto-sync (hooks + `scripts/claude-sync.sh`)
+
+Depois do primeiro `sync.sh`, manter as máquinas em dia é **automático** — sem precisar lembrar de
+`git pull`/`push`. Dois hooks (em `config/settings.json`) chamam `scripts/claude-sync.sh`:
+
+- **`SessionStart` → `claude-sync.sh pull`**: a cada nova sessão dá `git pull --ff-only` no repo (skills
+  e commands, por serem symlink, já ficam atuais na hora). Updates de config que estavam **em sync** são
+  reaplicados em `~/.claude/` (com backup); edição local não-salva **nunca** é sobrescrita — vira aviso.
+- **`SessionEnd` → `claude-sync.sh check`**: ao fim da sessão, se a config local divergir do repo, avisa
+  para você rodar `/sync-claude --save`. **Nunca pusha sozinho** (o repo é público — push automático
+  poderia vazar segredo).
+- **`/sync-claude --save` → `claude-sync.sh save`**: caminho de **captura** (push). Copia
+  `~/.claude/{CLAUDE.md,settings.json,skill-first-reminder.txt}` de volta pra `config/`, faz um **scan de
+  segredos** (aborta se achar credencial) e então commita + pusha — propagando às outras máquinas.
+
+Os hooks são **não-bloqueantes** (offline/sem-repo não atrapalha a sessão). Para revisar/desligar: `/hooks`.
 
 ---
 
@@ -91,6 +112,8 @@ sentido (`frontend-design` cria → `frontend-review` audita → `simplify`/`cod
 ```
 claude-skills/
 ├── sync.sh                     # bootstrap/sync idempotente (curl|bash ou /sync-claude)
+├── scripts/
+│   └── claude-sync.sh          # auto-sync: pull (SessionStart) / check (SessionEnd) / save (--save)
 ├── config/                     # config aplicada em ~/.claude/ pelo sync
 │   ├── CLAUDE.md               #   -> ~/.claude/CLAUDE.md (instruções globais)
 │   ├── settings.json           #   -> ~/.claude/settings.json (model/effort/theme/plugins/hook)
@@ -120,7 +143,9 @@ claude-skills/
   rode `/sync-claude` nas outras máquinas (ou `git pull`).
 - **Novo plugin:** adicione a linha `<nome>@claude-plugins-official` em `config/plugins.txt`, registre no
   catálogo (este README + `config/CLAUDE.md`) e dê push. `sync.sh` instala no próximo run.
-- **Mudar settings/hook/CLAUDE.md:** edite o arquivo correspondente em `config/`, commit, push, re-sync.
+- **Mudar settings/hook/CLAUDE.md:** edite em `config/`, commit, push — **ou** edite localmente
+  (`~/.claude/...`) e rode **`/sync-claude --save`**, que copia de volta pro repo, escaneia segredos e
+  pusha. As outras máquinas pegam sozinhas no próximo `SessionStart` (auto-pull).
 - Depois de qualquer mudança, propague com **`/sync-claude`** (ou o `curl|bash`) e reinicie o Claude.
 
 ---

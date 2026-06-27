@@ -15,6 +15,30 @@
           }
         ]
       }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /opt/claude-skills/scripts/claude-sync.sh pull 2>/dev/null || true",
+            "timeout": 20,
+            "statusMessage": "sync claude-skills (pull)"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /opt/claude-skills/scripts/claude-sync.sh check 2>/dev/null || true",
+            "timeout": 10,
+            "statusMessage": "check config drift"
+          }
+        ]
+      }
     ]
   },
   "enabledPlugins": {
