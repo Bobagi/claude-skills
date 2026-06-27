@@ -1,0 +1,12 @@
+# Plugins do Claude Code instalados nesta conta.
+# Formato: um plugin por linha, no formato <nome>@<marketplace>.
+# Linhas em branco e linhas iniciadas por # sao ignoradas.
+# O sync.sh adiciona o marketplace e instala cada plugin abaixo (claude plugin install ... --scope user).
+#
+# Marketplace: claude-plugins-official  ->  github: anthropics/claude-plugins-official
+
+frontend-design@claude-plugins-official
+claude-md-management@claude-plugins-official
+security-guidance@claude-plugins-official
+feature-dev@claude-plugins-official
+chrome-devtools-mcp@claude-plugins-official

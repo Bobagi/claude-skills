@@ -1,142 +1,145 @@
 # claude-skills
 
-Skills e configuracoes pessoais do Claude Code ([@Bobagi](https://github.com/Bobagi)).
+Configuração pessoal **completa e portável** do Claude Code ([@Bobagi](https://github.com/Bobagi)):
+skills, slash-commands, plugins, `CLAUDE.md` global, `settings.json` e o hook skill-first — tudo
+versionado aqui e aplicado por **um único script idempotente** (`sync.sh`). Objetivo: abrir o Claude
+numa máquina nova e, com um comando, deixar tudo **igual em qualquer máquina**.
 
-## O que sao skills
+---
 
-Skills sao slash commands customizados para o Claude Code. Ficam em `~/.claude/skills/<nome>/SKILL.md` e sao invocadas com `/<nome>`.
+## ⚡ Sincronizar (máquina nova ou re-sync)
 
-## Skills disponiveis
+Pré-requisitos: `git` e o **Claude Code** instalados.
 
-| Skill | Comando | Descricao |
+```bash
+curl -fsSL https://raw.githubusercontent.com/Bobagi/claude-skills/main/sync.sh | bash
+```
+
+Ou peça pra IA: **"sincronize meu Claude com o repo github.com/Bobagi/claude-skills"** — ela acha o
+`sync.sh` e roda. Com o repo já presente, dá pra rodar de novo a qualquer momento com **`/sync-claude`**
+ou `bash <repo>/sync.sh`. Depois, **reinicie o Claude** (um `claude` novo) para carregar plugins e hooks.
+
+> Variáveis úteis: `CLAUDE_SKILLS_DIR=/caminho` (onde clonar, padrão `~/.claude/claude-skills`) e
+> `SYNC_SKIP_PLUGINS=1` (só arquivos/symlinks, sem instalar plugins).
+
+### O que o `sync.sh` faz (idempotente, com backup)
+1. **Clona/atualiza** este repo (detecta se já está em `/opt/claude-skills` ou `~/.claude/claude-skills`).
+2. **Symlinks**: `~/.claude/skills → repo` e `~/.claude/commands → repo/commands`.
+3. **Copia config** para `~/.claude/`: `CLAUDE.md`, `settings.json`, `skill-first-reminder.txt`
+   (faz backup do que existia em `~/.claude/backups/`).
+4. **Plugins**: adiciona o marketplace `claude-plugins-official` e instala todos de `config/plugins.txt`.
+
+### O que ele **não** toca
+- `~/.claude/settings.local.json` (permissões específicas da máquina).
+- Segredos / memórias (`~/.claude/projects/*/memory/*`, ex.: credenciais do VPS) — nunca vão pro repo.
+- MCP `claude.ai Gmail`/`Google Drive`: voltam sozinhos após **login na conta claude.ai** (ver `config/mcp.md`).
+
+---
+
+## 📦 Inventário versionado
+
+### Skills (raiz do repo → `~/.claude/skills`)
+| Skill | Comando | Descrição |
 |-------|---------|-----------|
-| vps | `/vps` | Acessa e gerencia o VPS pessoal via SSH |
-| frontend-review | `/frontend-review` | Revisor de front-end/UX agnostico: screenshots multi-viewport + critica de padding/espacamento/responsividade, review de codigo do front e auditoria de a11y/consistencia. Rubric versionada que melhora a cada uso. |
+| `vps` | `/vps` | Acessa/gerencia o VPS pessoal via SSH (credenciais ficam **fora** do repo, na memória). |
+| `frontend-review` | `/frontend-review` | Revisor de front-end/UX agnóstico: screenshots multi-viewport + crítica de espaçamento/responsividade + review de código + a11y, contra uma `rubric.md` versionada que melhora a cada uso. |
+| `resume` | `/resume` | Resume um vídeo do YouTube a partir do link. |
+| `sync-claude` | `/sync-claude` | Roda o `sync.sh` (padroniza a config desta máquina). |
 
-## Politica SKILL-FIRST (todos os projetos)
+### Plugins (marketplace `claude-plugins-official` = `anthropics/claude-plugins-official`)
+| Plugin | Para que serve |
+|--------|----------------|
+| `frontend-design` | Direção visual/estética para **criar/redesenhar** UI nova (par do `frontend-review`). |
+| `claude-md-management` | Auditar/melhorar `CLAUDE.md` + capturar aprendizados de sessão. |
+| `security-guidance` | Review de segurança (injeção, XSS, SSRF, segredos hardcoded). |
+| `feature-dev` | Workflow de feature com agents (explorer/architect/reviewer) para itens grandes. |
+| `chrome-devtools-mcp` | Inspeção/automação de browser ao vivo (perf/network/console/a11y) — fornece o MCP `chrome-devtools`. |
 
-Em **qualquer** projeto desta maquina, a IA deve **procurar e usar skills/plugins antes**
-de fazer a tarefa na mao. Skills sao o primeiro lugar a olhar, nao o ultimo. Isso e imposto por:
+> **Instalar plugin do jeito certo:** `claude plugin install <nome>@claude-plugins-official`. **Só marcar
+> `enabledPlugins` no JSON NÃO instala** (`claude plugin list` fica vazio e a skill não carrega). Após
+> instalar, **um restart limpo** carrega; `claude --resume` recarrega skills do repo mas **não** ativa
+> plugins recém-instalados. O `sync.sh` já faz a instalação correta. Conferir com `claude plugin list`.
 
-- **`~/.claude/CLAUDE.md`** (carrega em todo projeto) com a regra skill-first + o catalogo.
-- **Hook `UserPromptSubmit`** em `~/.claude/settings.json` que roda
-  `cat ~/.claude/skill-first-reminder.txt` e reinjeta o lembrete a cada prompt
-  (saida em JSON com `suppressOutput`, entao vai pro contexto sem poluir o transcript).
-  Revisar/desligar: comando `/hooks`.
+### MCP servers — ver [`config/mcp.md`](config/mcp.md)
+| MCP | Origem | Numa máquina nova |
+|-----|--------|-------------------|
+| `claude.ai Gmail` | Remoto, conta claude.ai | Reconecta após login (nada a instalar). |
+| `claude.ai Google Drive` | Remoto, conta claude.ai | Reconecta após login. |
+| `chrome-devtools` | Plugin `chrome-devtools-mcp` (stdio, `npx`) | Vem com o plugin; conecta de fato só se houver Node + Chrome. |
 
-Fluxo: olhar a lista de skills + plugins -> se alguma encaixar (mesmo parcial) invocar ->
-so pular se nada for relevante -> combinar quando fizer sentido
-(ex.: `frontend-design` cria -> `frontend-review` audita -> `simplify`/`code-review` limpam -> `verify` confirma).
+### Settings & hooks (`config/`)
+- **`config/settings.json`** → `~/.claude/settings.json`: `model: opus`, `effortLevel: xhigh`,
+  `theme: dark`, `permissions.defaultMode: auto`, os 5 plugins habilitados e o **hook `UserPromptSubmit`**.
+- **`config/skill-first-reminder.txt`** → `~/.claude/skill-first-reminder.txt`: payload JSON que o hook
+  injeta a cada prompt (com `suppressOutput`), reforçando a política skill-first.
+- **`config/CLAUDE.md`** → `~/.claude/CLAUDE.md`: instruções globais (carregam em todo projeto).
 
-## Plugins instalados (marketplace `claude-plugins-official`)
+---
 
-| Plugin | Para que serve | Nota |
-|--------|----------------|------|
-| `frontend-design` | Direcao visual/estetica para **criar/redesenhar** UI nova | Par do `frontend-review`. Em app com design system travado, restrinja aos tokens; solte em telas novas |
-| `claude-md-management` | Auditar/melhorar `CLAUDE.md` + capturar aprendizados | Bom quando um `CLAUDE.md` cresce/desatualiza |
-| `security-guidance` | Review de seguranca (injecao, XSS, SSRF, segredos) | Relevante em apps que tocam dinheiro/credenciais |
-| `feature-dev` | Workflow de feature com agents (explorer/architect/reviewer) | Para itens grandes de backlog (billing, websockets, etc.) |
-| `chrome-devtools-mcp` | Inspecao/automacao de browser ao vivo (perf/network/console/a11y) — Chrome DevTools (Google oficial) | Complementa o `frontend-review` |
+## 🔁 Política SKILL-FIRST (todos os projetos)
 
-> **Instalar plugin do jeito certo:** `claude plugin install <nome>@claude-plugins-official` (ou o menu
-> `/plugin`). **Só marcar `enabledPlugins` no JSON NAO instala** — `claude plugin list` fica "No plugins
-> installed" e a skill do plugin nao carrega. Apos instalar, **um restart limpo** (`claude` novo) carrega;
-> **`claude --resume` recarrega as skills do repo (`~/.claude/skills`) mas NAO ativa plugins recem-instalados.**
-> Conferir com `claude plugin list`.
+A IA deve **procurar e usar skills/plugins antes** de fazer a tarefa na mão — são o primeiro lugar a
+olhar, não o último. Imposto por: (1) `~/.claude/CLAUDE.md` com a regra + catálogo, e (2) o hook
+`UserPromptSubmit` em `settings.json` que reinjeta o lembrete a cada prompt. Fluxo: olhar skills+plugins →
+se alguma encaixar (mesmo parcial) invocar → só pular se nada for relevante → combinar quando fizer
+sentido (`frontend-design` cria → `frontend-review` audita → `simplify`/`code-review` limpam → `verify` confirma).
 
-## Setup em uma maquina nova
+---
 
-### 1. Clonar o repositorio no lugar certo
-
-```bash
-git clone https://github.com/Bobagi/claude-skills.git D:\projetos\claude-skills
-```
-
-### 2. Criar junction para o Claude Code encontrar as skills
-
-Abra o PowerShell e rode:
-
-```powershell
-# Remover pastas vazias se existirem
-Remove-Item -Recurse -Force "$env:USERPROFILE\.claude\skills" -ErrorAction SilentlyContinue
-Remove-Item -Recurse -Force "$env:USERPROFILE\.claude\commands" -ErrorAction SilentlyContinue
-
-# Criar junctions (skills ficam na RAIZ do repo: cada pasta <nome>/SKILL.md e uma skill)
-cmd /c mklink /J "$env:USERPROFILE\.claude\skills" "D:\projetos\claude-skills"
-cmd /c mklink /J "$env:USERPROFILE\.claude\commands" "D:\projetos\claude-skills\commands"
-```
-
-> No Linux/Mac, equivalente: `ln -s /caminho/claude-skills ~/.claude/skills` e
-> `ln -s /caminho/claude-skills/commands ~/.claude/commands` (ou symlink por skill).
-> Pastas sem `SKILL.md` (como `commands/`, `README.md`) sao ignoradas pelo loader de skills.
-
-### 3. Instalar dependencias
-
-**Windows:**
-```powershell
-winget install PuTTY.PuTTY
-winget install GitHub.cli
-```
-
-**Linux/Mac:**
-```bash
-sudo apt install sshpass git   # Ubuntu/Debian
-brew install sshpass gh        # macOS
-```
-
-**Para o `frontend-review`** (qualquer SO): Node 18+ e um Chromium para os screenshots.
-```bash
-npm i -D puppeteer-core              # wrapper do browser (pode ser por-projeto ou na pasta da skill)
-npx puppeteer browsers install chrome # baixa um Chromium; ou: npx playwright install chromium
-# Alternativa: aponte CHROME_PATH=/caminho/para/chrome se ja tiver um Chrome instalado.
-```
-O `scripts/capture.mjs` acha o Chromium em caches conhecidos (Playwright/Puppeteer) ou via `CHROME_PATH`.
-
-### 4. Configurar credenciais do VPS
-
-Crie o arquivo de memoria em `~/.claude/projects/<projeto>/memory/vps_bobagi.md` com as credenciais de acesso. Esse arquivo nao fica no repositorio por seguranca.
-
-## Como adicionar uma nova skill
-
-```bash
-mkdir D:\projetos\claude-skills\minha-skill
-# criar o arquivo SKILL.md dentro da pasta
-
-cd D:\projetos\claude-skills
-git add .
-git commit -m "Add minha-skill"
-git push
-```
-
-## Usar o `frontend-review` em qualquer projeto
-
-A skill e **agnostica a projeto** e fica neste repo compartilhado — entao em qualquer
-maquina/projeto onde os junctions/symlinks acima existem, ela ja esta disponivel. O fluxo:
-
-1. Em qualquer projeto, peca: **"avalie o front"** / **"revise a UI"** / `/frontend-review <URL>`.
-2. Informe o **alvo**: uma URL rodando (prod ou `localhost:<porta>` do dev server).
-3. Se houver area logada, **voce** decide como autenticar naquele momento — fornece um login/cookie
-   de teste, manda criar conta via signup, ou pede so as paginas publicas. **As credenciais sao usadas
-   so naquela sessao e nunca ficam salvas** (nada de credencial vai pra este repo ou pra memoria).
-4. A skill roda os 3 pilares, gera o relatorio em `<projeto>/.claude/frontend-review/<timestamp>/` e,
-   ao final, **melhora a propria `rubric.md`** e da push aqui — entao a proxima review (em qualquer
-   projeto) ja vem mais afiada. Voce melhora num lugar so e propaga pra todos.
-
-A "expertise" mora em **`frontend-review/rubric.md`** (a checklist que cresce). Edite-a a mao quando
-quiser ensinar uma preferencia sua (ex.: "sempre cheque X"); e versionada como o resto.
-
-## Estrutura
+## 🧱 Estrutura do repo
 
 ```
 claude-skills/
-├── vps/
-│   └── SKILL.md            # Skill: gerenciar o VPS pessoal via SSH
-├── frontend-review/
-│   ├── SKILL.md            # Skill: revisor de front-end agnostico (3 pilares)
-│   ├── rubric.md           # Checklist/expertise versionada que cresce a cada uso
-│   └── scripts/
-│       └── capture.mjs     # Motor de screenshots multi-viewport (Puppeteer headless)
-└── commands/
-    ├── vps.md              # Slash-command espelho de /vps
-    └── frontend-review.md  # Slash-command espelho de /frontend-review
+├── sync.sh                     # bootstrap/sync idempotente (curl|bash ou /sync-claude)
+├── config/                     # config aplicada em ~/.claude/ pelo sync
+│   ├── CLAUDE.md               #   -> ~/.claude/CLAUDE.md (instruções globais)
+│   ├── settings.json           #   -> ~/.claude/settings.json (model/effort/theme/plugins/hook)
+│   ├── skill-first-reminder.txt#   -> ~/.claude/skill-first-reminder.txt (payload do hook)
+│   ├── plugins.txt             #   lista de plugins que o sync instala
+│   └── mcp.md                  #   inventário/notas dos MCP servers
+├── vps/SKILL.md                # skill: VPS via SSH
+├── frontend-review/            # skill: review de front-end (3 pilares)
+│   ├── SKILL.md
+│   ├── rubric.md               #   checklist/expertise versionada que cresce
+│   └── scripts/capture.mjs     #   screenshots multi-viewport (Puppeteer headless)
+├── resume/SKILL.md             # skill: resumo de vídeo do YouTube
+└── commands/                   # slash-commands espelho (-> ~/.claude/commands)
+    ├── vps.md
+    ├── frontend-review.md
+    └── sync-claude.md
 ```
+
+> Pastas sem `SKILL.md` (`config/`, `commands/`, `scripts/`) e arquivos soltos (`README.md`, `sync.sh`)
+> são ignorados pelo loader de skills — por isso podem coexistir na raiz com as skills.
+
+---
+
+## ➕ Adicionar / mudar algo
+
+- **Nova skill:** crie `claude-skills/<nome>/SKILL.md`, commite e dê push. O symlink já expõe na hora;
+  rode `/sync-claude` nas outras máquinas (ou `git pull`).
+- **Novo plugin:** adicione a linha `<nome>@claude-plugins-official` em `config/plugins.txt`, registre no
+  catálogo (este README + `config/CLAUDE.md`) e dê push. `sync.sh` instala no próximo run.
+- **Mudar settings/hook/CLAUDE.md:** edite o arquivo correspondente em `config/`, commit, push, re-sync.
+- Depois de qualquer mudança, propague com **`/sync-claude`** (ou o `curl|bash`) e reinicie o Claude.
+
+---
+
+## 🖥️ Dependências por skill
+- **`frontend-review`** (qualquer SO): Node 18+ e um Chromium para os screenshots.
+  ```bash
+  npm i -D puppeteer-core
+  npx puppeteer browsers install chrome   # ou: npx playwright install chromium
+  # alternativa: CHROME_PATH=/caminho/para/chrome se já tiver um Chrome instalado.
+  ```
+- **`vps`** (qualquer SO): `sshpass`+`git` (Linux/Mac) ou PuTTY (`plink`/`pscp`) no Windows; as
+  credenciais ficam em `~/.claude/projects/<projeto>/memory/vps_bobagi.md` (**fora** do repo).
+- **`chrome-devtools-mcp`** (plugin): Node/npx + Chrome para o MCP conectar.
+
+### Windows (symlink manual, se preferir não usar o sync.sh)
+```powershell
+Remove-Item -Recurse -Force "$env:USERPROFILE\.claude\skills","$env:USERPROFILE\.claude\commands" -ErrorAction SilentlyContinue
+cmd /c mklink /J "$env:USERPROFILE\.claude\skills"   "C:\caminho\claude-skills"
+cmd /c mklink /J "$env:USERPROFILE\.claude\commands" "C:\caminho\claude-skills\commands"
+```
+(No Linux/Mac o `sync.sh` já cria os symlinks equivalentes.)
