@@ -81,7 +81,10 @@ ou `bash <repo>/sync.sh`. Depois, **reinicie o Claude** (um `claude` novo) para 
 ## 🔄 Auto-sync (hooks + `scripts/claude-sync.sh`)
 
 Depois do primeiro `sync.sh`, manter as máquinas em dia é **automático** — sem precisar lembrar de
-`git pull`/`push`. Dois hooks (em `config/settings.json`) chamam `scripts/claude-sync.sh`:
+`git pull`/`push`. Funciona em **Linux, macOS e Windows**: cada hook tem duas variantes em
+`config/settings.json` (`shell: bash` → `claude-sync.sh`; `shell: powershell` → `claude-sync.ps1`), e o
+Claude Code escolhe a do SO. O caminho é sempre o portável `~/.claude/skills/scripts/...` (resolve via
+symlink no Linux/Mac e via junction no Windows). Os dois scripts têm a **mesma** lógica:
 
 - **`SessionStart` → `claude-sync.sh pull`**: a cada nova sessão dá `git pull --ff-only` no repo (skills
   e commands, por serem symlink, já ficam atuais na hora). Updates de config que estavam **em sync** são
@@ -113,7 +116,8 @@ sentido (`frontend-design` cria → `frontend-review` audita → `simplify`/`cod
 claude-skills/
 ├── sync.sh                     # bootstrap/sync idempotente (curl|bash ou /sync-claude)
 ├── scripts/
-│   └── claude-sync.sh          # auto-sync: pull (SessionStart) / check (SessionEnd) / save (--save)
+│   ├── claude-sync.sh          # auto-sync (bash: Linux/Mac/Git-Bash): pull/check/save
+│   └── claude-sync.ps1         # auto-sync (PowerShell: Windows nativo): mesmo pull/check/save
 ├── config/                     # config aplicada em ~/.claude/ pelo sync
 │   ├── CLAUDE.md               #   -> ~/.claude/CLAUDE.md (instruções globais)
 │   ├── settings.json           #   -> ~/.claude/settings.json (model/effort/theme/plugins/hook)

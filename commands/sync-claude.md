@@ -7,11 +7,13 @@ plugins, `~/.claude/CLAUDE.md`, `~/.claude/settings.json` e o hook skill-first.
 ## Instruções
 
 > **Se `$ARGUMENTS` contiver `--save`** (capturar a config local desta máquina de volta
-> pro repo): rode `bash /opt/claude-skills/scripts/claude-sync.sh save` (ou
-> `$HOME/.claude/skills/scripts/claude-sync.sh save`). Ele copia `~/.claude/{CLAUDE.md,
-> settings.json,skill-first-reminder.txt}` para `config/`, faz um **scan de segredos**
-> (aborta se achar credencial — o repo é público) e então commita + pusha. Mostre a saída
-> e **pare aqui** (não rode o `sync.sh` completo).
+> pro repo): rode o `claude-sync` no modo `save` conforme o SO:
+> - **Linux/Mac/Git-Bash:** `bash "$HOME/.claude/skills/scripts/claude-sync.sh" save`
+> - **Windows nativo (pwsh):** `pwsh -NoProfile -ExecutionPolicy Bypass -File "$HOME/.claude/skills/scripts/claude-sync.ps1" save`
+>
+> Ele copia `~/.claude/{CLAUDE.md,settings.json,skill-first-reminder.txt}` para `config/`,
+> faz um **scan de segredos** (aborta se achar credencial — o repo é público) e então
+> commita + pusha. Mostre a saída e **pare aqui** (não rode o `sync.sh` completo).
 
 1. Localize o `sync.sh`:
    - Se `~/.claude/skills/sync.sh` existir (symlink do repo), use esse caminho.
