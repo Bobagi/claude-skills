@@ -261,3 +261,16 @@ click, drive them separately for now (interaction steps are a planned engine fea
   analytics" while an analytics `<script>` loaded unconditionally in `app.html`. When reviewing a
   cookie/consent/analytics change, diff the *claims* in the legal copy against the *actual* network/script
   tags; a stale honest-looking policy is a compliance bug, not just a wording nit.
+- 2026-06-28 — **`overflowX:false` does NOT mean mobile is fine — confirm the PRIMARY pane survives.**
+  A `flex` layout with a `flex-1` content pane + a fixed-width sidebar (`w-[26rem]`) that lacks
+  `shrink-0` will, at phone widths, shrink the sidebar *and* starve the primary pane to ~0px instead
+  of overflowing — so `overflowX` stays false and `offCanvas` stays empty while the main content has
+  effectively **vanished**. The automated overflow signals miss this class entirely. On every mobile
+  shot, positively verify the *primary* content is still visible (not just "nothing overflows"); fix by
+  stacking panes (`flex-col`) below a breakpoint or giving the main pane a `min-width`/`min-height`.
+  **New rule: a mobile shot must be judged for "is the main thing still here?", not only overflow.**
+- 2026-06-28 — a11y nuance: an emoji/icon-only `<button>` with a **`title`** attribute does NOT trip the
+  `unnamedControls` signal (title provides an accessible name), so the engine reports it clean — but
+  `title` is weaker than `aria-label` (no reliable SR exposure on some setups, mouse-only tooltip). When
+  the signal says 0 unnamed controls but the UI is full of emoji buttons, spot-check that the name source
+  is a real label, and prefer `aria-label` over `title` for icon-only controls.
