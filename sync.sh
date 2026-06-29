@@ -29,7 +29,11 @@ warn() { printf '    \033[1;33m!\033[0m %s\n' "$*"; }
 SELF="${BASH_SOURCE[0]:-$0}"
 SCRIPT_DIR=""
 if [ -f "$SELF" ]; then
-  SCRIPT_DIR="$(cd "$(dirname "$SELF")" && pwd)"
+  # pwd -P resolves symlinks to the PHYSICAL path. Without it, running this via the
+  # ~/.claude/skills symlink (the path the sync-claude skill recommends first) makes
+  # REPO_DIR the symlink itself, and the link() step below then recreates ~/.claude/skills
+  # pointing at itself (a self-referential loop that breaks skills + config). See link() guard.
+  SCRIPT_DIR="$(cd "$(dirname "$SELF")" && pwd -P)"
 fi
 
 if [ -n "$SCRIPT_DIR" ] && [ -d "$SCRIPT_DIR/.git" ]; then
@@ -58,6 +62,14 @@ mkdir -p "$CLAUDE_HOME" "$BACKUP_DIR"
 # ---------------------------------------------------------------------------
 link() {  # <target> <linkpath>
   local target="$1" link="$2"
+  # Never create a self-referential symlink (link path == target path → infinite loop that
+  # breaks skills/commands/config resolution). Defends against a mis-resolved REPO_DIR
+  # (e.g. invoked via the symlink path). Literal compare on purpose: when the link merely
+  # already RESOLVES to target (the legit "already ok" case) the paths differ and we proceed.
+  if [ "$target" = "$link" ]; then
+    warn "ignorado symlink auto-referencial: $link -> $target (REPO_DIR resolveu para o proprio link?)"
+    return
+  fi
   if [ -L "$link" ]; then
     [ "$(readlink "$link")" = "$target" ] && { ok "symlink ja ok: $link"; return; }
     rm -f "$link"
