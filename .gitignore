@@ -1,0 +1,7 @@
+# dependencies
+node_modules/
+package-lock.json
+
+# frontend-review outputs (gerados por projeto, não versionar aqui)
+*-out/
+frontend-review-out/
