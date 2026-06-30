@@ -21,15 +21,15 @@
         "hooks": [
           {
             "type": "command",
-            "shell": "bash",
             "command": "bash \"$HOME/.claude/skills/scripts/claude-sync.sh\" pull 2>/dev/null || true",
+            "shell": "bash",
             "timeout": 20,
             "statusMessage": "sync claude-skills (pull)"
           },
           {
             "type": "command",
-            "shell": "powershell",
             "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"$HOME/.claude/skills/scripts/claude-sync.ps1\" pull",
+            "shell": "powershell",
             "timeout": 20,
             "statusMessage": "sync claude-skills (pull)"
           }
@@ -41,15 +41,15 @@
         "hooks": [
           {
             "type": "command",
-            "shell": "bash",
             "command": "bash \"$HOME/.claude/skills/scripts/claude-sync.sh\" check 2>/dev/null || true",
+            "shell": "bash",
             "timeout": 10,
             "statusMessage": "check config drift"
           },
           {
             "type": "command",
-            "shell": "powershell",
             "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"$HOME/.claude/skills/scripts/claude-sync.ps1\" check",
+            "shell": "powershell",
             "timeout": 10,
             "statusMessage": "check config drift"
           }
@@ -65,5 +65,13 @@
     "chrome-devtools-mcp@claude-plugins-official": true
   },
   "effortLevel": "xhigh",
-  "theme": "dark"
+  "theme": "dark",
+  "extraKnownMarketplaces": {
+    "claude-plugins-official": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-plugins-official"
+      }
+    }
+  }
 }
