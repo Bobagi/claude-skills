@@ -274,3 +274,11 @@ click, drive them separately for now (interaction steps are a planned engine fea
   `title` is weaker than `aria-label` (no reliable SR exposure on some setups, mouse-only tooltip). When
   the signal says 0 unnamed controls but the UI is full of emoji buttons, spot-check that the name source
   is a real label, and prefer `aria-label` over `title` for icon-only controls.
+- 2026-07-02 — Responsiveness (adding children to re-laid-out rows): when a mobile media query re-lays a
+  flex row as a **grid with explicit per-child placements** (each existing child has `grid-row/column`),
+  any NEW child added later gets **auto-placed into an unintended cell** (its own orphan row/column) —
+  desktop looks fine, only the breakpoint breaks. Caught live: a status icon added next to a badge landed
+  alone on a third grid row at <600px. Fix pattern: group the new element with its logical partner in one
+  wrapper (one wrapper = one grid cell) or give it explicit placement. **Whenever a diff adds a child to a
+  row that any media query restructures, re-screenshot that breakpoint** — the auto-placement bug is
+  invisible in the unchanged desktop layout.
