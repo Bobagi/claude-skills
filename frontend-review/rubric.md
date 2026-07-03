@@ -293,3 +293,14 @@ click, drive them separately for now (interaction steps are a planned engine fea
   on the bright art and its text contrast collapses. If a chip conveys state (ONLINE/OFFLINE), give it a
   **solid** background; save translucency for chips that always sit on a known surface. Check every fixed
   decorative element against reflowed positions of overlaying content at each viewport.
+- 2026-07-03 — **CRITICAL bug class: `[hidden]` is defeated by any author `display` rule.** An element
+  toggled via the `hidden` attribute/property but styled with `display:flex|grid|block` in a class
+  (`.modal-backdrop{display:flex}`, `.stale-warn{display:flex}`) STAYS VISIBLE when hidden — the UA
+  `[hidden]{display:none}` is the weakest rule and loses to any author `display`. Two nasty symptoms:
+  (1) a "hidden" full-screen modal/overlay with `opacity:0` still covers the page with `pointer-events`
+  on, **swallowing every click** (page looks dead); (2) a "hidden" warning/badge shows permanently.
+  Fix once, globally: `[hidden]{display:none!important}`. Always add this reset in any page that toggles
+  flex/grid elements via `hidden`. Verdict method that caught it: a headless click test where the modal
+  never opened + the warning showed in the wrong state — screenshot a toggled-off overlay element and
+  confirm it's truly gone, not just transparent. Promote: every review must check that `hidden`-toggled
+  elements have no competing `display` rule.
