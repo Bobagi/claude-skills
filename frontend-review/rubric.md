@@ -282,3 +282,14 @@ click, drive them separately for now (interaction steps are a planned engine fea
   wrapper (one wrapper = one grid cell) or give it explicit placement. **Whenever a diff adds a child to a
   row that any media query restructures, re-screenshot that breakpoint** — the auto-placement bug is
   invisible in the unchanged desktop layout.
+- 2026-07-03 — Gamified/themed dashboard cards: a card header using `display:flex; justify-content:space-between`
+  with a **wrappable title** on the left and a small **tag/badge** on the right (e.g. "Workshop ↗") breaks when
+  the title wraps to 2 lines — the tag's own text (esp. a trailing glyph/arrow) wraps onto its own line and the
+  tag drifts to vertical-center. Fixes: `align-items:flex-start` (tag pins to the title's first line),
+  `white-space:nowrap; flex:none` on the tag, and `min-width:0` on the title so it (not the tag) absorbs the wrap.
+  General: any space-between header with one flexible + one fixed child needs nowrap+flex:none on the fixed one.
+- 2026-07-03 — Status chips/badges with **semi-transparent backgrounds** break when the layout lets them
+  float over a bright decorative layer (fixed-position moon/sun/blob art): at some viewport the chip lands
+  on the bright art and its text contrast collapses. If a chip conveys state (ONLINE/OFFLINE), give it a
+  **solid** background; save translucency for chips that always sit on a known surface. Check every fixed
+  decorative element against reflowed positions of overlaying content at each viewport.
