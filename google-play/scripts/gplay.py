@@ -367,6 +367,33 @@ def cmd_reviews_reply(args):
     print("OK: resposta publicada.")
 
 
+def cmd_details(args):
+    token = access_token()
+    edit = new_edit(args.package, token)
+    try:
+        data = api("GET", f"/{args.package}/edits/{edit}/details", token)
+        print(json.dumps(data, indent=2, ensure_ascii=False))
+    finally:
+        delete_edit(args.package, edit, token)
+
+
+def cmd_details_set(args):
+    # ATENÇÃO: contactWebsite é onde o rastreador do AdMob procura o app-ads.txt.
+    token = access_token()
+    edit = new_edit(args.package, token)
+    body = {}
+    if args.website:
+        body["contactWebsite"] = args.website
+    if args.email:
+        body["contactEmail"] = args.email
+    if not body:
+        delete_edit(args.package, edit, token)
+        die("nada para alterar (use --website e/ou --email)")
+    api("PATCH", f"/{args.package}/edits/{edit}/details", token, body=body)
+    commit_edit(args.package, edit, token)
+    print("OK: detalhes de contato atualizados.")
+
+
 def cmd_listing(args):
     token = access_token()
     edit = new_edit(args.package, token)
@@ -435,6 +462,12 @@ def main():
     rr.add_argument("--review-id", required=True)
     rr.add_argument("--text", required=True)
 
+    sub.add_parser("details")
+
+    ds = sub.add_parser("details-set")
+    ds.add_argument("--website")
+    ds.add_argument("--email")
+
     li = sub.add_parser("listing")
     li.add_argument("--lang")
 
@@ -454,6 +487,8 @@ def main():
         "rollout": cmd_rollout,
         "reviews": cmd_reviews,
         "reviews-reply": cmd_reviews_reply,
+        "details": cmd_details,
+        "details-set": cmd_details_set,
         "listing": cmd_listing,
         "listing-set": cmd_listing_set,
     }

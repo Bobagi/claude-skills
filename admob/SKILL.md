@@ -46,6 +46,26 @@ python3 $S create-adunit --app APP_ID --name "Rewarded skins" --format REWARDED
   de mediação/eCPM floor também são manuais na UI.
 - Relatórios de dias muito recentes podem vir zerados/parciais (delay do AdMob).
 
+## Limites — só na UI, feitos pelo operador (explicar, não contornar)
+
+- **Pagamentos** (perfil de pagamento, dados fiscais, PIN por carta, conta
+  bancária) — sem isso o saldo acumula mas não é pago.
+- **Central de políticas** (violações/apelações) e **status do app-ads.txt**
+  (a API não expõe; ver na UI em Apps → app-ads.txt). NOTA: o rastreador só
+  valida o arquivo **depois que o app gera requests reais** e o procura no
+  domínio do `contactWebsite` da ficha da Play (ver skill `google-play`,
+  comando `details`) — "sem dados" antes de ter tráfego real é normal.
+- Criação/edição de ad units e grupos de mediação (403 na API — ver acima).
+- Vincular app novo do AdMob à Play, consent GDPR/UMP settings, bloqueio de
+  categorias de anúncio.
+
+## Automação de navegador (Playwright etc.) — política
+
+Mesma política da skill `google-play`: **nunca automatizar login Google na
+VPS** (anti-bot/2FA + risco de travar a conta dona do AdMob/Play). Itens
+UI-only: guiar o operador; último recurso = chrome-devtools-mcp **na máquina
+do operador**, logado e presente. Nunca guardar cookies Google na VPS.
+
 ## Regras
 
 1. Dados financeiros: apresentar como estimativas do AdMob (a receita final

@@ -33,7 +33,12 @@ python3 $S reviews --limit 10
 python3 $S reviews-reply --review-id XYZ --text "Obrigado! Corrigido na v1.0.5."
 python3 $S listing                      # ficha da loja em todos os idiomas
 python3 $S listing-set --lang pt-BR --title "Tic Tac Verse: Jogo da Velha"
+python3 $S details                      # contato da ficha (site do dev, e-mail)
+python3 $S details-set --website https://bobagi.space
 ```
+
+> `contactWebsite` (em `details`) é **onde o rastreador do AdMob procura o
+> app-ads.txt** — precisa apontar p/ um domínio que sirva o arquivo na raiz.
 
 Outro app: `--package com.exemplo.app` (padrão: `com.bobagi.tictacverse`).
 
@@ -51,9 +56,30 @@ Outro app: `--package com.exemplo.app` (padrão: `com.bobagi.tictacverse`).
    de repositório. Se vazar: revogar a chave no GCP e gerar outra.
 5. Depois de publicar, lembre o operador de manter o `pubspec.yaml` do
    repositório em sincronia com o versionCode publicado.
-6. O que a API **não** faz (continua manual na Play Console): declarações de
-   app content / data safety, criação de app novo, e envio para revisão quando
-   o commit responder `changesNotSentForReview` (o script avisa quando for o caso).
+
+## Limites — o que a API NÃO cobre (explicar ao operador, não tentar contornar)
+
+Ficam **manuais na Play Console, feitos pelo operador** (guie com passo a passo
+e peça prints em `/root/prints` se precisar diagnosticar):
+- Criar app novo; declarações de **App content / Data safety**; formulários de
+  privacidade; classificação etária.
+- **Imagens da ficha** (screenshots, feature graphic) — a API até tem endpoint
+  (`edits.images`), mas o script ainda não implementa; se virar necessidade
+  recorrente, implemente no `gplay.py` em vez de fazer manual.
+- Conta do desenvolvedor: pagamentos/payout, identidade, configurações da conta.
+- **Keystore/assinatura**: a upload key fica na máquina; nunca sai dela.
+- Envio p/ revisão quando o commit responder `changesNotSentForReview`
+  (managed publishing) — o script avisa; o operador clica em "Send for review".
+
+## Automação de navegador (Playwright etc.) — política
+
+**NÃO automatizar login/navegação na conta Google a partir da VPS.** Motivos:
+anti-bot/2FA do Google quebram o fluxo, viola ToS, e o risco real é **travar a
+conta Google que é dona do Play Console + AdMob** (catastrófico e sem suporte).
+A API oficial já cobre o ciclo recorrente (release/relatórios/listing). Para o
+resto (raro e pontual): 1º guiar o operador com passo a passo; último recurso =
+**chrome-devtools-mcp na máquina DO OPERADOR**, com ele logado e presente.
+Nunca armazenar cookies/sessão Google na VPS.
 
 ## Build do Tic Tac Verse nesta VPS (contexto)
 

@@ -40,6 +40,13 @@ reinjeta esse lembrete a cada prompt. Para revisar/desligar: comando `/hooks`.
   inventário. OAuth do dono da conta (setup único: `admob/SETUP.md`); escrita de inventário
   é restrita pelo Google (fallback manual).
 
+> **Limite transversal Google (Play/AdMob):** o que a API oficial não cobre (pagamentos,
+> data safety, criar ad unit/mediação, consent screen) é feito PELO OPERADOR guiado passo a
+> passo (prints em `/root/prints` ajudam a diagnosticar). **Automação de navegador logado no
+> Google (Playwright etc.): nunca na VPS** — anti-bot/2FA + risco de travar a conta dona do
+> Play/AdMob; último recurso é chrome-devtools-mcp NA MÁQUINA DO OPERADOR, com ele presente.
+> Detalhes na seção "Limites" dos `SKILL.md` de `google-play` e `admob`.
+
 ### Plugins instalados (marketplace `claude-plugins-official`)
 - **`frontend-design`** — direção visual/estética para **criar/redesenhar** UI nova
   (par natural do `frontend-review`: design → review). Cuidado em apps com design system
