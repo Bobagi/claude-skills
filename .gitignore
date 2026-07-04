@@ -12,3 +12,7 @@ admob-client.json
 admob-token.json
 *.pem
 *.p12
+
+# python bytecode
+__pycache__/
+*.pyc
