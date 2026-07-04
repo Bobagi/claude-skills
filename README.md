@@ -45,6 +45,8 @@ ou `bash <repo>/sync.sh`. Depois, **reinicie o Claude** (um `claude` novo) para 
 | `frontend-review` | `/frontend-review` | Revisor de front-end/UX agnóstico: screenshots multi-viewport + crítica de espaçamento/responsividade + review de código + a11y, contra uma `rubric.md` versionada que melhora a cada uso. |
 | `resume` | `/resume` | Resume um vídeo do YouTube a partir do link. |
 | `sync-claude` | `/sync-claude` | Roda o `sync.sh` (padroniza a config desta máquina). |
+| `google-play` | `/gplay` | Releases na Play Store via Play Developer API (service account): sobe AAB, tracks, promoção, rollout gradual, reviews e listing. Credenciais fora do repo (`~/.config/bobagi-google/`); setup único do operador em `google-play/SETUP.md`. |
+| `admob` | `/admob` | Relatórios AdMob via API (receita, eCPM, impressões por dia/ad unit/país) + inventário de ad units. OAuth do dono da conta (setup único em `admob/SETUP.md`); escrita de inventário é restrita pelo Google (fallback manual documentado). |
 
 ### Plugins (marketplace `claude-plugins-official` = `anthropics/claude-plugins-official`)
 | Plugin | Para que serve |

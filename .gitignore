@@ -5,3 +5,10 @@ package-lock.json
 # frontend-review outputs (gerados por projeto, não versionar aqui)
 *-out/
 frontend-review-out/
+
+# credenciais — NUNCA commitar (as skills google-play/admob leem de ~/.config/bobagi-google/)
+*service-account*.json
+admob-client.json
+admob-token.json
+*.pem
+*.p12

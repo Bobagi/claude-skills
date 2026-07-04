@@ -33,6 +33,12 @@ reinjeta esse lembrete a cada prompt. Para revisar/desligar: comando `/hooks`.
   a11y + consistência, com rubric versionada que melhora a cada uso. Use para **avaliar/revisar** UI.
 - **`vps`** — gerenciar o VPS bobagi.space via SSH.
 - **`resume`** — resumir um vídeo do YouTube a partir do link.
+- **`google-play`** — releases na Play Store via Play Developer API (service account): sobe
+  AAB, tracks, promoção, rollout, reviews, listing. Produção exige confirmação explícita do
+  operador. Credenciais em `~/.config/bobagi-google/` (setup único: `google-play/SETUP.md`).
+- **`admob`** — relatórios AdMob via API (receita, eCPM, impressões por dia/ad unit/país) +
+  inventário. OAuth do dono da conta (setup único: `admob/SETUP.md`); escrita de inventário
+  é restrita pelo Google (fallback manual).
 
 ### Plugins instalados (marketplace `claude-plugins-official`)
 - **`frontend-design`** — direção visual/estética para **criar/redesenhar** UI nova
