@@ -305,3 +305,18 @@ click, drive them separately for now (interaction steps are a planned engine fea
   confirm it's truly gone, not just transparent. Promote: every review must check that `hidden`-toggled
   elements have no competing `display` rule.
 - 2026-07-05 — Apps canvas (Flutter web, jogos): os signals de DOM ficam cegos e cliques por seletor não funcionam — use as actions `clickXY` (clique por coordenada, derivada de um screenshot anterior) e `evalJs` (semear estado via localStorage/reload) adicionadas ao capture.mjs; e ao revisar builds web de apps móveis, cheque primeiro se plugins nativos sem implementação web (ads/consent) travam o boot no splash — guarda kIsWeb no main é o fix padrão. (via tictacverse)
+- 2026-07-05 — Method (verify a **consent-gated** element deterministically): don't `clickText` the
+  accept button as the first action — it races the banner render (the banner mounts a tick after load,
+  so the click finds nothing and the "consented" shot is silently unconsented). Seed consent with
+  `evalJs: "localStorage.setItem('<consent-key>','accepted')"` then a second `evalJs: "location.reload()"`
+  + a generous trailing `wait`; the reload's context-destroyed error is caught, and the reloaded page
+  boots already-consented. Read the app's actual consent localStorage key from the source (it may be
+  versioned, e.g. bumped when a new script category is added). (via CoinHub ad rails)
+- 2026-07-05 — Method (verify a **width-gated** element, e.g. desktop-only side rails shown only above a
+  wide breakpoint): capture a viewport **above** the show-breakpoint to prove it renders in the intended
+  slot (gutter), AND the band **just below** it to prove it's cleanly hidden (not squished/overlapping) —
+  plus a true mobile width to prove the base layout is untouched. Expect a `position:fixed` element to
+  paint in the FIRST viewport band of a full-page screenshot (vertically centred if `top:50%`); that's
+  correct fixed behaviour, not a bug — judge its horizontal placement (inside the empty gutter, not over
+  content) and confirm `overflowX:false`. Gutter-centred rails should use a token-relative offset
+  (`calc((100vw - page-max)/4 - halfwidth)`), never a magic px. (via CoinHub ad rails)
