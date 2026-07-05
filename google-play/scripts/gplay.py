@@ -394,6 +394,33 @@ def cmd_details_set(args):
     print("OK: detalhes de contato atualizados.")
 
 
+def cmd_images_upload(args):
+    """Substitui as imagens da ficha (screenshots/feature graphic) de um idioma."""
+    token = access_token()
+    edit = new_edit(args.package, token)
+    base_path = f"/{args.package}/edits/{edit}/listings/{args.lang}/{args.image_type}"
+    if args.replace:
+        api("DELETE", base_path, token, ok404=True)
+    for file_path in args.files.split(","):
+        file_path = file_path.strip()
+        if not os.path.exists(file_path):
+            delete_edit(args.package, edit, token)
+            die(f"arquivo não existe: {file_path}")
+        url = f"{UPLOAD_API}/{args.package}/edits/{edit}/listings/{args.lang}/{args.image_type}?uploadType=media"
+        out = subprocess.run(
+            ["curl", "-sS", "--fail-with-body", "-X", "POST",
+             "-H", f"Authorization: Bearer {token}",
+             "-H", "Content-Type: image/png",
+             "--data-binary", f"@{file_path}", url],
+            capture_output=True, text=True)
+        if out.returncode != 0:
+            delete_edit(args.package, edit, token)
+            die(f"upload de {file_path} falhou:\n{out.stdout}\n{out.stderr}")
+        print(f"  + {os.path.basename(file_path)} enviado")
+    commit_edit(args.package, edit, token)
+    print(f"OK: {args.image_type} de [{args.lang}] atualizado.")
+
+
 def cmd_listing(args):
     token = access_token()
     edit = new_edit(args.package, token)
@@ -477,6 +504,13 @@ def main():
     ls.add_argument("--short")
     ls.add_argument("--full", help="arquivo .txt com a descrição longa")
 
+    iu = sub.add_parser("images-upload")
+    iu.add_argument("--lang", required=True)
+    iu.add_argument("--image-type", default="phoneScreenshots",
+                    help="phoneScreenshots|featureGraphic|icon|sevenInchScreenshots|tenInchScreenshots")
+    iu.add_argument("--files", required=True, help="caminhos .png separados por vírgula, na ordem")
+    iu.add_argument("--replace", action="store_true", default=True)
+
     args = p.parse_args()
     handlers = {
         "doctor": cmd_doctor,
@@ -489,6 +523,7 @@ def main():
         "reviews-reply": cmd_reviews_reply,
         "details": cmd_details,
         "details-set": cmd_details_set,
+        "images-upload": cmd_images_upload,
         "listing": cmd_listing,
         "listing-set": cmd_listing_set,
     }

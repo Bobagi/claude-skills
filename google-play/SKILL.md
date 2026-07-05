@@ -35,6 +35,8 @@ python3 $S listing                      # ficha da loja em todos os idiomas
 python3 $S listing-set --lang pt-BR --title "Tic Tac Verse: Jogo da Velha"
 python3 $S details                      # contato da ficha (site do dev, e-mail)
 python3 $S details-set --website https://bobagi.space
+python3 $S images-upload --lang pt-BR --files s1.png,s2.png   # screenshots da ficha (ordem)
+python3 $S images-upload --lang pt-BR --image-type featureGraphic --files feature.png
 ```
 
 > `contactWebsite` (em `details`) é **onde o rastreador do AdMob procura o
@@ -63,9 +65,9 @@ Ficam **manuais na Play Console, feitos pelo operador** (guie com passo a passo
 e peça prints em `/root/prints` se precisar diagnosticar):
 - Criar app novo; declarações de **App content / Data safety**; formulários de
   privacidade; classificação etária.
-- **Imagens da ficha** (screenshots, feature graphic) — a API até tem endpoint
-  (`edits.images`), mas o script ainda não implementa; se virar necessidade
-  recorrente, implemente no `gplay.py` em vez de fazer manual.
+- ~~Imagens da ficha~~ **IMPLEMENTADO (2026-07-05):** `images-upload --lang pt-BR
+  --files a.png,b.png` (phoneScreenshots, ordem preservada, substitui os antigos) e
+  `--image-type featureGraphic`. Screenshots 1080x1920, feature 1024x500, PNG.
 - Conta do desenvolvedor: pagamentos/payout, identidade, configurações da conta.
 - **Keystore/assinatura**: a upload key fica na máquina; nunca sai dela.
 - Envio p/ revisão quando o commit responder `changesNotSentForReview`
