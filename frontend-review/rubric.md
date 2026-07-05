@@ -304,3 +304,4 @@ click, drive them separately for now (interaction steps are a planned engine fea
   never opened + the warning showed in the wrong state — screenshot a toggled-off overlay element and
   confirm it's truly gone, not just transparent. Promote: every review must check that `hidden`-toggled
   elements have no competing `display` rule.
+- 2026-07-05 — Apps canvas (Flutter web, jogos): os signals de DOM ficam cegos e cliques por seletor não funcionam — use as actions `clickXY` (clique por coordenada, derivada de um screenshot anterior) e `evalJs` (semear estado via localStorage/reload) adicionadas ao capture.mjs; e ao revisar builds web de apps móveis, cheque primeiro se plugins nativos sem implementação web (ads/consent) travam o boot no splash — guarda kIsWeb no main é o fix padrão. (via tictacverse)

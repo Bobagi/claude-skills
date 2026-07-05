@@ -202,7 +202,7 @@ const browser = await puppeteer.launch({ executablePath: chrome, headless: 'new'
 const manifest = { base, generatedAt: new Date().toISOString(), shots: [], errors: [] };
 
 // Run interaction actions before a shot — unlocks tabs, sub-tabs, modals, filled forms.
-// Action shapes: {wait:ms} | {press:'Escape'} | {click:'css'} | {fill:'css',value:'x'} | {clickText:'Trade'}
+// Action shapes: {wait:ms} | {press:'Escape'} | {click:'css'} | {fill:'css',value:'x'} | {clickText:'Trade'} | {clickXY:[x,y]} (canvas apps: Flutter web, jogos)
 async function applyActions(page, actions) {
   for (const a of (actions || [])) {
     try {
@@ -210,6 +210,8 @@ async function applyActions(page, actions) {
       else if (a.press) { await page.keyboard.press(String(a.press)); }
       else if (a.fill) { await page.click(a.fill, { clickCount: 3 }); await page.type(a.fill, String(a.value ?? '')); }
       else if (a.click) { await page.click(a.click); }
+      else if (a.clickXY) { await page.mouse.click(Number(a.clickXY[0]), Number(a.clickXY[1])); }
+      else if (a.evalJs) { await page.evaluate(a.evalJs); }
       else if (a.clickText) {
         const ok = await page.evaluate((txt) => {
           const norm = s => (s || '').replace(/\s+/g, ' ').trim().toLowerCase();
