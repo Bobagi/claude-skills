@@ -320,3 +320,11 @@ click, drive them separately for now (interaction steps are a planned engine fea
   correct fixed behaviour, not a bug — judge its horizontal placement (inside the empty gutter, not over
   content) and confirm `overflowX:false`. Gutter-centred rails should use a token-relative offset
   (`calc((100vw - page-max)/4 - halfwidth)`), never a magic px. (via CoinHub ad rails)
+- **2026-07-06 (via CoinHub):** A native control element repurposed as a NON-control (e.g. a `<button>`
+  used as an image frame/card wrapper for a lightbox) inherits the app's global control styles — the
+  killer is a global `button { height: var(--control-h) }`: the wrapper stays ~40px tall and the
+  image visually overflows onto the content below (vertical OVERLAP with zero horizontal overflow, so
+  scrollWidth-based checks pass). Rule: when wrapping media/content in `button`/`a`, explicitly
+  neutralize the global control rules (`height:auto; padding:0; border:0; background:none` + hover
+  filter) — and judge full-page screenshots by EYE for vertical overlap; automated signals only catch
+  horizontal overflow. Script-only verification (naturalWidth>0, scrollWidth) is NOT a visual review.
