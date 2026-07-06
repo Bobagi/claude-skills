@@ -43,6 +43,7 @@ ou `bash <repo>/sync.sh`. Depois, **reinicie o Claude** (um `claude` novo) para 
 |-------|---------|-----------|
 | `vps` | `/vps` | Acessa/gerencia o VPS pessoal via SSH (credenciais ficam **fora** do repo, na memória). |
 | `frontend-review` | `/frontend-review` | Revisor de front-end/UX agnóstico: screenshots multi-viewport + crítica de espaçamento/responsividade + review de código + a11y, contra uma `rubric.md` versionada que melhora a cada uso. |
+| `security-sweep` | `/security-sweep` | **Varredura de segurança agnóstica que ENCONTRA, TESTA ao vivo (dispara o ataque) e CORRIGE** — não só reporta. Cobre race conditions/TOCTOU, IDOR/autorização, enumeração, injeção, SSRF, upload, XSS, segredos, sessão/CSRF/step-up, crypto, exposição de dados e lógica financeira, contra uma `rubric.md` versionada que cresce. Use em "varredura de segurança"/"pentest"/"está seguro?" **e** ao fim de toda feature sensível (auth/dinheiro/permissões/input/upload/dados). |
 | `resume` | `/resume` | Resume um vídeo do YouTube a partir do link. |
 | `sync-claude` | `/sync-claude` | Roda o `sync.sh` (padroniza a config desta máquina). |
 | `google-play` | `/gplay` | Releases na Play Store via Play Developer API (service account): sobe AAB, tracks, promoção, rollout gradual, reviews e listing. Credenciais fora do repo (`~/.config/bobagi-google/`); setup único do operador em `google-play/SETUP.md`. |

@@ -23,14 +23,30 @@ Fluxo obrigatório em cada pedido:
 3. **Só pule** quando nenhuma for de fato relevante. Se pular, é por não haver match,
    nunca por ter esquecido de olhar.
 4. **Combine skills** quando fizer sentido (ex.: `frontend-design` cria a UI →
-   `frontend-review` audita → `simplify`/`code-review` limpam → `verify` confirma).
+   `frontend-review` audita → `simplify`/`code-review` limpam → `security-sweep` testa+corrige → `verify` confirma).
 
 Um **hook `UserPromptSubmit`** (`~/.claude/settings.json` → `cat "$HOME/.claude/skill-first-reminder.txt"`)
 reinjeta esse lembrete a cada prompt. Para revisar/desligar: comando `/hooks`.
 
+## ★★ Política SEGURANÇA-SEMPRE (obrigatória, todo projeto)
+Ao **terminar qualquer feature nova ou alterada** que toque **autenticação, dinheiro/cobrança,
+limites/quotas, permissões, input do usuário, upload, fetch de URL server-side ou dados sensíveis**,
+rode a skill **`security-sweep`** escopada na feature ANTES de encerrar — ela **encontra, TESTA ao vivo
+(dispara o ataque de verdade) e CORRIGE**, não só reporta. Isso é não-negociável, como a regra de front.
+Quando o usuário disser **"faça uma varredura de segurança" / "pentest" / "está seguro?"**, invoque
+`security-sweep` (varredura completa da app). Complementos: `/security-review` (review estático do diff) e
+o plugin `security-guidance` (lente) — rode-os junto, mas a `security-sweep` é a que **fecha o loop
+testando e consertando**. Motivo desta política: um review estático já **deixou passar** uma race condition
+financeira real — só o teste adversarial ao vivo pega esse tipo de falha.
+
 ### Skills disponíveis (repo pessoal `claude-skills`, symlinked em `~/.claude/skills`)
 - **`frontend-review`** — auditor de front-end agnóstico: screenshots multi-viewport +
   a11y + consistência, com rubric versionada que melhora a cada uso. Use para **avaliar/revisar** UI.
+- **`security-sweep`** — **varredura de segurança agnóstica que ENCONTRA, TESTA ao vivo e CORRIGE**
+  (não só reporta): race conditions/TOCTOU, IDOR/autz, enumeração, injeção, SSRF, upload, XSS, segredos,
+  sessão/CSRF/step-up, crypto, exposição de dados, lógica financeira, infra/headers — contra uma
+  `rubric.md` versionada que cresce. Use em "varredura de segurança"/"pentest"/"está seguro?" **e** ao
+  fim de toda feature sensível. É NOSSA (não confie só no `/security-review` estático).
 - **`vps`** — gerenciar o VPS bobagi.space via SSH.
 - **`resume`** — resumir um vídeo do YouTube a partir do link.
 - **`google-play`** — releases na Play Store via Play Developer API (service account): sobe
