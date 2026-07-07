@@ -328,3 +328,9 @@ click, drive them separately for now (interaction steps are a planned engine fea
   neutralize the global control rules (`height:auto; padding:0; border:0; background:none` + hover
   filter) — and judge full-page screenshots by EYE for vertical overlap; automated signals only catch
   horizontal overflow. Script-only verification (naturalWidth>0, scrollWidth) is NOT a visual review.
+- **2026-07-07 (via CoinHub):** Ao inserir CTA promocional/afiliado/monetização numa UI de produto,
+  verifique que ele **não compete com a ação primária** da tela: coloque-o DENTRO da seção auxiliar
+  relevante (ex.: um "não tem conta? crie aqui" dentro do guia de conexão), não como banner no topo
+  roubando atenção do fluxo principal, e sem dark pattern (deixe a ação primária mais proeminente).
+  Links externos de afiliado/apoio: sempre `target="_blank" rel="noopener"` e cheque o contraste do
+  link sobre a caixa tingida (callout âmbar/tinta de marca).
