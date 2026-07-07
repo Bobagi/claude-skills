@@ -48,6 +48,13 @@ Pule: getters/setters triviais, o que o compilador/framework já garante, UI pur
   (só 1 passou, saldo consistente) — em Go use goroutines + `-race`; em app rodando, N requests paralelos.
 
 ## Learnings log (append-only, geral)
+- **2026-07-07 (via CoinHub):** Ao fazer o **mutation check** (inverter uma regra pra provar que o teste
+  fica vermelho), **NUNCA reverta a mutação com `git checkout <arquivo>`** se o arquivo tem mudanças
+  **não-commitadas** — o checkout apaga TUDO que não foi commitado (as extrações/funções novas junto).
+  Reverta a mutação com o inverso exato (sed de volta, ou re-Edit da linha), ou faça a mutação numa CÓPIA.
+  Melhor ainda: rode o mutation check só DEPOIS de commitar, ou num `cp` do arquivo. (Um `git checkout`
+  mascarado por `|| true` falhou silenciosamente e deixou a mutação `>` no lugar do `<=` correto — só
+  não foi pra produção porque reconferi a linha.)
 - **2026-07-06 (via CoinHub, origem da skill):** Projeto de money-path com **zero testes** no núcleo de
   ordens era o maior risco pré-lançamento. Lições: (1) priorize o caminho do dinheiro e os **invariantes**
   (idempotência da compra diária, atomicidade do limite sob concorrência, conversão de moeda que nunca
