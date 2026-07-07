@@ -186,6 +186,24 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
 ---
 
 ## Learnings log (append-only, geral)
+- **2026-07-07 (via CoinHub — pentest de app "vibe-coded"):** Padrões clássicos de "não confie no
+  front", todos = **autorização/gate que tem que ser server-side, nunca escondido só no cliente**.
+  Como testar cada um AO VIVO: (1) **Role tampering** — o atacante reescreve a RESPOSTA (Burp
+  Match&Replace `"role":"student"`→`"admin"`) e, se a aba admin aparecer E as requisições funcionarem, o
+  backend confia no cliente. Teste: com uma conta NÃO-admin, **chame o endpoint admin diretamente** (curl)
+  → deve dar 403; e confirme que nenhum campo do payload (`is_admin`/`role`/`user_id`/`plan`) é respeitado
+  (papéis vêm da sessão/DB). (2) **Gate de conteúdo só no front** (ex.: `released:false`→`true` interceptado)
+  — todo cadeado da UI (conteúdo pago, aba bloqueada, "verifique o e-mail") precisa ser reenforçado no
+  servidor: chame a AÇÃO por trás do cadeado sem cumprir o pré-requisito → deve barrar (403/400).
+  (3) **Cookie de sessão SEM `Secure`/`HttpOnly`** deixa XSS roubar a sessão — cheque `Set-Cookie` (curl -i):
+  precisa de `HttpOnly; Secure; SameSite`. (4) **Endpoint de listagem vazando PII de OUTROS usuários**
+  (comentários com email/CPF/telefone) — todo endpoint que lista precisa filtrar por dono; teste com a
+  conta B tentando ler recursos/dados da conta A por id. (5) **Campo "HTML/CSS custom" de admin injetado
+  nas páginas sem sanitização** = XSS armazenado que compromete todos — se existir tal feature, ela É a
+  vulnerabilidade (grep por sinks `{@html}`/`innerHTML`/`dangerouslySetInnerHTML`; e qualquer HTML de
+  usuário/admin renderizado). LIÇÃO META do vídeo: o defensor tem que proteger TODAS as rotas; o atacante
+  só precisa de UMA — então a classe 2 (autz/IDOR) tem que ser rodada **rota a rota**, chamando cada
+  endpoint mutável/admin diretamente com uma conta sem privilégio, não confiando no que a UI esconde.
 - **2026-07-06 (via CoinHub, origem da skill):** Um review ESTÁTICO passou por uma race condition financeira
   real (bypass de limite pago criando N recursos concorrentes com chaves DIFERENTES; o índice único
   `(user,env,symbol)` só barrava duplicatas do MESMO item). Lições: (1) análise estática não basta —
