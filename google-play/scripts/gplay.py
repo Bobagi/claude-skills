@@ -421,6 +421,25 @@ def cmd_images_upload(args):
     print(f"OK: {args.image_type} de [{args.lang}] atualizado.")
 
 
+def cmd_images_list(args):
+    """Lista as imagens atuais da ficha (URLs visualizáveis) de um idioma."""
+    token = access_token()
+    edit = new_edit(args.package, token)
+    try:
+        types = args.image_type.split(",") if args.image_type else [
+            "featureGraphic", "icon", "phoneScreenshots",
+            "sevenInchScreenshots", "tenInchScreenshots"]
+        for t in types:
+            data = api("GET", f"/{args.package}/edits/{edit}/listings/{args.lang}/{t}",
+                       token, ok404=True)
+            images = (data or {}).get("images", [])
+            print(f"[{args.lang}] {t}: {len(images)} imagem(ns)")
+            for img in images:
+                print(f"  {img.get('url')}")
+    finally:
+        delete_edit(args.package, edit, token)
+
+
 def cmd_listing(args):
     token = access_token()
     edit = new_edit(args.package, token)
@@ -504,6 +523,11 @@ def main():
     ls.add_argument("--short")
     ls.add_argument("--full", help="arquivo .txt com a descrição longa")
 
+    il = sub.add_parser("images-list")
+    il.add_argument("--lang", required=True)
+    il.add_argument("--image-type", default=None,
+                    help="opcional: um ou mais tipos separados por vírgula (padrão: todos)")
+
     iu = sub.add_parser("images-upload")
     iu.add_argument("--lang", required=True)
     iu.add_argument("--image-type", default="phoneScreenshots",
@@ -523,6 +547,7 @@ def main():
         "reviews-reply": cmd_reviews_reply,
         "details": cmd_details,
         "details-set": cmd_details_set,
+        "images-list": cmd_images_list,
         "images-upload": cmd_images_upload,
         "listing": cmd_listing,
         "listing-set": cmd_listing_set,
