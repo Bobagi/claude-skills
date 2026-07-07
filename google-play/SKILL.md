@@ -35,6 +35,7 @@ python3 $S listing                      # ficha da loja em todos os idiomas
 python3 $S listing-set --lang pt-BR --title "Tic Tac Verse: Jogo da Velha"
 python3 $S details                      # contato da ficha (site do dev, e-mail)
 python3 $S details-set --website https://bobagi.space
+python3 $S images-list --lang pt-BR              # URLs das imagens atuais da ficha
 python3 $S images-upload --lang pt-BR --files s1.png,s2.png   # screenshots da ficha (ordem)
 python3 $S images-upload --lang pt-BR --image-type featureGraphic --files feature.png
 ```
