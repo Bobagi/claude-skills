@@ -277,3 +277,12 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   resultado); (4) ao adicionar clamp de tamanho, **case com a largura real da coluna** (cortar em 120
   numa coluna de 80 troca poluição de banco por um 500); (5) fix de race = contagem+escrita numa
   transação sob `pg_advisory_xact_lock` por usuário (forma 2-int32 não colide com o leader-lock 1-bigint).
+- **2026-07-08 (via CoinHub — sweep completa, 0 achados):** Duas lições de método. (1) **Num host
+  compartilhado (vários projetos/containers), atribua CADA porta em escuta ao container DONO antes de
+  reportar "DB exposto".** Um `0.0.0.0:5432` no `ss -tlnp` pode ser de um projeto VIZINHO, não do alvo — e
+  o DB do alvo pode estar **sem porta no host** (só rede interna do Docker). Rode `docker ps --format
+  '{{.Names}} {{.Ports}}'` e case a porta ao serviço; senão você reporta um falso-positivo (ou pior, culpa
+  o app errado). (2) **No teste de limite/quota (classe 1), zere a contagem antes** (delete os itens do
+  usuário de teste) — se a conta já está no limite, o endpoint devolve 403 por LIMITE e mascara o que você
+  queria medir (ex.: o clamp de tamanho da classe 5 nunca é exercido porque o create morre antes). Um 403
+  inesperado num teste que não é de limite = provável limite/gate anterior no caminho; isole-o.
