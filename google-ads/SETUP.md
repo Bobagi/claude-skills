@@ -26,6 +26,12 @@ OPERADOR (~10 min + espera de aprovação do Google):
    python3 ~/.claude/skills/google-ads/scripts/gads.py set-config --developer-token 'SEU_TOKEN'
    ```
 
+## 1½. Ativar a Google Ads API no projeto GCP
+
+No mesmo projeto GCP do OAuth client (ex.: `bobagi-apps-automation`), ative o
+serviço **Google Ads API** (sem isso toda chamada dá 403 `SERVICE_DISABLED`):
+https://console.cloud.google.com/apis/library/googleads.googleapis.com
+
 ## 2. Consentimento OAuth (escopo adwords)
 
 ```bash
