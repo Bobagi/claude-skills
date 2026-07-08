@@ -334,3 +334,16 @@ click, drive them separately for now (interaction steps are a planned engine fea
   roubando atenção do fluxo principal, e sem dark pattern (deixe a ação primária mais proeminente).
   Links externos de afiliado/apoio: sempre `target="_blank" rel="noopener"` e cheque o contraste do
   link sobre a caixa tingida (callout âmbar/tinta de marca).
+- **2026-07-08 (via CoinHub):** Bug class — **stale state badges via helper-closure in compiler-tracked
+  templates (Svelte & co.)**: a template that reads state through a plain `const` arrow helper
+  (`isActive(x)` closing over `credentials`) hides the dependency from the compiler — the block never
+  re-renders when the state object is reassigned, so status tags ("Active/not configured") go STALE
+  after the user switches, while sibling expressions that reference tracked vars directly DO update
+  (half-fresh UI, worse than fully stale). Fix: reference the state var directly in the markup or via
+  a `$:`/derived mirror. **Method that caught it: screenshot AFTER a state-changing interaction
+  (click → wait → shot), never only the initial render** — first-paint screenshots cannot reveal
+  stale-render bugs; every review of a stateful control (tabs/switch/selector) must include a
+  post-interaction shot and check ALL views of that state (card badge + header pill + panel title)
+  agree. Bonus check the same run reconfirmed: when a selection highlight and an "active" status are
+  distinct concepts, the DEFAULT selection on load must equal the active one, or the two visuals
+  contradict each other.
