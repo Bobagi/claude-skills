@@ -251,6 +251,20 @@ de dinheiro que você criar — construir sem ela é criar a fraude junto.**
   CDN/Cloudflare, travar a origem aos ranges do CDN e ler o **IP real** (`CF-Connecting-IP`).
 - **🛡 Blinda com:** classe 15 (infra/headers/portas) + classe 10 (CSP).
 
+## 21. 2FA / TOTP (opcional — acima do mínimo, mas é o gap nº1 de app maduro)
+- **O quê:** segundo fator (app autenticador TOTP) além da senha.
+- **Por quê:** senha sozinha (mesmo com throttle) cai a phishing/vazamento; 2FA é a expectativa de qualquer
+  app sério que guarda dinheiro/dados. **Não é mínimo** (por isso é o módulo 21, opcional), mas é o primeiro
+  item a subir quando o app amadurece — e **step-up re-auth NÃO substitui 2FA** (step-up re-pede a MESMA
+  senha; 2FA adiciona um fator independente).
+- **Padrão canônico:** segredo TOTP **cifrado em repouso** (reusa o módulo 17), enrolamento com QR +
+  confirmação de um código antes de ativar, **recovery codes** (hasheados, uso único) para não travar o
+  usuário que perde o aparelho, e o desafio 2FA no login **após** a senha (não antes — não vaze existência
+  de conta). Desativar 2FA exige a senha atual ou um código válido.
+- **🛡 Blinda com:** classe 3 (o desafio 2FA não pode enumerar), classe 8 (segredo TOTP cifrado, recovery
+  codes hasheados), classe 9 (2FA integrado à sessão/step-up).
+- **🔒 Trava com:** test-forge — código TOTP válido/inválido/replay (janela), recovery code uso-único.
+
 ---
 
 ## Learnings log (append-only, geral)
@@ -273,3 +287,10 @@ de dinheiro que você criar — construir sem ela é criar a fraude junto.**
   condicional), não só a que audita. Toda função de recurso finito criada aqui fecha obrigatoriamente com a
   `security-sweep` classe 1 (teste concorrente DISTINTO no eixo do invariante) + `test-forge`
   (N simultâneos ⇒ 1 passa). Idempotência/nonce em webhooks de pagamento para não creditar em dobro.
+- **2026-07-08 (inventário no CoinHub — a app-fonte):** rodar o catálogo na app de onde ele foi destilado
+  deu **20/20 completos** (esperado). Valor real do modo diagnóstico: (a) confirmar zero regressão e (b)
+  isolar os gaps que NÃO são do catálogo — apareceram **2FA/TOTP**, **billing/assinatura** e **alertas por
+  e-mail**. Lição geral: **2FA é o gap nº1 de um app maduro** e **step-up re-auth não o substitui** (mesmo
+  fator) → promovido a **módulo 21 (opcional, acima do mínimo)**. Billing, quando existir, cai inteiro na
+  Regra transversal nº1 (atomicidade + idempotência de webhook). Modo diagnóstico deve sempre gerar a matriz
+  (módulo→estado→evidência/gap) como artefato em `.claude/app-essentials/<data>/report.md`.
