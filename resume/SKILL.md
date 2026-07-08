@@ -43,4 +43,12 @@ Apresente o resumo com:
 
 Seja claro e conciso. O resumo deve capturar a essência do vídeo sem ser excessivamente longo.
 
+**Vídeos de aporte/carteira de investimentos:** se o vídeo for desse tipo (ex.: "aporte do mês",
+"carteira de investimentos", canais de finanças que compram/vendem ativos ao vivo), as compras e
+vendas feitas são o ponto principal — SEMPRE termine o resumo com uma tabela simples listando cada
+ativo, tipo (ação/FII/cripto/ETF/renda fixa), valor e uma observação curta (motivo da compra/venda,
+se mencionado). Se houve venda ou realocação, liste também, mesmo que tenha ocorrido em episódio
+anterior mas seja referenciada no vídeo atual. Não pule essa tabela substituindo por prosa — é o
+dado que o usuário mais quer.
+
 **Importante:** Se a transcrição não estiver disponível em português ou inglês, informe o usuário e tente outros idiomas disponíveis listados pela API.
