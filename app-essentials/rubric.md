@@ -13,6 +13,34 @@ Verificação de e-mail/reset → Trilha de login/alertas → i18n/erros → Obs
 
 ---
 
+## ⚠️ REGRA TRANSVERSAL Nº1 — DINHEIRO/LIMITE/SALDO É SEMPRE ATÔMICO (anti-race, anti-fraude)
+Vale para QUALQUER módulo desta skill que crie uma função sobre um **recurso finito**: saldo/carteira,
+cobrança, limite de plano/quota ("N robôs/itens por usuário"), cupom/reembolso de uso único, "só o 1º ganha",
+estoque, créditos. **É o vetor de fraude mais comum em app vibe-coded** e um review estático já deixou passar
+um caso real (bypass de limite pago com N requests concorrentes). Portanto, ao CONSTRUIR qualquer coisa
+assim:
+- **NUNCA** `contar/ler em memória → decidir → inserir/atualizar` em passos separados (check-then-act/TOCTOU).
+  N requests concorrentes leem o mesmo estado velho e **todos passam**.
+- Enforce o invariante **atomicamente**, por um destes:
+  1. **transação + advisory lock por usuário** (`pg_advisory_xact_lock(chave, user_id)`), fazendo
+     contagem+escrita dentro do lock (padrão `CreateRobotForUserWithinLimit` do CoinHub);
+  2. **constraint no banco** (unique/check) que seja **o invariante real** — cuidado: um unique
+     `(user, tipo, item)` **NÃO** barra furar um limite de CONTAGEM com itens DIFERENTES;
+  3. **UPDATE condicional** (`UPDATE saldo SET x=x-$v WHERE x>=$v` e checar `RowsAffected`).
+- Locks em **namespaces distintos** para não colidir (no Postgres, a forma de 1 bigint e a de 2 int32 são
+  espaços separados).
+- **🛡 Blinda com a `security-sweep` CLASSE 1 (race/TOCTOU) + CLASSE 14 (lógica financeira)** — e o teste
+  ao vivo tem que disparar **N requests concorrentes DISTINTOS no eixo do invariante** (moedas/itens
+  diferentes), senão uma constraint irrelevante finge que está seguro. **🔒 Trava com `test-forge`**:
+  10 creates/débitos simultâneos ⇒ só 1 (ou só o saldo permite) passa.
+- **Idempotência/replay** em callbacks de pagamento (verificar assinatura + nonce/id único), senão um
+  webhook reenviado credita duas vezes.
+
+**Enquanto esta skill não tiver um módulo próprio de billing/saldo, esta regra é a lei para qualquer função
+de dinheiro que você criar — construir sem ela é criar a fraude junto.**
+
+---
+
 ## 1. Autenticação e-mail + senha (a base)
 - **O quê:** signup/login/logout com senha.
 - **Por quê:** identidade é o alicerce de tudo que é por-usuário.
@@ -202,6 +230,8 @@ Verificação de e-mail/reset → Trilha de login/alertas → i18n/erros → Obs
   (ex.: `live_trading_enabled`; contas novas começam em TESTNET); exclusão/rotação exige confirmação
   (idealmente step-up); nunca destrutivo por acidente.
 - **🛡 Blinda com:** classe 14 (lógica de negócio) + classe 18 da security-sweep (defaults seguros).
+- **Ver também a REGRA TRANSVERSAL Nº1 (topo):** se a ação perigosa mexe em dinheiro/limite/saldo, além do
+  opt-in ela tem que ser **atômica** (anti-race) — as duas coisas juntas.
 
 ## 19. Backup + retenção + saúde/observabilidade (pré-produção)
 - **O quê:** o app tem backup, purga PII velha e sabe dizer se está vivo.
@@ -237,3 +267,9 @@ Verificação de e-mail/reset → Trilha de login/alertas → i18n/erros → Obs
   (blinda) + `test-forge` (trava)** — é o mecanismo que garante paridade de proteção entre projetos. **Par
   fixo:** esta skill CONSTRÓI, a security-sweep GARANTE; as duas rubrics devem concordar (se um fix de
   segurança nasce aqui, replicar na rubric da security-sweep).
+- **2026-07-08 (reforço anti-fraude):** promovida ao TOPO a **Regra transversal nº1 — dinheiro/limite/saldo
+  é sempre atômico**. Motivo: race condition financeira é o vetor de fraude mais comum e um review estático
+  já a deixou passar; a skill que CONSTRÓI tem que nascer atômica (advisory lock/constraint/UPDATE
+  condicional), não só a que audita. Toda função de recurso finito criada aqui fecha obrigatoriamente com a
+  `security-sweep` classe 1 (teste concorrente DISTINTO no eixo do invariante) + `test-forge`
+  (N simultâneos ⇒ 1 passa). Idempotência/nonce em webhooks de pagamento para não creditar em dobro.

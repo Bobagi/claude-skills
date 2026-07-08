@@ -27,7 +27,7 @@ lock), **é vulnerável**: N requests concorrentes leem o mesmo estado velho e t
   mascara o bug** — ex.: unique `(user, tipo, item)` NÃO impede furar um limite de CONTAGEM com itens
   DIFERENTES.
 - **▶ Testar ao vivo:** dispare **N requests concorrentes** (`for ...; do curl ... & done; wait`, ou
-  `Promise.all`) contra o endpoint. Faça **DUAS** rodadas: (a) idênticos e (b) **DISTINValidos no eixo do
+  `Promise.all`) contra o endpoint. Faça **DUAS** rodadas: (a) idênticos e (b) **DISTINTOS no eixo do
   invariante** (ex.: moedas/itens diferentes — este é o teste que expõe o bypass de contagem; sem ele o
   índice único finge que está seguro). Depois **conte no DB**: se passou do limite, é P0/P1. **LIÇÃO
   DURÁVEL: garanta que cada request é distinto no eixo certo, senão você testa a constraint errada e tem
