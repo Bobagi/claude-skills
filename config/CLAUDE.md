@@ -76,13 +76,17 @@ teste confiável que roda e pode falhar — priorize o caminho do dinheiro) e, e
 - **`admob`** — relatórios AdMob via API (receita, eCPM, impressões por dia/ad unit/país) +
   inventário. OAuth do dono da conta (setup único: `admob/SETUP.md`); escrita de inventário
   é restrita pelo Google (fallback manual).
+- **`google-ads`** — relatórios Google Ads via API (**somente leitura**): status/orçamento de
+  campanha, gasto por dia, CPI, conversões (instalações) por campanha/grupo. Exige developer
+  token com acesso Básico aprovado (setup único: `google-ads/SETUP.md`); reusa o OAuth client
+  do AdMob. Criar/pausar/editar campanha = operador na UI.
 
-> **Limite transversal Google (Play/AdMob):** o que a API oficial não cobre (pagamentos,
+> **Limite transversal Google (Play/AdMob/Ads):** o que a API oficial não cobre (pagamentos,
 > data safety, criar ad unit/mediação, consent screen) é feito PELO OPERADOR guiado passo a
 > passo (prints em `/root/prints` ajudam a diagnosticar). **Automação de navegador logado no
 > Google (Playwright etc.): nunca na VPS** — anti-bot/2FA + risco de travar a conta dona do
 > Play/AdMob; último recurso é chrome-devtools-mcp NA MÁQUINA DO OPERADOR, com ele presente.
-> Detalhes na seção "Limites" dos `SKILL.md` de `google-play` e `admob`.
+> Detalhes na seção "Limites" dos `SKILL.md` de `google-play`, `admob` e `google-ads`.
 
 ### Plugins instalados (marketplace `claude-plugins-official`)
 - **`frontend-design`** — direção visual/estética para **criar/redesenhar** UI nova
