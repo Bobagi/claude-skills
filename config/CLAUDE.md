@@ -49,9 +49,18 @@ teste confiável que roda e pode falhar — priorize o caminho do dinheiro) e, e
   a11y + consistência, com rubric versionada que melhora a cada uso. Use para **avaliar/revisar** UI.
 - **`security-sweep`** — **varredura de segurança agnóstica que ENCONTRA, TESTA ao vivo e CORRIGE**
   (não só reporta): race conditions/TOCTOU, IDOR/autz, enumeração, injeção, SSRF, upload, XSS, segredos,
-  sessão/CSRF/step-up, crypto, exposição de dados, lógica financeira, infra/headers — contra uma
-  `rubric.md` versionada que cresce. Use em "varredura de segurança"/"pentest"/"está seguro?" **e** ao
-  fim de toda feature sensível. É NOSSA (não confie só no `/security-review` estático).
+  sessão/CSRF/step-up, crypto, exposição de dados, lógica financeira, OAuth/federada, trilha+anomalia de
+  login, defaults seguros, infra/headers — contra uma `rubric.md` versionada que cresce. Use em "varredura
+  de segurança"/"pentest"/"está seguro?" **e** ao fim de toda feature sensível. É NOSSA (não confie só no
+  `/security-review` estático). **Par da `app-essentials`:** aquela CONSTRÓI a feature de base, esta a BLINDA.
+- **`app-essentials`** — **implementa** (não só audita) as funcionalidades que todo sistema web sério tem:
+  login e-mail+senha, **login Google (OAuth)**, verificação de e-mail, reset de senha, sessões/cookies
+  seguros, página de conta + **exclusão hard-delete**, **Termos+Privacidade versionados com aceite
+  server-side**, **banner de cookies (LGPD) com scripts de 3º só sob consentimento**, trilha de login +
+  alerta de novo dispositivo, e-mail transacional, i18n completa, step-up. Detecta o que falta, implementa
+  adaptado à stack e **fecha com `security-sweep` (blinda) + `test-forge` (trava)** — cada item do catálogo
+  aponta a classe de segurança que o protege. Use em "adicione login com Google/termos/cookies/verificação
+  de e-mail", "o que falta pro app ficar sério/pronto pra produção?".
 - **`test-forge`** — **cria e RODA testes úteis e confiáveis** (determinísticos, que podem falhar),
   priorizando o caminho crítico (dinheiro/auth/limites/parsers/idempotência) sobre % de cobertura; roda
   até passar e conserta o código se um teste acha bug. Use em "crie testes"/"o projeto não tem testes"

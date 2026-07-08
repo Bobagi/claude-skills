@@ -164,8 +164,56 @@ lock), **é vulnerável**: N requests concorrentes leem o mesmo estado velho e t
 - [ ] TLS 1.2/1.3 só; HSTS; `Permissions-Policy` negando o que não se usa; `X-Content-Type-Options`,
   `X-Frame-Options`/frame-ancestors. Portas de DB/admin **não** públicas (bind 127.0.0.1 + túnel/proxy).
   Serviços internos atrás de firewall (cuidado: **Docker fura o UFW** — regra em `DOCKER-USER`).
+- [ ] Atrás de CDN/Cloudflare: origem travada aos **ranges do CDN** (senão o atacante bate direto no IP e
+  contorna o WAF) e o **IP real** lido de `CF-Connecting-IP` (para audit/geo/fail2ban corretos).
 - **▶ Testar:** `curl -I` os headers; do lado de fora, `nc`/scan das portas que deviam ser internas.
 - **Fix:** ajustar nginx/headers; rebind 127.0.0.1; regra de firewall na chain certa.
+
+## 16. Autenticação federada (OAuth/SSO) — sequestro de conta e state
+- [ ] O fluxo OAuth tem **`state` aleatório** guardado em cookie e **conferido no callback** (anti-CSRF).
+- [ ] O e-mail do provedor é **verificado** (`email_verified`) antes de auto-linkar; **auto-link por e-mail
+  não pode sequestrar** uma conta existente cujo e-mail o atacante consiga fazer o provedor emitir sem
+  verificar. Guarda-se o **`subject`** (id estável), não só o e-mail.
+- [ ] Feature **config-driven**: sem as envs do OAuth, o provider fica **off** e o botão some (não vira uma
+  rota meio-configurada explorável).
+- [ ] No **step-up via OAuth**, casar o `subject` da sessão com o do re-consent (não basta "logou no Google").
+- **▶ Testar ao vivo:** callback com `state` ausente/trocado ⇒ rejeitar. Com conta B, tentar linkar ao
+  e-mail da conta A ⇒ não pode assumir a conta de A. Sem as envs, `/auth/providers` reporta `google:false`.
+- **Fix:** state em cookie conferido; exigir e-mail verificado + subject; feature-flag por env.
+
+## 17. Trilha de auditoria & alerta de anomalia de login
+- [ ] Existe **trilha append-only** de acessos (IP+UA+método+fingerprint+sucesso/falha) que sobrevive à
+  expiração da sessão. **Login falho para conta existente é registrado, mas a resposta ao cliente não muda**
+  (não pode virar oráculo de enumeração — cruza com a classe 3).
+- [ ] **Alerta de novo dispositivo** só quando o fingerprint é novo **E** já houve acesso anterior (1º
+  login/signup nunca alerta); o gate do alerta conta **só sucessos** (uma falha do atacante não pode
+  mascarar o "novo dispositivo" do login real seguinte).
+- [ ] O IP da trilha vem de fonte **não-forjável** atrás do proxy (cruza com a classe 12); a trilha tem
+  **retenção** (purga > N dias) e cai no cascade do delete da conta (é PII — cruza com a classe 13).
+- **▶ Testar ao vivo:** logar de um "novo" UA/IP após um acesso anterior ⇒ e-mail de alerta; 1º acesso ⇒
+  sem alerta; falha de login ⇒ linha `success=false` sem alerta e sem mudar a resposta ao cliente.
+- **Fix:** registrar acesso off-request (best-effort); gate de alerta (novo E ≥1 anterior E só sucesso);
+  IP do header confiável; job de retenção.
+
+## 18. Defaults seguros para ações perigosas / irreversíveis
+- [ ] O caminho **perigoso** (dinheiro real/produção) é **recusado até opt-in explícito** (ex.: contas novas
+  começam em sandbox/testnet; produção exige uma flag que o usuário liga sabendo). O **irreversível** (excluir
+  conta, rotacionar chave, apagar em massa) exige **confirmação** (idealmente step-up), nunca por acidente.
+- [ ] Exclusão de conta é **hard delete + auditoria não-identificável** (fingerprint HMAC), não soft-delete
+  que retém PII (cruza com a classe 13 e o direito de eliminação da LGPD).
+- **▶ Testar ao vivo:** disparar a ação de produção/dinheiro **sem** a flag de opt-in ⇒ deve recusar
+  (400/403); a exclusão sem confirmação ⇒ não executa.
+- **Fix:** gate de opt-in server-side; confirmação/step-up nas irreversíveis; hard delete com auditoria HMAC.
+
+---
+
+## Par com a skill `app-essentials` (construir ↔ blindar)
+A `app-essentials` **implementa** as funcionalidades de base (login Google, termos, privacidade, cookies,
+verificação de e-mail, reset, exclusão de conta, trilha de login, i18n…); esta skill **garante que cada uma
+nasce segura**. O catálogo da `app-essentials` aponta, por módulo, a **classe desta rubric** que o testa ao
+vivo. Regra: toda feature que a `app-essentials` cria fecha com uma sweep desta skill escopada nela — é assim
+que a proteção fica **idêntica entre projetos** (falha que não existe numa app não existe na outra). Se um fix
+de segurança novo nasce numa das skills, replique o conceito na outra rubric — as duas devem concordar.
 
 ---
 
@@ -182,10 +230,26 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   distintos no eixo do invariante**.
 - Caps de tamanho de input casados à largura das colunas (sem 500 por overflow).
 - Scripts de 3º (analytics/ads) só sob consentimento, ads em iframe isolado; CSP sem `unsafe-inline` em script.
+- OAuth com `state` conferido + e-mail verificado + subject-match; provider config-driven (off sem env).
+- Trilha de login append-only; alerta de novo dispositivo (novo E ≥1 anterior E só sucesso); falha registrada
+  sem enumerar; retenção da trilha; IP não-forjável atrás do proxy.
+- Origem travada aos ranges do CDN + IP real via `CF-Connecting-IP` quando atrás de Cloudflare.
+- Ação de dinheiro/produção recusada sem opt-in explícito (sandbox/testnet por default); exclusão = hard
+  delete + auditoria HMAC (sem reter PII).
+- E-mail transacional/SMTP config-driven e no-op sem env; segredo/token nunca em log.
 
 ---
 
 ## Learnings log (append-only, geral)
+- **2026-07-08 (via CoinHub — compilado de segurança + par com `app-essentials`):** destiladas de uma app
+  madura de dinheiro três classes que faltavam explícitas: **16 (OAuth/federada)** — state conferido,
+  e-mail verificado, subject-match, provider off sem env; **17 (trilha + anomalia de login)** — audit
+  append-only, alerta de novo dispositivo com gate correto (novo E ≥1 anterior E só sucesso), falha
+  registrada sem enumerar, retenção; **18 (defaults seguros)** — perigoso exige opt-in, irreversível exige
+  confirmação, exclusão = hard delete + auditoria HMAC. Lição meta: as funcionalidades "comuns de todo
+  sistema sério" (login social, termos, cookies, verificação de e-mail, trilha de acesso) têm, cada uma,
+  uma superfície de ataque conhecida — a skill `app-essentials` as CONSTRÓI e esta as BLINDA; manter as
+  duas rubrics em concordância é o que garante paridade de proteção entre projetos.
 - **2026-07-07 (via CoinHub — pentest de app "vibe-coded"):** Padrões clássicos de "não confie no
   front", todos = **autorização/gate que tem que ser server-side, nunca escondido só no cliente**.
   Como testar cada um AO VIVO: (1) **Role tampering** — o atacante reescreve a RESPOSTA (Burp
