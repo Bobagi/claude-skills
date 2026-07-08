@@ -9,8 +9,13 @@ OPERADOR (~10 min + espera de aprovação do Google):
 1. Abra o **Google Ads** logado na conta dona da campanha.
 2. Menu **Ferramentas e configurações** (chave inglesa) → **Configuração** →
    **Central da API** (API Center).
-   - Se não aparecer, a conta precisa estar no modo Especialista e com
-     faturamento configurado.
+   - **A Central da API só existe em conta de ADMINISTRADOR (MCC).** Se a sua
+     conta é uma conta comum (a da campanha), crie uma MCC gratuita em
+     https://ads.google.com/home/tools/manager-accounts/ e pegue o token nela.
+     Isso NÃO muda a campanha de lugar: o token independe da conta consultada —
+     a skill consulta a conta da campanha direto, desde que o e-mail do OAuth
+     tenha acesso a ela (feito assim em 2026-07-08: token da MCC 765-603-5209,
+     campanha na 598-395-7282, sem `login-customer-id`).
 3. Aceite os termos → copie o **token de desenvolvedor**.
 4. O token nasce com acesso **"Conta de teste"** (não lê a conta real!). Na
    mesma tela, clique **"Solicitar acesso básico"** e preencha o formulário
