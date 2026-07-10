@@ -62,3 +62,8 @@ Pule: getters/setters triviais, o que o compilador/framework já garante, UI pur
   resolução de cotação) escreva **testes de unidade table-driven** sem DB/rede — rápidos e à prova de
   flaky; (3) rode Go com **`-race`** para provar a atomicidade de fixes de concorrência; (4) um teste
   que expõe um bug real ⇒ conserte o código, nunca o teste.
+- **2026-07-10 (via CoinHub):** Para testar **sweeps janelados/paginados de API externa** (ex.: histórico
+  em janelas de 30/90 dias, paginação por fromId), faça o fake HTTP devolver as fixtures **só quando a
+  janela/página pedida as contém** (comparando start/end/fromId da query) — assim o teste exercita a
+  lógica de janelamento/paginação em si, não só o parse do JSON. Grave também os parâmetros recebidos
+  pelo fake (ex.: lista de fromId) e afirme sobre eles: prova que a 2ª página foi pedida do ponto certo.
