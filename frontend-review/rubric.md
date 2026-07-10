@@ -347,3 +347,11 @@ click, drive them separately for now (interaction steps are a planned engine fea
   agree. Bonus check the same run reconfirmed: when a selection highlight and an "active" status are
   distinct concepts, the DEFAULT selection on load must equal the active one, or the two visuals
   contradict each other.
+- **2026-07-10 (via CoinHub):** Ao adicionar um painel novo com tabelas de dado denso (7+ colunas) num
+  app que JÁ tem padrão de reflow stacked-card < 600px para outras tabelas, decida conscientemente:
+  ou reflowa igual (consistência) ou aceite o scroll-x contido — mas nesse caso **garanta que os
+  números-chave (os que respondem à pergunta do usuário) vivam em CARDS responsivos acima das tabelas**,
+  não só dentro delas, senão o mobile esconde o essencial no scroll. Um scroll-x contido é aceitável
+  para DETALHE denso; nunca para a métrica principal. (Método de captura de painel auth+chave-gated:
+  extrair o `<style>` verbatim do .svelte + os tokens do :root do app.css num mock HTML servido por
+  http.server — file:// quebra o route-append do capture.mjs; sirva por http.)
