@@ -286,3 +286,13 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   usuário de teste) — se a conta já está no limite, o endpoint devolve 403 por LIMITE e mascara o que você
   queria medir (ex.: o clamp de tamanho da classe 5 nunca é exercido porque o create morre antes). Um 403
   inesperado num teste que não é de limite = provável limite/gate anterior no caminho; isole-o.
+- **2026-07-11 (via CoinHub):** Ao auditar um endpoint que ESCREVE no banco a partir de um cache/estado
+  server-side (ex.: importar histórico agregado), duas provas fecham a idempotência sem precisar do fluxo
+  real de dados: (1) **prove o índice único parcial DIRETO no DB** — insira a linha, depois tente a
+  duplicata idêntica com `ON CONFLICT (...) WHERE <predicado> DO NOTHING` e confirme `INSERT 0 0`; e
+  insira uma linha de OUTRA categoria com a mesma chave natural (ex.: mesmo order_id mas initiated_by
+  diferente) para provar que o índice PARCIAL não bloqueia o que não deve (`INSERT 0 1`). (2) A dedup de
+  aplicação (pular o que já existe) vale testar com mutation-check nos unit tests. Juntas cobrem re-import
+  E concorrência quando o fluxo E2E exige credencial externa que você não deve usar. LIÇÃO META: para
+  idempotência de escrita, um índice único (não um SELECT-then-INSERT) é a defesa de concorrência — e
+  quando escopado por um predicado parcial, teste os DOIS lados (bloqueia o alvo, ignora o resto).
