@@ -355,3 +355,10 @@ click, drive them separately for now (interaction steps are a planned engine fea
   para DETALHE denso; nunca para a métrica principal. (Método de captura de painel auth+chave-gated:
   extrair o `<style>` verbatim do .svelte + os tokens do :root do app.css num mock HTML servido por
   http.server — file:// quebra o route-append do capture.mjs; sirva por http.)
+- **2026-07-11 (via CoinHub):** Barra de ação "copy + botão" (título/descrição à esquerda, CTA à direita):
+  no desktop use `justify-content:space-between` com a copy `flex:1 1 <base>` e o botão `flex:none`; no
+  mobile o `flex-wrap:wrap` empilha (copy acima, botão abaixo) sem overflow. Sempre teste os 2 estados —
+  a copy longa é o que empurra o botão pra fora se o botão não for `flex:none`. Para categorias novas num
+  split de métricas (ex.: "Você/Robôs/Externo"), renderize a nova parte condicional (`{#if hasX}`) para não
+  mostrar "· Externo: R$ 0,00" quando não há dado — e confirme que o total do card SOMA a nova parte
+  (headline e split têm que bater).
