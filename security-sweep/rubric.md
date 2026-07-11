@@ -296,3 +296,11 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   E concorrência quando o fluxo E2E exige credencial externa que você não deve usar. LIÇÃO META: para
   idempotência de escrita, um índice único (não um SELECT-then-INSERT) é a defesa de concorrência — e
   quando escopado por um predicado parcial, teste os DOIS lados (bloqueia o alvo, ignora o resto).
+- **2026-07-11 (via CoinHub):** Padrão "delete-and-recreate de linhas DERIVADAS" (ex.: reimportar/
+  ressincronizar dados externos) é seguro SE o DELETE for escopado por 3 eixos: **dono (user_id da
+  sessão) + partição (env/tenant) + um marcador que separa o derivado do real** (ex.: `is_imported=true`).
+  O eixo do marcador é o crítico: sem ele, um "delete tudo do usuário antes de reinserir" APAGA os dados
+  REAIS/manuais do usuário junto. Teste ao vivo: semeie no DB uma linha REAL (marcador=false) e uma
+  derivada (true) para o MESMO usuário + uma real de OUTRO usuário; rode o DELETE do código; prove que só
+  a derivada do dono some (as duas reais sobrevivem). Serialize reimports concorrentes com advisory lock
+  por usuário (namespace distinto dos outros locks) para o delete-all+insert não duplicar.
