@@ -370,3 +370,10 @@ click, drive them separately for now (interaction steps are a planned engine fea
   melhor que um mock. Cuidado: um estado que depende de OUTRA credencial (ex.: "conectado à exchange") vai
   cair no ramo "não conectado" com a conta de teste — verifique esse estado por código e reporte que o
   ramo conectado precisa da credencial real, não finja tê-lo capturado.
+- **2026-07-11 (via CoinHub):** Quando uma view depende de estado que SÓ existe com credencial externa
+  real (ex.: saldo de exchange), a review viva de conta descartável só alcança o estado VAZIO — capture-o
+  (prova que o código novo não quebra: sem crash/console-error/overflow) e valide a view POPULADA por (a)
+  teste da lógica pura de valuation num script e (b) conferência dos números derivados contra os DADOS
+  REAIS no banco (ex.: preço médio por par = SUM(total)/SUM(qty) bate com o esperado). Diga no relatório
+  que o populado foi verificado por lógica+dados, não por screenshot, e peça a conferência visual final ao
+  dono da credencial. Não finja screenshot do que exige a credencial real.
