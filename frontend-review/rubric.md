@@ -362,3 +362,11 @@ click, drive them separately for now (interaction steps are a planned engine fea
   split de métricas (ex.: "Você/Robôs/Externo"), renderize a nova parte condicional (`{#if hasX}`) para não
   mostrar "· Externo: R$ 0,00" quando não há dado — e confirme que o total do card SOMA a nova parte
   (headline e split têm que bater).
+- **2026-07-11 (via CoinHub):** Para revisar AO VIVO uma feature atrás de login+dado (ex.: posições que só
+  existem com estado no banco), o caminho fiel é: signup via API → promover a conta no DB (verificação/
+  termos) → **semear as linhas de dado direto no banco** (as posições/registros que a feature exibe) →
+  injetar o cookie de sessão no capture.mjs → dirigir as sub-abas com `--scenarios` (arquivo JSON, NÃO
+  inline — o script lê `existsSync(path)`) usando `clickText`. Isso prova a feature de ponta a ponta muito
+  melhor que um mock. Cuidado: um estado que depende de OUTRA credencial (ex.: "conectado à exchange") vai
+  cair no ramo "não conectado" com a conta de teste — verifique esse estado por código e reporte que o
+  ramo conectado precisa da credencial real, não finja tê-lo capturado.
