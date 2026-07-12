@@ -383,3 +383,10 @@ click, drive them separately for now (interaction steps are a planned engine fea
   (botões) costuma ser a última — ela é a primeira a sumir no scroll horizontal do desktop, escondendo a
   ação mais importante. Sempre re-capture a tabela após adicionar colunas e confirme que a última coluna
   (ações) aparece sem scroll no viewport alvo; aperte frações + min-width até caber.
+- **2026-07-12 (via CoinHub):** Para uma tabela larga que estoura o card em telas grandes, a correção
+  "alargar o container" tem que ser CIENTE de elementos fixed nas calhas (ad-rails/sidebars): esses se
+  posicionam via a largura ANTIGA do container (ex.: `--page-max`), então alargar o conteúdo além dela no
+  breakpoint onde eles aparecem causa COLISÃO. Padrão: alargue o container só na faixa SEM os fixed
+  (ex.: 1280–1519px) e volte ao valor base no breakpoint onde eles surgem (≥1520px); e reduza o min-width
+  da tabela para caber também no valor base (com os fixed presentes). Verifique nos 3 regimes: faixa
+  alargada, breakpoint dos fixed, e confirme que a última coluna (ações) aparece sem scroll em todos.
