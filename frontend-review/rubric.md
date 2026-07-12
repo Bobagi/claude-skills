@@ -377,3 +377,9 @@ click, drive them separately for now (interaction steps are a planned engine fea
   REAIS no banco (ex.: preço médio por par = SUM(total)/SUM(qty) bate com o esperado). Diga no relatório
   que o populado foi verificado por lógica+dados, não por screenshot, e peça a conferência visual final ao
   dono da credencial. Não finja screenshot do que exige a credencial real.
+- **2026-07-12 (via CoinHub):** Ao ADICIONAR colunas a uma tabela grid com `min-width` fixo, recalcule o
+  min-width contra a largura REAL do card que a contém (container `page-max` − paddings), não contra o
+  viewport. Uma tabela que cabia com N colunas passa a estourar com N+2 e — como a coluna de AÇÕES
+  (botões) costuma ser a última — ela é a primeira a sumir no scroll horizontal do desktop, escondendo a
+  ação mais importante. Sempre re-capture a tabela após adicionar colunas e confirme que a última coluna
+  (ações) aparece sem scroll no viewport alvo; aperte frações + min-width até caber.
