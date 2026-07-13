@@ -347,6 +347,16 @@ click, drive them separately for now (interaction steps are a planned engine fea
   agree. Bonus check the same run reconfirmed: when a selection highlight and an "active" status are
   distinct concepts, the DEFAULT selection on load must equal the active one, or the two visuals
   contradict each other.
+  - **2026-07-13 reinforcement (via CoinHub):** the SAME class bites **`$:` reactive/derived statements**,
+    not only markup expressions — and one helper can hide **several** dependencies at once. A derived
+    `$: cost = foldByQuote(execFilter(e => e.by==='USER'), e => e.total)` stayed **R$0** after data loaded
+    because BOTH `execFilter` (reads `summary`) and `foldByQuote` (reads `quoteBySymbol`) hid their state
+    reads from the compiler, so the block was never re-run; a sibling `$: x = fold(summary.operations,…)`
+    that named `summary` directly updated fine (again: half-fresh, worse). Fix: inline the state reads so
+    every tracked var appears **textually** in the `$:` (`summary.executions.filter(…)`, pass
+    `quoteBySymbol` as an arg), or use an explicit `$:`-mirror. Rule of thumb: a `$:` that computes from
+    state must MENTION that state by name — if a helper is the only thing that touches it, the compiler is
+    blind to it.
 - **2026-07-10 (via CoinHub):** Ao adicionar um painel novo com tabelas de dado denso (7+ colunas) num
   app que JÁ tem padrão de reflow stacked-card < 600px para outras tabelas, decida conscientemente:
   ou reflowa igual (consistência) ou aceite o scroll-x contido — mas nesse caso **garanta que os
