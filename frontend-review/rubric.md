@@ -412,3 +412,14 @@ click, drive them separately for now (interaction steps are a planned engine fea
   (ex.: 1280–1519px) e volte ao valor base no breakpoint onde eles surgem (≥1520px); e reduza o min-width
   da tabela para caber também no valor base (com os fixed presentes). Verifique nos 3 regimes: faixa
   alargada, breakpoint dos fixed, e confirme que a última coluna (ações) aparece sem scroll em todos.
+- **2026-07-15 (via todo):** Método — revisar app que autentica por **token em `localStorage` (não
+  cookie)**: `--cookie` NÃO loga. Registre uma conta descartável pela API, e no scenario semeie o token
+  com `evalJs: "localStorage.setItem('token', <json-do-token>)"` seguido de um SEGUNDO `evalJs:
+  "location.reload()"` + um `wait` generoso — a SPA remonta já autenticada (mesmo padrão do consent-seed;
+  o erro de context-destroyed do reload é engolido). Para ver o estado POPULADO de um app de listas cujo
+  tier grátis limita linhas/abas, **semeie várias linhas direto no banco** (conta descartável) em vez de
+  esbarrar no limite — e **apague a conta ao final** (cascade). Check barato de alto valor que este
+  review reforçou: grep por `box-sizing` (sem `*{box-sizing:border-box}` global, qualquer
+  `width:100% + padding` vira overflow de poucos px no mobile — invisível no desktop), por `:focus-visible`
+  (ausência total = zero anel de foco de teclado, invisível em screenshot) e por `prefers-reduced-motion`
+  (animações decorativas sem guarda). Os três faltando juntos é o padrão "projeto quase pronto".
