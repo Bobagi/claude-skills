@@ -296,6 +296,16 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   E concorrência quando o fluxo E2E exige credencial externa que você não deve usar. LIÇÃO META: para
   idempotência de escrita, um índice único (não um SELECT-then-INSERT) é a defesa de concorrência — e
   quando escopado por um predicado parcial, teste os DOIS lados (bloqueia o alvo, ignora o resto).
+- **2026-07-15 (via CoinHub — paginação keyset/cursor e IDOR):** Um **cursor de paginação** (keyset/
+  "load more", opaco base64 ou dois params `time`+`id`) **NÃO é vetor de IDOR desde que o WHERE continue
+  escopado à sessão** — o cursor carrega só uma POSIÇÃO de ordenação `(sort_time, id)` aplicada como
+  `(col, id) < ($t, $id)`, e a query mantém `AND user_id = <sessão>`. Forjar/roubar o cursor de outro
+  usuário só reposiciona a janela do PRÓPRIO atacante dentro dos dados dele. **Como testar ao vivo (prova
+  definitiva):** construa um cursor REAL logado como conta A (pegue o `next_cursor` da resposta de A),
+  reenvie-o logado como conta B e confirme que B retorna só as PRÓPRIAS linhas (ou vazio), **nunca** as de
+  A. Complementos: cursor malformado/tamperado ⇒ cai na 1ª página (parse tolerante → nil), nunca erro/panic
+  (DoS); precisão do timestamp no cursor tem que bater com a coluna (microssegundo) senão pula/repete linha
+  — isso é bug de CORREÇÃO (não de segurança), teste à parte. Promovido à classe 2 como item a re-validar.
 - **2026-07-15 (via CoinHub — filtro enum num endpoint de leitura):** Ao auditar um parâmetro de
   **enum/whitelist** que alimenta um `WHERE` (ex.: `status=open|sold|all`, `initiated_by=USER|BOT`), a
   prova de segurança não é só "deu 200 sem erro de SQL" — é **contar as linhas para confirmar que o valor
