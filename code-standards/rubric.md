@@ -44,3 +44,13 @@ Testes → `test-forge`. UI/UX → `frontend-review`.
   projeto** (camadas handler→service→repository, erros tipados `*UserFacingError`, i18n com en/pt/es
   sempre completos, tokens de CSS em vez de px mágico). Rodar o linter/`svelte-check`/`go vet` do repo
   primeiro dá o padrão objetivo de graça; código morto só some após grep de chamadores no repo inteiro.
+- **2026-07-15 (via todo):** Higiene de deps num front **sem bundler (libs via CDN)** engana em dois
+  sentidos, então SEMPRE cruze `require()`/`import` de módulos bare vs `package.json` **E leia o
+  Dockerfile/CI**: (1) libs que só entram por CDN em runtime (ex.: `react`/`react-dom` via unpkg)
+  aparecem **declaradas-mas-sem-uso** pelo Node — enganoso, sugerem um build que não existe; (2) uma lib
+  `require()`d de verdade pelo servidor (ex.: `stripe`) pode estar **faltando** no `package.json` porque
+  um `RUN npm install X` ad-hoc no Dockerfile a instala — aí `npm install` puro (fora do Docker) gera app
+  quebrado, e `npm ci` nem roda. O Dockerfile/entrypoint costuma esconder tanto deps não-declaradas
+  quanto um **segundo sistema de migrations** (SQL aplicado por psql no boot) que torna um `runMigrations()`
+  JS **morto**. Footgun recorrente: script `"test": "docker compose down -v && …"` — o `-v` **apaga o
+  volume do banco**; rodar `npm test` destrói dados. Sinalize e neutralize (placeholder não-destrutivo).
