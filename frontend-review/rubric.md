@@ -393,6 +393,19 @@ click, drive them separately for now (interaction steps are a planned engine fea
   (botões) costuma ser a última — ela é a primeira a sumir no scroll horizontal do desktop, escondendo a
   ação mais importante. Sempre re-capture a tabela após adicionar colunas e confirme que a última coluna
   (ações) aparece sem scroll no viewport alvo; aperte frações + min-width até caber.
+- **2026-07-15 (via CoinHub — ícone-botão num flex encolhe abaixo do tap-target):** Um botão pequeno
+  quadrado (ex.: um ✕ de "limpar", com `width/height` fixos) colocado num container **flex** (`inline-flex`/
+  `flex`) pode ser **encolhido pelo flex-shrink abaixo do piso de 24px** mesmo com `width` setado — o sinal
+  `tinyTargets` pegou um ✕ renderizado a **12×24** apesar de `width:1.5rem`. Regra: todo ícone-botão dentro
+  de um flex precisa de **`flex: none`** (+ `min-width`/`min-height` explícitos) senão vira alvo minúsculo
+  em algum viewport. Cheque no código: grep botões quadrados de ícone dentro de `display:flex` e confirme
+  `flex:none`/`min-width`. Barato de corrigir, e o sinal automático já aponta — mas o fix é `flex:none`, não
+  só aumentar `width` (que o shrink ignora).
+- **2026-07-15 (via CoinHub — dirigir `<input type=date>` e o formato do date picker nativo):** Para semear
+  um `<input type="date">` via `evalJs` no capture, set `el.value='YYYY-MM-DD'` (SEMPRE ISO, independente do
+  locale) e dispare **`input` E `change`** (Svelte/bind escuta os dois). E não reporte como bug que o campo
+  mostre `mm/dd/yyyy` vs `dd/mm/aaaa`: o formato exibido do date picker nativo vem do **locale do
+  navegador**, não da app (o Chrome headless costuma ser en-US) — só o `value` (ISO) importa para a lógica.
 - **2026-07-15 (via CoinHub):** Dois pontos de MÉTODO ao capturar uma SPA atrás de nginx com filtros
   `<select>`. (1) **Aponte a base para o host do SPA (nginx), não para a porta da API** — bater direto no
   backend (`:5020`) devolve "404 page not found" para `/` (a API só serve rotas de API; o `dist/` é servido
