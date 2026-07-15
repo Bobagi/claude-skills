@@ -393,6 +393,18 @@ click, drive them separately for now (interaction steps are a planned engine fea
   (botões) costuma ser a última — ela é a primeira a sumir no scroll horizontal do desktop, escondendo a
   ação mais importante. Sempre re-capture a tabela após adicionar colunas e confirme que a última coluna
   (ações) aparece sem scroll no viewport alvo; aperte frações + min-width até caber.
+- **2026-07-15 (via CoinHub):** Dois pontos de MÉTODO ao capturar uma SPA atrás de nginx com filtros
+  `<select>`. (1) **Aponte a base para o host do SPA (nginx), não para a porta da API** — bater direto no
+  backend (`:5020`) devolve "404 page not found" para `/` (a API só serve rotas de API; o `dist/` é servido
+  pelo nginx). O token de sessão é válido em qualquer host (lookup por hash), então injete o mesmo cookie com
+  `--cookie-domain <host-publico>` e capture a URL pública (cookie `Secure` ⇒ precisa de HTTPS). (2) Para
+  **dirigir um `<select>` nativo** via `evalJs`, o valor tem que ser **UMA expressão** — `page.evaluate(str)`
+  do Puppeteer avalia a string como expressão, então `const s=…; s.dispatchEvent(…)` (múltiplas instruções)
+  lança SyntaxError e a ação falha silenciosa (o "action failed" aparece, mas o shot ainda é escrito no
+  estado ERRADO). Embrulhe numa IIFE: `(function(){var s=document.querySelectorAll('.x select')[0]; s.value='sold'; s.dispatchEvent(new Event('change',{bubbles:true}));})()`.
+  Setar `.value` + disparar `change` é o caminho (opções de `<select>` não são "texto clicável" p/ `clickText`).
+  Sempre confira no screenshot que o filtro REALMENTE trocou (conte linhas/leia o cabeçalho), não confie no
+  "✓" da cena.
 - **2026-07-12 (via CoinHub):** Para uma tabela larga que estoura o card em telas grandes, a correção
   "alargar o container" tem que ser CIENTE de elementos fixed nas calhas (ad-rails/sidebars): esses se
   posicionam via a largura ANTIGA do container (ex.: `--page-max`), então alargar o conteúdo além dela no
