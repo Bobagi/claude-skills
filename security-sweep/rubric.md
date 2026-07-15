@@ -296,6 +296,15 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   E concorrência quando o fluxo E2E exige credencial externa que você não deve usar. LIÇÃO META: para
   idempotência de escrita, um índice único (não um SELECT-then-INSERT) é a defesa de concorrência — e
   quando escopado por um predicado parcial, teste os DOIS lados (bloqueia o alvo, ignora o resto).
+- **2026-07-15 (via CoinHub — filtro enum num endpoint de leitura):** Ao auditar um parâmetro de
+  **enum/whitelist** que alimenta um `WHERE` (ex.: `status=open|sold|all`, `initiated_by=USER|BOT`), a
+  prova de segurança não é só "deu 200 sem erro de SQL" — é **contar as linhas para confirmar que o valor
+  inválido caiu no DEFAULT, não foi silenciosamente aceito**. Teste ao vivo: mande `status=sold' OR 1=1--`
+  e verifique que a contagem retornada é a do default (ex.: *open-only*), NÃO a de *sold* — se vier a
+  contagem de sold, o whitelist falhou e o URL-encoding mascarou. Dupla defesa correta = **whitelist para
+  constantes fixas no handler** (valor desconhecido → `""`/default) **+ bind param `$N`** no repo (o valor,
+  mesmo whitelistado, nunca é concatenado). E confirme que o fragmento base do WHERE mantém os invariantes
+  não-negociáveis (ex.: `status <> 'CANCELED'`, `user_id` da sessão) independentemente do filtro do cliente.
 - **2026-07-11 (via CoinHub):** Padrão "delete-and-recreate de linhas DERIVADAS" (ex.: reimportar/
   ressincronizar dados externos) é seguro SE o DELETE for escopado por 3 eixos: **dono (user_id da
   sessão) + partição (env/tenant) + um marcador que separa o derivado do real** (ex.: `is_imported=true`).
