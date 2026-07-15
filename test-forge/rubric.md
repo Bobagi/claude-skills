@@ -48,6 +48,20 @@ Pule: getters/setters triviais, o que o compilador/framework já garante, UI pur
   (só 1 passou, saldo consistente) — em Go use goroutines + `-race`; em app rodando, N requests paralelos.
 
 ## Learnings log (append-only, geral)
+- **2026-07-15 (via CoinHub):** Testar código **fuso-dependente por design** (ex.: converter uma DATA local
+  YYYY-MM-DD nas fronteiras do dia — início/fim — para um instante UTC) de forma determinística: **pine o
+  fuso** com `process.env.TZ` no TOPO do script (antes de qualquer uso de `Date`), e **escolha um fuso
+  NÃO-UTC** (ex.: `America/Sao_Paulo`, UTC-3). Sob UTC a meia-noite local == meia-noite UTC e o teste NÃO
+  distingue "construiu em hora local" de "construiu em UTC"; sob UTC-3 a meia-noite local vira 03:00Z, então
+  a asserção prova as DUAS coisas de uma vez (a matemática início/fim do dia E que usa hora local — uma
+  mutação para `Date.UTC(...)` daria 00:00Z e ficaria vermelha). Regra geral: para lógica dependente de
+  fuso/locale, não FUJA do fuso (rubric "sem depender de fuso") — **fixe um fuso específico e revelador** e
+  asserte o valor exato. 2 mutation-checks que fecharam o valor: inverter fim-do-dia→início-do-dia (script
+  node vermelho) e `UnixNano→UnixMilli` no codec do cursor keyset (round-trip perde os microssegundos → o
+  teste de round-trip com nanos .123456000 fica vermelho). LIÇÃO META p/ **paginação keyset**: o teste do
+  codec do cursor DEVE usar um timestamp com precisão de sub-segundo (microssegundo) no valor esperado,
+  senão um downgrade de precisão (nano→milli) passa silencioso e PULA/REPETE linhas na fronteira em produção.
+
 - **2026-07-07 (via CoinHub):** Ao fazer o **mutation check** (inverter uma regra pra provar que o teste
   fica vermelho), **NUNCA reverta a mutação com `git checkout <arquivo>`** se o arquivo tem mudanças
   **não-commitadas** — o checkout apaga TUDO que não foi commitado (as extrações/funções novas junto).
