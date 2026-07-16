@@ -509,3 +509,13 @@ click, drive them separately for now (interaction steps are a planned engine fea
   momento mas são conceitos distintos (ex.: um relógio "Fass/Vome" que compartilha a duração mas não é o
   mesmo ciclo). Promovido a um item de checklist (Pillar 1 · Information design). Também: superfície com
   poucos itens deve distribuir pela largura (`space-between`/center), não amontoar num canto deixando buraco.
+- **2026-07-16 (via warframe-farm-helper — duas caixas de busca ATIVAS na mesma tela):** Uma rubric antiga
+  minha dizia "confira que a busca do header e a busca-hero não brigam — redundância **aceitável se
+  intencional**"; foi tratada como intencional e o operador reclamou (duas barras na home). Lição: **duas
+  entradas de busca ATIVAS na mesma tela são redundância a CONFIRMAR com o dono, não a assumir intencional.**
+  O default de produto é **uma entrada de busca por tela**; a secundária vira dica/atalho (ex.: chips de
+  exemplo que levam aos resultados) ou é removida. Exceção legítima: uma página **dedicada a busca**
+  (resultados) pode ter a barra grande "da página" + a global do header — ali a grande é o campo ATIVO com o
+  termo (padrão tipo Google SERP), não redundância. Regra ao FLAGAR: numa tela que NÃO é de resultados de
+  busca, se há 2+ campos de busca que fazem a mesma coisa, reporte como redundância (P2) e proponha manter
+  só um. (Reforça o item Pillar 1 · Information design: vale para busca, não só para tiles/relógios.)
