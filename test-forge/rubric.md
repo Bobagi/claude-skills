@@ -89,3 +89,16 @@ Pule: getters/setters triviais, o que o compilador/framework já garante, UI pur
   (fomos conferir o COPY à toa). Bônus da sessão: quando módulos leem `process.env` no **load** (const
   no topo), o teste PRECISA setar o env ANTES do `require` — em `node --test` cada arquivo é um processo
   novo, então setar `process.env.X` no topo do arquivo de teste funciona e isola por arquivo.
+
+- **2026-07-16 (via warframe-farm-helper — a lição do git checkout mordeu DE NOVO):** Reincidência da lição
+  de 2026-07-07: rodei `git checkout server/search.js` pra reverter uma mutação, mas o arquivo tinha
+  melhorias NÃO-commitadas (um filtro novo + um export) → o checkout apagou tudo e voltou pro último commit,
+  que era a versão ANTIGA. Sintoma: 2 testes que passavam voltaram a falhar depois do "revert". Mitigação
+  reforçada: **antes de fazer mutation-check, COMMITE** (ou copie o arquivo pra /tmp e mute a cópia, ou
+  reverta a mutação com o `sed` inverso exato — nunca `git checkout` de arquivo com trabalho pendente). Um
+  `git status` antes do checkout teria mostrado o arquivo modificado. Segunda lição, geral: para testar
+  "componente X é ingrediente (não vira sub-doc de busca)", a distinção robusta NÃO é "tem drop de relíquia"
+  (exclui peças de warframe que dropam de boss) e sim **"o nome do componente é um item próprio no banco"**
+  (Morphics/Orokin Cell são recursos avulsos) — com um **fallback de lista curada** para recursos que o
+  dataset lista como componente mas não cataloga como item próprio (Orokin Cell/Morphics ficam num Misc não
+  ingerido). Testar os dois lados: a peça vira sub-doc, o recurso avulso não.
