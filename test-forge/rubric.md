@@ -81,3 +81,11 @@ Pule: getters/setters triviais, o que o compilador/framework já garante, UI pur
   janela/página pedida as contém** (comparando start/end/fromId da query) — assim o teste exercita a
   lógica de janelamento/paginação em si, não só o parse do JSON. Grave também os parâmetros recebidos
   pelo fake (ex.: lista de fromId) e afirme sobre eles: prova que a 2ª página foi pedida do ponto certo.
+
+- **2026-07-16 (via warframe-farm-helper):** Em **Node 22.23**, `node --test test/` (diretório como
+  argumento) falha com `MODULE_NOT_FOUND: Cannot find module '/app/test'` — o runner tenta carregar o
+  caminho como entrypoint CJS. Use **`node --test` sem argumentos** (descobre `./test/**/*.test.js`
+  sozinho) ou um glob explícito. Sintoma enganoso: parece que o diretório não está na imagem Docker
+  (fomos conferir o COPY à toa). Bônus da sessão: quando módulos leem `process.env` no **load** (const
+  no topo), o teste PRECISA setar o env ANTES do `require` — em `node --test` cada arquivo é um processo
+  novo, então setar `process.env.X` no topo do arquivo de teste funciona e isola por arquivo.
