@@ -153,7 +153,9 @@ function collectSignals() {
     }
   }
   for (const img of document.querySelectorAll('img')) {
-    if (!img.alt && img.getAttribute('role') !== 'presentation' && img.getAttribute('aria-hidden') !== 'true') {
+    // alt="" é a marcação CORRETA de imagem decorativa (WAI) — só acusar quando
+    // o atributo está realmente ausente
+    if (!img.hasAttribute('alt') && img.getAttribute('role') !== 'presentation' && img.getAttribute('aria-hidden') !== 'true') {
       if (out.missingAlt.length < 25) out.missingAlt.push({ el: desc(img), src: (img.currentSrc || img.src || '').slice(-60) });
     }
   }

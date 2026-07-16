@@ -448,6 +448,19 @@ click, drive them separately for now (interaction steps are a planned engine fea
   não dispara overflow nem layout-shift, só o console denuncia. E o piso de tap-target (24px) num link de
   tabela densa se resolve com `display:inline-block; padding:Ypx 0; min-height:24px` no `<a>` (a célula já
   tem padding, mas o sinal mede o bounding-box do link, não da célula).
+- **2026-07-16 (via warframe-farm-helper — ENGINE fix `missingAlt` + review atrás de CDN/proxy com cache):**
+  (1) O check de alt usava `!img.alt`, que acusa **`alt=""` — a marcação CORRETA de imagem decorativa**
+  (WAI): false-positive em todo site bem feito. Corrigido para `!img.hasAttribute('alt')`; regra geral:
+  `alt` vazio ≠ `alt` ausente — só o segundo é bug. (2) Ao re-capturar um site atrás de **CDN/proxy com
+  cache de estáticos** (Cloudflare & co.) logo após um deploy, os shots podem vir com **JS/CSS VELHOS**
+  (o fix "não aparece" — sintoma: comportamento antigo num arquivo que você acabou de mudar). Verifique
+  contra a ORIGEM (`http://127.0.0.1:<porta>`) para validar o fix agora, e deixe o edge expirar (ou
+  purge) para o público. Nunca conclua "fix não funcionou" a partir de um shot atrás de cache. (3) Uma
+  **faixa/barra horizontal de status com scrollbar oculta**: no MOBILE o chip cortado na borda é
+  affordance suficiente, mas no DESKTOP (mouse, sem swipe) conteúdo cortado fica inalcançável na
+  prática — dimensione para caber TUDO no viewport desktop comum (compacte: segundos só quando faltam
+  <10min, letter-spacing, divisores) e verifique na banda mais justa (viewport = max-width do wrap
+  +20px), nos DOIS idiomas (PT costuma ser mais largo que EN).
 - **2026-07-16 (via warframe-farm-helper — toggle de idioma i18n + default por locale):** Ao revisar um
   **toggle de idioma** (PT/EN) cujo default segue `navigator.language`: o **headless Chrome roda em en-US**,
   então as páginas em "idioma default" renderizam no idioma do NAVEGADOR (EN), não no que você imagina —
