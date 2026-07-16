@@ -339,6 +339,21 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   derivada (true) para o MESMO usuário + uma real de OUTRO usuário; rode o DELETE do código; prove que só
   a derivada do dono some (as duas reais sobrevivem). Serialize reimports concorrentes com advisory lock
   por usuário (namespace distinto dos outros locks) para o delete-all+insert não duplicar.
+- **2026-07-16 (via warframe-farm-helper — amplificação de fan-out contra API de 3º, cota de SAÍDA):**
+  A classe 1 (quota/limite) tem um espelho pouco lembrado: além de proteger NOSSO recurso finito de
+  requests de ENTRADA, cuide da **cota de SAÍDA quando um endpoint faz fan-out para uma API pública de
+  3º**. Um endpoint que, por request, dispara **N fetches a um host externo** (agregador de estado,
+  proxy, dashboard que junta várias fontes) **amplifica**: sem coalescência, uma rajada de M requests
+  concorrentes na janela de **TTL vencido** vira **N×M** chamadas ao upstream — e como saem do **mesmo IP
+  do servidor** (compartilhado com os outros serviços do host), um atacante não-autenticado provoca
+  **rate-limit/ban do nosso IP** na API de 3º (nega a feature pra todos) com um `for`+`curl`. Defesas a
+  exigir/re-validar: **(a) cache com TTL + serve-stale**; **(b) coalescência de requests concorrentes**
+  (mapa `inflight` por chave → 1 Promise compartilhada; sem isso o cache não protege a janela de miss
+  concorrente); **(c)** idealmente um teto de concorrência ao upstream. **▶ Testar ao vivo:** dispare
+  uma rajada concorrente (`for i in $(seq 40); do curl ...& done; wait`) e, com `fetch` stubado num teste
+  unitário, **conte as chamadas ao upstream** — tem que ser 1 por chave/janela, não 1 por request. Fix é
+  barato e o teste do stub prova a coalescência de forma determinística. (Nota: isto é defense-in-depth
+  P2, não roubo de dado — mas é DoS-por-amplificação real e trivial de disparar num app público.)
 - **2026-07-16 (via warframe-farm-helper — app público read-only, sem auth/dinheiro):** Dois pontos de
   método para apps de **leitura sem login** (buscadores, dashboards públicos): (1) a superfície real é
   **input→URL externa (SSRF de PATH)** e **input→SQL/render**, não as classes de sessão/dinheiro — não
