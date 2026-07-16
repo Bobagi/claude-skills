@@ -448,3 +448,15 @@ click, drive them separately for now (interaction steps are a planned engine fea
   não dispara overflow nem layout-shift, só o console denuncia. E o piso de tap-target (24px) num link de
   tabela densa se resolve com `display:inline-block; padding:Ypx 0; min-height:24px` no `<a>` (a célula já
   tem padding, mas o sinal mede o bounding-box do link, não da célula).
+- **2026-07-16 (via warframe-farm-helper — toggle de idioma i18n + default por locale):** Ao revisar um
+  **toggle de idioma** (PT/EN) cujo default segue `navigator.language`: o **headless Chrome roda em en-US**,
+  então as páginas em "idioma default" renderizam no idioma do NAVEGADOR (EN), não no que você imagina —
+  rotular a cena "pt-mobile" NÃO força PT. Para capturar um idioma específico, **semeie
+  `localStorage['<lang-key>']` + reload** (mesmo padrão do consent-seed) OU lance o browser com locale
+  fingido. Sempre capture os DOIS idiomas e confirme visualmente que TUDO trocou (nav, chips, placeholders,
+  seções, e conteúdo gerado no servidor como passo-a-passo/prosa) — um toggle costuma cobrir a UI estática e
+  esquecer a prosa gerada (steps, mensagens), que fica no idioma antigo. Padrão de header responsivo que
+  funcionou (busca fixa + toggle): mobile-first com `flex-wrap` e `order` — marca+toggle na linha 1 (toggle
+  `margin-left:auto`), busca `flex-basis:100%` na linha 2, nav rolável na linha 3; num breakpoint (~760px)
+  vira `flex-nowrap` uma linha só (marca·nav·busca que cresce·toggle). Verifique que a busca compacta do
+  header e a busca-hero da home não brigam (duas caixas) — redundância aceitável se intencional.
