@@ -436,3 +436,15 @@ click, drive them separately for now (interaction steps are a planned engine fea
   `width:100% + padding` vira overflow de poucos px no mobile — invisível no desktop), por `:focus-visible`
   (ausência total = zero anel de foco de teclado, invisível em screenshot) e por `prefers-reduced-motion`
   (animações decorativas sem guarda). Os três faltando juntos é o padrão "projeto quase pronto".
+- **2026-07-16 (via warframe-farm-helper — CSP vs redirect de CDN de imagem):** Quando as imagens vêm de um
+  CDN que **301/302-redireciona** para outro host (comum: `cdn.foo.us/img/x.png` → `raw.githubusercontent.com/...`),
+  a CSP `img-src` precisa liberar **os DOIS hosts** — o navegador checa o destino do redirect contra a
+  política, então liberar só o host inicial faz a imagem **falhar silenciosamente** (aparece o alt/ícone
+  quebrado). Sintoma no capture: `consoleErrors` cheio de "Loading the image '<host-do-redirect>' violates
+  ... Content Security Policy" e o sinal `missingAlt`/imagem quebrada na tela. Método que pegou: ler o
+  `.consoleErrors` do manifest (não só os sinais visuais) — erro de CSP de imagem só aparece no console, e um
+  `curl -I` na URL do CDN revela o `location:` do redirect. Fix: adicionar o host de destino ao `img-src`.
+  LIÇÃO META: sempre leia `consoleErrors` do manifest numa página com imagens de 3º — CSP de imagem quebrada
+  não dispara overflow nem layout-shift, só o console denuncia. E o piso de tap-target (24px) num link de
+  tabela densa se resolve com `display:inline-block; padding:Ypx 0; min-height:24px` no `<a>` (a célula já
+  tem padding, mas o sinal mede o bounding-box do link, não da célula).
