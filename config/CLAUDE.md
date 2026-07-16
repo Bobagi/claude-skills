@@ -80,6 +80,11 @@ teste confiável que roda e pode falhar — priorize o caminho do dinheiro) e, e
   campanha, gasto por dia, CPI, conversões (instalações) por campanha/grupo. Exige developer
   token com acesso Básico aprovado (setup único: `google-ads/SETUP.md`); reusa o OAuth client
   do AdMob. Criar/pausar/editar campanha = operador na UI.
+- **`cloudflare`** — DNS da zona `bobagi.space` no Cloudflare via API (`scripts/cf-dns.sh`):
+  criar/alterar/remover subdomínios (A/CNAME, proxied/DNS-only). **DNS é SÓ no Cloudflare**
+  (painel Hostinger morto desde 2026-07-06 — nameservers movidos). Use ao subir/derrubar
+  serviço web no VPS ou em "crie um subdomínio"/"altere o DNS". Credenciais só no VPS
+  (`/root/.config/cloudflare/`, chmod 600); de outra máquina, executar via skill `vps` (SSH).
 
 > **Limite transversal Google (Play/AdMob/Ads):** o que a API oficial não cobre (pagamentos,
 > data safety, criar ad unit/mediação, consent screen) é feito PELO OPERADOR guiado passo a

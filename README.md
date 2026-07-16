@@ -52,6 +52,7 @@ ou `bash <repo>/sync.sh`. Depois, **reinicie o Claude** (um `claude` novo) para 
 | `google-play` | `/gplay` | Releases na Play Store via Play Developer API (service account): sobe AAB, tracks, promoção, rollout gradual, reviews e listing. Credenciais fora do repo (`~/.config/bobagi-google/`); setup único do operador em `google-play/SETUP.md`. |
 | `admob` | `/admob` | Relatórios AdMob via API (receita, eCPM, impressões por dia/ad unit/país) + inventário de ad units. OAuth do dono da conta (setup único em `admob/SETUP.md`); escrita de inventário é restrita pelo Google (fallback manual documentado). |
 | `google-ads` | `/gads` | Relatórios Google Ads via API (somente leitura): status/orçamento de campanha, gasto por dia, CPI, conversões por campanha/grupo. Exige developer token com acesso Básico aprovado (setup único em `google-ads/SETUP.md`); reusa o OAuth client do AdMob. |
+| `cloudflare` | `/cloudflare` | Gerencia o DNS da zona `bobagi.space` no Cloudflare via API (`scripts/cf-dns.sh`): cria/altera/remove subdomínios (A/CNAME, proxied/DNS-only). DNS é SÓ no Cloudflare (Hostinger morto desde 2026-07-06). Credenciais fora do repo (`/root/.config/cloudflare/` no VPS, chmod 600); de outra máquina, executa via skill `vps` (SSH). |
 
 ### Plugins (marketplace `claude-plugins-official` = `anthropics/claude-plugins-official`)
 | Plugin | Para que serve |
