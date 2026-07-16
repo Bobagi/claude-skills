@@ -315,6 +315,22 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   constantes fixas no handler** (valor desconhecido → `""`/default) **+ bind param `$N`** no repo (o valor,
   mesmo whitelistado, nunca é concatenado). E confirme que o fragmento base do WHERE mantém os invariantes
   não-negociáveis (ex.: `status <> 'CANCELED'`, `user_id` da sessão) independentemente do filtro do cliente.
+- **2026-07-16 (via todo — GIS ID-token login, distinto do code-flow):** O login **Google Identity
+  Services** (botão `g_id_onload`/`renderButton` → `idToken` → `verifyIdToken` no server) é um fluxo
+  DIFERENTE do OAuth redirect-code (client_secret + redirect + `state`): **não há redirect, logo não
+  precisa de cookie `state`** — o anti-forjação é a **assinatura RS256 + audience** do próprio ID token
+  (um atacante não consegue emitir token assinado pra aquele `client_id`). Os DOIS footguns reais da
+  classe 16 aqui: (a) **auto-link por e-mail** — casar por `google_id OR email` deixa uma conta Google
+  assumir a conta local de MESMO e-mail (takeover) assim que o signup local capturar e-mail; casar
+  **só por `google_id`** (subject estável) e **exigir `payload.email_verified`**; (b) se você **injeta o
+  client id (público) no HTML server-side**, **valide o formato** (`^[\w-]+\.apps\.googleusercontent\.com$`)
+  antes de substituir, senão um env malformado quebra o contexto do `<script>` (class 10). Re-valide
+  também: provider **off sem env** (botão sumido no front + endpoint rejeitando todo token com audience
+  `""`) — nunca uma rota meio-configurada. Teste ao vivo: POST `/google-login` com JWT forjado/`alg:none`/
+  `email_verified:false` ⇒ 400 (a assinatura falha primeiro); guard de injeção com valores break-out ⇒
+  string vazia. Nota de método: o branch de CRIAÇÃO de conta (token Google-assinado real) só fecha e2e com
+  origin autorizado no console do Google — verifique os branches de rejeição ao vivo e diga que o happy-path
+  depende do passo manual do operador (não finja cobertura).
 - **2026-07-11 (via CoinHub):** Padrão "delete-and-recreate de linhas DERIVADAS" (ex.: reimportar/
   ressincronizar dados externos) é seguro SE o DELETE for escopado por 3 eixos: **dono (user_id da
   sessão) + partição (env/tenant) + um marcador que separa o derivado do real** (ex.: `is_imported=true`).
