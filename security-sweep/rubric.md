@@ -339,3 +339,20 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   derivada (true) para o MESMO usuário + uma real de OUTRO usuário; rode o DELETE do código; prove que só
   a derivada do dono some (as duas reais sobrevivem). Serialize reimports concorrentes com advisory lock
   por usuário (namespace distinto dos outros locks) para o delete-all+insert não duplicar.
+- **2026-07-16 (via warframe-farm-helper — app público read-only, sem auth/dinheiro):** Dois pontos de
+  método para apps de **leitura sem login** (buscadores, dashboards públicos): (1) a superfície real é
+  **input→URL externa (SSRF de PATH)** e **input→SQL/render**, não as classes de sessão/dinheiro — não
+  desperdice o sweep tentando IDOR onde não há usuário. Quando o único input que toca uma URL externa é um
+  `slug`/`id` que vira **só o PATH** de um host FIXO (ex.: `api.foo.com/item/<slug>`), o SSRF é baixo risco
+  **desde que a validação (whitelist regex) rode ANTES de montar a URL** — prove disparando `..%2f..%2f`,
+  `;`, espaço no slug e confirmando rejeição antes de qualquer fetch. (2) **CSP `style-src 'self'` SEM
+  `'unsafe-inline'` quebra atributos `style=""`** (inline style attrs contam como inline-style e são
+  bloqueados) — se a app usa `style=` inline, ou remove todos, ou usa `style-src 'self' 'unsafe-inline'`
+  MANTENDO `script-src 'self'` estrito (é o script-src que barra XSS; style inline é risco baixo e some de
+  vez se não há HTML de usuário). Testar CSP com `curl -I | grep -o "style-src[^;]*"` e confirmar que
+  `script-src` NÃO ganhou `unsafe-inline` junto. Bônus: retornar **200 com `{error}`** para input inválido
+  é mau cheiro de status (não-vuln) — valide na rota e devolva 400; um handler que delega a validação a uma
+  função de serviço que retorna `{error}` costuma esquecer de setar o status. Re-validado que funciona bem:
+  render 100% via `textContent`/DOM (nunca innerHTML com dado de API), markdown de conteúdo **sanitizado na
+  INGESTÃO** (renderer do marked escapa HTML cru + remove href de esquema perigoso) — assim o cliente pode
+  confiar no HTML servido; token-bucket por IP protegendo cota de API paga de 3º (CSE) + cache por query.
