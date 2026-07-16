@@ -77,6 +77,18 @@ Every finding must carry: **what** (the problem), **where** (route + viewport + 
 - [ ] Error state is styled and actionable (matches the app's error pattern, not a raw browser alert).
 - [ ] Success/confirmation feedback for actions.
 
+### Information design (redundancy & space)
+- [ ] **When a surface repeats N items of the same type** (clocks, status pills, "balance" cards, metric
+  tiles, list rows), check the **semantic relationship** between them, not just that they render. Two items
+  that **always carry the same information** are redundant → **merge them into one** (and reclaim the space).
+  Do NOT clear this by observing that "right now they show different values" — values can coincide or diverge
+  by chance; ask whether they are the *same underlying thing by design*. (Real case: two day/night clocks,
+  "Cetus" and "Earth", that the game syncs 1:1 — obvious once merged, invisible while a data bug made them
+  show different states.) Conversely, don't merge items that only *happen* to match now but are distinct
+  concepts (e.g. a "Fass/Vome" clock that shares a duration but not the same cycle).
+- [ ] **A surface with few items shouldn't bunch to one side** — distribute across the width
+  (`justify-content: space-between/around`) or center, so freed space is used, not left as a dead gap.
+
 ---
 
 ## Pillar 2 — Front-end code
@@ -484,3 +496,16 @@ click, drive them separately for now (interaction steps are a planned engine fea
   `margin-left:auto`), busca `flex-basis:100%` na linha 2, nav rolável na linha 3; num breakpoint (~760px)
   vira `flex-nowrap` uma linha só (marca·nav·busca que cresce·toggle). Verifique que a busca compacta do
   header e a busca-hero da home não brigam (duas caixas) — redundância aceitável se intencional.
+- **2026-07-16 (via warframe-farm-helper — redundância semântica que só emerge após fix de dados):** Uma
+  review NÃO deve tratar "dois itens do mesmo tipo mostram valores diferentes agora" como prova de que não
+  são redundantes. Caso real: dois relógios dia/noite ("Cetus" e "Terra") que o jogo sincroniza 1:1 por
+  design (U38.5) apareciam com estados DIFERENTES na 1ª review — porque uma das fontes de dado estava bugada
+  (Terra vinha de uma API legada mostrando "noite" enquanto Cetus mostrava "dia"). A duplicação (dois chips
+  carregando sempre a mesma info) só ficou óbvia DEPOIS de corrigir o dado. Lição: ao ver N itens do mesmo
+  tipo, pergunte se são **a mesma coisa subjacente por design** (→ fundir e reaproveitar o espaço), não se
+  os valores atuais coincidem — valores coincidem/divergem por acaso, inclusive por BUG. Método barato:
+  para cada par de itens repetidos, cheque na fonte/no código se derivam do mesmo dado; se sim, é candidato
+  a fusão mesmo que na tela de agora estejam diferentes. E o inverso: não funda itens que só coincidem no
+  momento mas são conceitos distintos (ex.: um relógio "Fass/Vome" que compartilha a duração mas não é o
+  mesmo ciclo). Promovido a um item de checklist (Pillar 1 · Information design). Também: superfície com
+  poucos itens deve distribuir pela largura (`space-between`/center), não amontoar num canto deixando buraco.
