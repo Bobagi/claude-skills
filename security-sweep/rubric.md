@@ -393,3 +393,14 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   render 100% via `textContent`/DOM (nunca innerHTML com dado de API), markdown de conteúdo **sanitizado na
   INGESTÃO** (renderer do marked escapa HTML cru + remove href de esquema perigoso) — assim o cliente pode
   confiar no HTML servido; token-bucket por IP protegendo cota de API paga de 3º (CSE) + cache por query.
+- **2026-07-17 (via warframe-farm-helper — SCRAPING de 3º renderizado no front):** Ao puxar dado de uma
+  fonte externa que você NÃO controla (wiki/scraping, RSS, API de comunidade) e mostrá-lo, trate o conteúdo
+  como HOSTIL mesmo que a fonte seja "confiável" — a wiki é editável por qualquer um, então uma recompensa
+  de quest poderia conter `<img src=x onerror=...>`. Defesa em DUAS camadas, ambas necessárias: (1)
+  **sanitizar na ORIGEM ao parsear** (o `cleanLines` do wikitext remove `<[^>]+>` e resolve
+  links/templates para texto puro) e (2) **renderizar via `textContent`** no front (nunca innerHTML). Teste
+  ao vivo: passe `<img src=x onerror=alert(1)>Evil` pelo parser e confirme que a tag some (só sobra "Evil").
+  SSRF do fetch de scraping: **host FIXO + `encodeURIComponent`** do termo (que vem do dataset, não do
+  usuário direto) = SSRF de path baixo risco; nunca deixe o host/scheme vir do input. Cacheie em banco com
+  TTL longo (dado de wiki quase não muda) para não martelar o site de 3º. LIÇÃO META: "fonte confiável" não
+  é sanitização — todo conteúdo de 3º renderizado passa por sanitização-na-origem + textContent, ponto.
