@@ -533,3 +533,14 @@ click, drive them separately for now (interaction steps are a planned engine fea
   inativo, é candidato a collapse. NOTA de método: para capturar o estado ABERTO de um `<details>`, dispare
   `document.querySelector('.x > summary').click()` via `evalJs` + `wait` antes do shot (o fold-shot padrão
   pega só o estado fechado no topo). Promovido ao item Pillar 1 · Information design.
+- **2026-07-17 (via warframe-farm-helper — badge de estado BINÁRIO aplicado a tipo que não tem esse eixo):**
+  Um badge de status de duas faces (Disponível/Vaulted, Ativo/Inativo, Em estoque/Esgotado) derivado de um
+  booleano `available` mostra o rótulo ERRADO quando renderizado num tipo de item que **não possui esse
+  eixo de estado**. Caso real: um recurso bruto (Orokin Cell) caía em `available=false` (não tinha relíquia
+  nem fonte no dataset) e exibia **"VAULTED"** — mas recurso não vaulta, está sempre disponível. O default
+  `false` de um flag de disponibilidade vira uma AFIRMAÇÃO FALSA de estado. Checagem ao revisar qualquer
+  badge de status: confirme que TODO tipo que chega ali realmente tem os dois estados possíveis; para os
+  tipos sem esse eixo (recursos, itens sempre-disponíveis, categorias "N/A"), ou force o estado correto na
+  origem, ou não renderize o badge. Method: abra a página de um item de CADA tipo que compartilha o
+  componente de badge (não só o tipo "normal") e leia o rótulo — um badge "errado mas plausível" passa
+  despercebido se você só olha o caso feliz. (Cruza com Pillar 1 · Information design.)
