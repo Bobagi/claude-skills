@@ -241,6 +241,28 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
 ---
 
 ## Learnings log (append-only, geral)
+- **2026-07-17 (via investidor10 — leitor server-side de API JSON de 3º, SSRF classe 6):** Quando um
+  serviço lê uma API externa a partir de um **id/URL do usuário** mas extrai **só um id numérico** e monta
+  toda request contra um **host fixo**, o desenho já é SSRF-safe — mas a classe 6 tem DOIS pontos cegos que
+  um review estático quase sempre esquece e que valem P2 de defense-in-depth (dispare-os): **(a) PIN de host
+  no REDIRECT** — `requests`/`fetch` seguem 3xx por padrão; um open-redirect no host confiável levaria a um
+  alvo interno. Prove stubando o cliente HTTP pra devolver uma resposta cujo `response.url` final é
+  `http://169.254.169.254/...` e confirmando que o código **valida o host FINAL** (`urlparse(response.url)
+  .hostname` na allowlist), não só o host que ele mesmo montou. **(b) valor da RESPOSTA do 3º que reflui pra
+  um segmento de PATH** (ex.: um "type"/"category" vindo do próprio JSON externo que vira `.../actives/{id}/
+  {type}`) — não muda o host (o `@`/`../` cai no path porque a autoridade termina no 1º `/`), mas um token
+  com `../` atinge um path arbitrário no host confiável; **whitelist com regex de identificador**
+  (`^[A-Za-z][A-Za-z0-9_-]{0,40}$`) ANTES de montar a URL, filtrando na descoberta e guardando no fetch
+  (token ruim ⇒ `[]`, zero request). **Método de prova de SSRF sem rede:** instrumente `requests.get` pra
+  **gravar o hostname de CADA URL de saída**, jogue os payloads hostis (`169.254.169.254`, `localhost:<porta
+  interna>`, `evil.com`, sufixo `investidor10.com.br.evil.com`, userinfo `investidor10.com.br@evil.com`,
+  `file://`, `gopher://`) e afirme DUAS coisas: os hostis **levantam antes de qualquer request** (contador
+  em 0) e um id válido contata **só** o host allowlistado. O truque de **userinfo** (`host-bom@host-mau`) e o
+  de **sufixo** (`host-bom.host-mau`) são os dois que um `in`/`startswith` ingênuo deixa passar — `urlparse`
+  resolve o hostname certo (host-mau), então validar `host == ALVO or host.endswith("." + ALVO)` pega ambos.
+  Nota de gotcha de teste: ao passar a validar `response.url`, os fakes de resposta dos testes existentes
+  precisam expor um atributo `.url` (senão AttributeError vira "erro" em massa que MASCARA o resultado real).
+
 - **2026-07-08 (via CoinHub — compilado de segurança + par com `app-essentials`):** destiladas de uma app
   madura de dinheiro três classes que faltavam explícitas: **16 (OAuth/federada)** — state conferido,
   e-mail verificado, subject-match, provider off sem env; **17 (trilha + anomalia de login)** — audit
