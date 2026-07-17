@@ -519,3 +519,17 @@ click, drive them separately for now (interaction steps are a planned engine fea
   termo (padrão tipo Google SERP), não redundância. Regra ao FLAGAR: numa tela que NÃO é de resultados de
   busca, se há 2+ campos de busca que fazem a mesma coisa, reporte como redundância (P2) e proponha manter
   só um. (Reforça o item Pillar 1 · Information design: vale para busca, não só para tiles/relógios.)
+- **2026-07-17 (via warframe-farm-helper — lista longa com itens "ativos" vs "históricos/inativos"):**
+  Quando uma lista mistura itens **acionáveis agora** com itens **inativos/históricos** (disponível vs
+  vaulted, ativo vs arquivado/expirado, em estoque vs esgotado), e os inativos são a MAIORIA (aqui: 37 de
+  39 relíquias vaulted por componente), despejar tudo afoga a informação que o usuário precisa e empurra o
+  resto da página para longe. Padrão: **mostrar os ATIVOS inline + colapsar os inativos num `<details>`**
+  ("▸ Ver N vaulted"), com um estado vazio ("nenhum disponível — todos vaulted") quando não há ativos.
+  `<details>/<summary>` nativo é a ferramenta certa (acessível por teclado de graça); estilizar com
+  `summary{list-style:none}` + `::-webkit-details-marker{display:none}` + um chevron `::before` que rotaciona
+  em `[open]`, e **`summary:focus-visible`** explícito (o foco default some ao remover o marker). Checagem
+  ao revisar QUALQUER lista longa: os itens estão ORDENADOS com o acionável primeiro (o backend já ordenava
+  disponível→vaulted) E o inativo em massa está colapsado? Se a lista tem >~10 itens e a maioria é ruído
+  inativo, é candidato a collapse. NOTA de método: para capturar o estado ABERTO de um `<details>`, dispare
+  `document.querySelector('.x > summary').click()` via `evalJs` + `wait` antes do shot (o fold-shot padrão
+  pega só o estado fechado no topo). Promovido ao item Pillar 1 · Information design.
