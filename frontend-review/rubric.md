@@ -554,3 +554,13 @@ click, drive them separately for now (interaction steps are a planned engine fea
   'flutter.settings.locale', JSON.stringify('hi'))` + reload + wait) — e então percorra home, sheets,
   seleção e telas de jogo. Cobre também: tile do idioma novo no seletor com bandeira/check, e a
   auto-detecção (supportedLocales gerado) sem precisar de aparelho real. (Cruza com Pillar 3 · i18n.)
+- **2026-07-17 (via warframe-farm-helper — i18n que MUTA cache vaza um idioma pro outro):** Ao traduzir/
+  transformar server-side dados que vêm de um **cache compartilhado** (um TTL-cache em memória, um objeto
+  reaproveitado entre requests), **CLONE antes de transformar** (`map(x => ({...x, campo: tr(x.campo)}))`),
+  nunca mute em lugar. Caso real: o handler traduzia `location` mutando os objetos retornados por um cache
+  de drops → o cache ficava em PT e o **request EN seguinte vinha traduzido** (um idioma vazando pro outro,
+  de forma dependente-de-ordem e intermitente). Método de review que PEGA isso (o teste de "capturar os 2
+  idiomas" não basta se rodar sempre na mesma ordem): carregue PT primeiro, DEPOIS bata no MESMO recurso em
+  EN e confirme que voltou ao inglês — a contaminação só aparece na 2ª língua após a 1ª ter tocado o cache.
+  Vale para qualquer transform (formatar moeda/data, mascarar, reordenar) sobre dado cacheado: transform =
+  cópia. (Cruza com a checagem de i18n: teste os dois idiomas E a ordem entre eles.)
