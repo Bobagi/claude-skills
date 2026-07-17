@@ -544,3 +544,13 @@ click, drive them separately for now (interaction steps are a planned engine fea
   origem, ou não renderize o badge. Method: abra a página de um item de CADA tipo que compartilha o
   componente de badge (não só o tipo "normal") e leia o rótulo — um badge "errado mas plausível" passa
   despercebido se você só olha o caso feliz. (Cruza com Pillar 1 · Information design.)
+- **2026-07-17 (via tictacverse — review de LOCALE NOVO num app canvas):** ao revisar a adição de um
+  idioma cujo script a fonte bundled NÃO cobre (ex.: Devanagari com fonte latina como Fredoka), a
+  pergunta não é "a fonte tem os glifos?" (o fallback do sistema resolve) e sim: (a) o fallback
+  renderiza em TODAS as telas com peso/altura de linha aceitáveis? (b) strings do idioma novo, muitas
+  vezes mais LARGAS, estouram botões/cards/HUD apertados? Method p/ Flutter web e afins: em vez de
+  clicar até o seletor de idioma, FORCE o locale persistido antes do boot — shared_preferences web
+  grava em localStorage com prefixo `flutter.` e valor JSON-encodado (`localStorage.setItem(
+  'flutter.settings.locale', JSON.stringify('hi'))` + reload + wait) — e então percorra home, sheets,
+  seleção e telas de jogo. Cobre também: tile do idioma novo no seletor com bandeira/check, e a
+  auto-detecção (supportedLocales gerado) sem precisar de aparelho real. (Cruza com Pillar 3 · i18n.)
