@@ -48,6 +48,21 @@ Pule: getters/setters triviais, o que o compilador/framework já garante, UI pur
   (só 1 passou, saldo consistente) — em Go use goroutines + `-race`; em app rodando, N requests paralelos.
 
 ## Learnings log (append-only, geral)
+- **2026-07-17 (via investidor10):** Testar um parser **SSRF-safe do tipo "extraia um id de uma URL não
+  confiável e depois SEMPRE bata num host fixo"** (aqui: `parse_wallet_id` → só o id numérico flui adiante,
+  toda request é montada contra `API_BASE`). Dois testes fecham a propriedade sem rede: (1) a lista de
+  entradas hostis DEVE incluir o **truque de sufixo** `https://investidor10.com.br.evil.com/...` (não só um
+  host claramente estrangeiro) — a validação certa é `host == "investidor10.com.br" or
+  host.endswith(".investidor10.com.br")`, e o sufixo-trick só é rejeitado porque NÃO termina em
+  `.investidor10.com.br` (termina em `.evil.com`); um `in`/`startswith` ingênuo passaria; (2) um teste que
+  afirma `parse(...)` retorna `int` + que a constante `API_BASE` é o host esperado trava o "nunca contata
+  host arbitrário" mesmo offline. Mutation check revelador: trocar o guard de host por `if False:` — as
+  entradas hostis (metadata SSRF + sufixo-trick) devem ficar vermelhas. Bônus: para JSON de API externa com
+  **campos que variam por tipo** (Tesouro usa `avg_price_treasure`/`current_price_treasure`, ações usam
+  `avg_price`/`current_price`), o teste do normalizador tem que cobrir CADA forma; a mutação "remover o
+  fallback `... or _to_float(row.get('avg_price_treasure'))`" prova que o teste do Tesouro pega (avg_price→None).
+
+
 - **2026-07-15 (via CoinHub):** Testar código **fuso-dependente por design** (ex.: converter uma DATA local
   YYYY-MM-DD nas fronteiras do dia — início/fim — para um instante UTC) de forma determinística: **pine o
   fuso** com `process.env.TZ` no TOPO do script (antes de qualquer uso de `Date`), e **escolha um fuso
