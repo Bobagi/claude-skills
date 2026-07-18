@@ -410,6 +410,27 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   render 100% via `textContent`/DOM (nunca innerHTML com dado de API), markdown de conteúdo **sanitizado na
   INGESTÃO** (renderer do marked escapa HTML cru + remove href de esquema perigoso) — assim o cliente pode
   confiar no HTML servido; token-bucket por IP protegendo cota de API paga de 3º (CSE) + cache por query.
+- **2026-07-18 (via warframe-farm-helper — app que MIGRA de render client-side p/ SSR de HTML):** Quando
+  uma app cujo front era 100% `textContent` (XSS-safe por construção) ganha **render de HTML no servidor**
+  (SSR para SEO/crawlers, e-mail, PDF), toda a superfície de XSS **reabre** — o `escapeHtml` cobre o corpo
+  do texto (title/h1/parágrafo), mas há DOIS sinks que ele NÃO cobre e que um review estático quase sempre
+  esquece: **(a) o ESQUEMA de um `href`/`src`** — `escapeHtml` neutraliza aspas e `<>`, mas
+  `<a href="javascript:alert(1)">` passa intacto porque não tem metacaractere HTML; um `wiki_url`/`link`
+  vindo de dado EXTERNO (dataset, scraping) valendo `javascript:`/`data:` vira href executável. Fix:
+  `safeHttpUrl()` — só `^https?://` passa, senão não emita o link (é o que um renderer de markdown sério
+  já faz). A CSP `script-src 'self'` sem unsafe-inline bloqueia a execução na maioria dos browsers
+  (rebaixa p/ P2), mas sanitize na origem mesmo assim. **(b) `</script>` dentro de JSON-LD/JSON embutido** —
+  `JSON.stringify(obj)` num `<script type="application/ld+json">` fecha a tag se um valor contém
+  `</script>`; escape `<` → `<` no JSON serializado. **▶ Testar ao vivo (o que fecha):** semeie no DB
+  um item hostil com `<script>` no NOME, `<img onerror>` na DESCRIÇÃO e `javascript:alert()` num campo de
+  URL; bata na rota SSR e faça 3 asserts distintos — nome/descrição vêm `&lt;escapados&gt;` (grep do cru =
+  0), href `javascript:` = 0 ocorrências, e o JSON-LD não tem `</script>` cru. Cuidado no teste: `grep -c
+  "onerror=alert"` dá **falso-positivo** porque a substring existe dentro do texto JÁ escapado
+  (`&lt;img...onerror=alert&gt;`) — confirme lendo o trecho (`grep -o '<p...>.*</p>'`), não só a contagem.
+  Limpe o item semeado (DELETE + bump `last_ingest` p/ o mapa de slugs reconstruir sem ele). Re-validado:
+  slugs que só viram lookup em mapa/regex `[a-z0-9-]` ANTES do SQL matam SQLi/traversal (todos 404); e um
+  redirect 301 cujo destino é sempre caminho relativo próprio (`/x/…`) + `encodeURIComponent`/regex no
+  input não é open-redirect (prove com `//evil.com`, `https://evil.com` no param → Location nunca externo).
 - **2026-07-17 (via warframe-farm-helper — SCRAPING de 3º renderizado no front):** Ao puxar dado de uma
   fonte externa que você NÃO controla (wiki/scraping, RSS, API de comunidade) e mostrá-lo, trate o conteúdo
   como HOSTIL mesmo que a fonte seja "confiável" — a wiki é editável por qualquer um, então uma recompensa
