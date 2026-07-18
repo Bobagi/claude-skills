@@ -48,6 +48,18 @@ Pule: getters/setters triviais, o que o compilador/framework já garante, UI pur
   (só 1 passou, saldo consistente) — em Go use goroutines + `-race`; em app rodando, N requests paralelos.
 
 ## Learnings log (append-only, geral)
+- **2026-07-18 (via CoinHub — mutation check que COMPILA, não build-fail):** Ao mutar um guard cuja quebra
+  deixaria um símbolo **não-usado** (ex.: neutralizar `if host != H && !strings.HasSuffix(host, "."+H) {`
+  removendo o corpo torna `H`/`strings` órfãos → em Go isso é **erro de compilação**, não teste vermelho).
+  Um build-fail ainda prova que a linha é load-bearing, mas NÃO prova que o **teste** pega a regressão (o
+  compilador pegou, não o teste). Para um mutation check limpo, **inverta a DECISÃO mantendo os símbolos
+  referenciados**: aqui, anexar `&& false` à condição de rejeição (`... && false {`) faz o bloco nunca
+  executar → hosts hostis são ACEITOS → os testes de SSRF ficam vermelhos com asserção significativa
+  ("aceitou input hostil"). Regra geral: a melhor mutação é a que **compila e muda o comportamento**, não a
+  que apaga código. Padrão análogo em outras stacks: troque `x < limite` por `x <= limite` / `true`, não
+  delete a variável. (Fecha o caminho crítico da importação: parser anti-SSRF + matemática de cooldown 30min/
+  2min + flatten com drop de ticker vazio — 3 mutações, 3 vermelhos; Go via container com `CGO_ENABLED=1` +
+  `apk add gcc musl-dev` quando quiser `-race`, senão `-race` reclama "requires cgo".)
 - **2026-07-17 (via investidor10):** Testar um parser **SSRF-safe do tipo "extraia um id de uma URL não
   confiável e depois SEMPRE bata num host fixo"** (aqui: `parse_wallet_id` → só o id numérico flui adiante,
   toda request é montada contra `API_BASE`). Dois testes fecham a propriedade sem rede: (1) a lista de
