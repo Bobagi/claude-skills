@@ -616,6 +616,18 @@ click, drive them separately for now (interaction steps are a planned engine fea
   signup→promover no DB→**satisfazer TODOS os gates**→injetar cookie→dirigir com `--scenarios`.) Bônus: num
   painel de dado denso (tabela 8 col) o combo certo é métricas-em-chips (`flex-wrap`) ACIMA + tabela em
   `overflow-x:auto` — `overflowX=false` com a métrica principal nos chips é o padrão aprovado, não achado.
+- **2026-07-18 (via warframe-farm-helper — portar um bloco de ADS/3º-party de um app para outro):** Ao
+  reusar o padrão de anúncio de outro projeto (iframe A-ads em rails laterais + bloco mobile), os pontos
+  que realmente quebram são: (1) o **breakpoint dos rails deriva do page-max DESTE app**, não do original —
+  recalcule (`breakpoint ≈ page-max + 2×(rail+folga)`; aqui 1060px → 1420px, no original 1160px → 1520px)
+  e capture a faixa logo ACIMA do novo breakpoint; (2) **CSP**: iframe de ad exige `frame-src <host>` no
+  app destino (sem frame-src, default-src 'self' bloqueia SILENCIOSO — só o console denuncia; ler
+  consoleErrors do manifest); (3) **rótulo "Anúncio" entra no i18n** do app destino em TODAS as línguas
+  (teste de paridade de dicionário pega); (4) caixa com width/height explícitos → sem CLS quando o
+  criativo chega; iframe `loading=lazy` no fim da página não pinta em full-page shot — não é bug. E um
+  check de PRODUTO: units compartilhados entre sites compartilham também o filtro de categoria do painel —
+  inventário cripto/apostas pode destoar num site de outro nicho; units novos por site se o dono quiser
+  filtros independentes.
 - **2026-07-18 (via tictacverse — provar ESTADOS TRANSIENTES de animação/timing):** o capture.mjs tem
   ~0,5–1s de overhead por shot full-page (CDP + página canvas pesada) — janelas de sub-segundo (ex.:
   "a CPU só joga após 550ms", "o modal só sobe após 1,65s") NÃO são prováveis com a cadeia de actions
