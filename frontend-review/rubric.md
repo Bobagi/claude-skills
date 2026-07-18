@@ -583,3 +583,21 @@ click, drive them separately for now (interaction steps are a planned engine fea
   EN e confirme que voltou ao inglês — a contaminação só aparece na 2ª língua após a 1ª ter tocado o cache.
   Vale para qualquer transform (formatar moeda/data, mascarar, reordenar) sobre dado cacheado: transform =
   cópia. (Cruza com a checagem de i18n: teste os dois idiomas E a ordem entre eles.)
+- **2026-07-18 (via warframe-farm-helper — adicionar um 3º/4º idioma a um i18n binário PT/EN):** Ao
+  expandir um i18n que só tinha 2 idiomas, o bug nº1 é o **ternário binário** espalhado pelo código:
+  `lang === 'en' ? EN : PT` (ou `=== 'pt' ? PT : EN`). Ele parte o mundo em "um idioma vs. TODO o
+  resto" — então CADA idioma novo (es, ru…) cai no ramo do idioma ERRADO (aqui es/ru vazavam
+  **português** na descrição/passo-a-passo/raridade do servidor, porque tudo ≠ 'en' virava PT). Fix
+  em duas frentes: (a) normalize no BOUNDARY (o handler que recebe `?lang=`) para os idiomas que a
+  prosa do servidor realmente tem — `pt`→pt, qualquer outro→`en` (fallback internacional), nunca
+  deixe um idioma desconhecido herdar o ramo pt; (b) torne os ternários internos "idioma-base
+  positivo" (só `=== 'pt'` → PT; resto → EN) como defesa em profundidade. E o fallback de chave
+  faltante do `t()` deve cair em **en** (padrão internacional), não no 1º idioma do dict. Método de
+  review que PEGA o vazamento: bata no MESMO recurso do servidor com `?lang=es` e `?lang=ru` e
+  confirme que voltou INGLÊS (não o outro idioma pré-existente) — capturar só a UI estática não pega
+  prosa gerada no servidor. Decisão de produto que vale reusar: em apps de nicho com jargão/entidades
+  em inglês (games: nomes de item no market/wiki/trade; libs; APIs), **traduza o CHROME e deixe os
+  NOMES/dados em inglês** nos idiomas novos — localizar os nomes pioraria a busca. Cross-check de
+  ícone: uma **bandeira em opacidade baixa (estado não-selecionado)** pode perder a identidade
+  (Espanha vermelho-amarelo-vermelho dimmed ≈ Alemanha escuro-ouro-escuro) — confira a
+  reconhecibilidade no estado dim, não só no selecionado. (Cruza com Pillar 3 · i18n.)
