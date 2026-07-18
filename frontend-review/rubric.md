@@ -601,3 +601,15 @@ click, drive them separately for now (interaction steps are a planned engine fea
   ícone: uma **bandeira em opacidade baixa (estado não-selecionado)** pode perder a identidade
   (Espanha vermelho-amarelo-vermelho dimmed ≈ Alemanha escuro-ouro-escuro) — confira a
   reconhecibilidade no estado dim, não só no selecionado. (Cruza com Pillar 3 · i18n.)
+- **2026-07-18 (via tictacverse — provar ESTADOS TRANSIENTES de animação/timing):** o capture.mjs tem
+  ~0,5–1s de overhead por shot full-page (CDP + página canvas pesada) — janelas de sub-segundo (ex.:
+  "a CPU só joga após 550ms", "o modal só sobe após 1,65s") NÃO são prováveis com a cadeia de actions
+  dele; o shot "instantâneo" chega tarde e mente. Método que funciona: script puppeteer dedicado com
+  (a) screenshots **viewport-only** (rápidos), (b) o **elapsed REAL desde o evento gravado no nome do
+  arquivo** (`_t244.png`) para julgar com honestidade o instante capturado, e (c) além do timing, uma
+  prova por ESTADO INDIRETO que não depende de relógio (ex.: um toque disparado durante a janela de
+  bloqueio deve ser ENGOLIDO — a célula continuar vazia prova a guarda sem medir ms). Bônus de método:
+  o 1º clique após uma transição de tela de SPA/canvas pode ser engolido pela animação de rota — dê
+  settle ≥1,5s antes do primeiro clique de cada tela, e desconfie quando a partida "seguiu outro rumo"
+  (o rumo errado é sintoma de clique perdido, não de bug do app). E `tinyTargets` em Flutter web acusa
+  sempre o `flt-semantics-placeholder` 1×1 — artefato do framework, não é achado.
