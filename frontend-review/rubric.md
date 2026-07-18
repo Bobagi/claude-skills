@@ -554,7 +554,25 @@ click, drive them separately for now (interaction steps are a planned engine fea
   'flutter.settings.locale', JSON.stringify('hi'))` + reload + wait) — e então percorra home, sheets,
   seleção e telas de jogo. Cobre também: tile do idioma novo no seletor com bandeira/check, e a
   auto-detecção (supportedLocales gerado) sem precisar de aparelho real. (Cruza com Pillar 3 · i18n.)
-- **2026-07-17 (via warframe-farm-helper — i18n que MUTA cache vaza um idioma pro outro):** Ao traduzir/
+- **2026-07-18 (via warframe-farm-helper — deep-link gerado por slug 404 para CLASSES inteiras):** Ao
+  gerar links para uma referência externa (wiki/docs/catálogo) a partir do NOME do item por um padrão de
+  slug (`/w/<Nome_com_underscores>`), NÃO assuma que o padrão resolve para todos os tipos. Caso real: itens
+  "de topo" (armas, warframes, recursos: `/w/Jade`, `/w/Plastids`, `/w/Orokin_Cell`) resolvem 200, mas
+  **peças de conjunto** ("Braton Prime Barrel") e **cosméticos** ("Alone Portrait", "Stalker's Lair Scene")
+  dão **404** — eles vivem como SEÇÃO da página do set/quest, não como página própria. Um link 404 é pior
+  que nenhum. Fix por CLASSE: alvos que têm página → `/w/`; alvos que são subitens → a **URL de BUSCA** do
+  destino (`/index.php?search=<termo>`, que sempre resolve e cai na página-mãe). Método barato que pegou:
+  `curl -o /dev/null -w "%{http_code}" -L` numa AMOSTRA de CADA classe de link (item, peça, cosmético,
+  recurso) antes de enviar — não teste só o caso feliz (um item real), teste um representante de cada tipo
+  que passa pelo gerador. LIÇÃO META: sempre que um diff introduz links gerados por padrão, enumere as
+  CLASSES de entrada e verifique o status HTTP de uma de cada; roteie as que 404 para busca/fallback.
+- **2026-07-18 (via warframe-farm-helper — texto que vira link precisa de afordância em REPOUSO):** Ao
+  transformar rótulos de texto (nomes de item, recompensas) em `<a>`, decida a afordância de REPOUSO
+  conscientemente: `color:inherit` + sublinhado só no hover fica limpo mas é quase indescoberto (o usuário
+  não sabe que dá pra clicar sem passar o mouse — e no mobile não há hover). Se os links são o ponto da
+  feature (o dono PEDIU pra poder clicar), dê um cue sutil em repouso (sublinhado pontilhado/opacidade baixa)
+  ou uma cor de link discreta — sem cair no extremo de N links berrantes competindo com os CTAs. Regra:
+  hover-only affordance é aclitável para link secundário/raro, insuficiente para o valor principal da tela.
   transformar server-side dados que vêm de um **cache compartilhado** (um TTL-cache em memória, um objeto
   reaproveitado entre requests), **CLONE antes de transformar** (`map(x => ({...x, campo: tr(x.campo)}))`),
   nunca mute em lugar. Caso real: o handler traduzia `location` mutando os objetos retornados por um cache
