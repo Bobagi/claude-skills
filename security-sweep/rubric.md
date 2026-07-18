@@ -241,6 +241,23 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
 ---
 
 ## Learnings log (append-only, geral)
+- **2026-07-18 (via CoinHub — importador que reivindica cota ANTES do fetch externo caro):** Quando um
+  endpoint (a) gasta uma **quota finita por usuário** (ex.: "1 import a cada 30 min") E (b) dispara um
+  **fetch server-side caro a um 3º**, a ordem certa é **reivindicar a cota atomicamente ANTES do fetch** —
+  isso mata DUAS classes de uma vez: a **race da classe 1** (só 1 request passa) E a **amplificação de
+  fan-out da lição 2026-07-16** (uma rajada concorrente não vira N leituras no upstream, porque os perdedores
+  do claim caem em 429 sem nunca chamar o 3º). O claim atômico correto = tabela de estado separada do
+  snapshot + `INSERT ... ON CONFLICT (user_id) DO NOTHING` seguido de `SELECT ... FOR UPDATE` na MESMA
+  transação, decidindo com o **relógio do BANCO** (`NOW()`), nunca com o relógio da aplicação (skew burla).
+  Guarde o cooldown numa tabela que **sobrevive ao wipe do dado** (reimportar apaga o snapshot; se o cooldown
+  morasse no snapshot, apagar-e-reimportar zeraria a cota). E **devolva a cota** (`ReleaseFailedAttempt`)
+  quando a falha é do PRÓPRIO serviço (upstream down), não da carteira do usuário (privada/inválida) — senão
+  uma indisponibilidade nossa queima os 30 min do usuário. **▶ Testar ao vivo (a prova que fecha):** dispare
+  **N POSTs concorrentes** (`for i in $(seq 8); do curl ...& done; wait`) para um usuário fresco e conte os
+  status — tem que dar **exatamente um 200** e N-1 **429**, e **1 linha** no DB. Isso prova o claim atômico E
+  a não-amplificação num teste só. (Re-validado junto: a classe 6 com host pinado + só-id-numérico atravessa,
+  e o delete-and-recreate escopado por user_id da lição 2026-07-11.)
+
 - **2026-07-17 (via investidor10 — leitor server-side de API JSON de 3º, SSRF classe 6):** Quando um
   serviço lê uma API externa a partir de um **id/URL do usuário** mas extrai **só um id numérico** e monta
   toda request contra um **host fixo**, o desenho já é SSRF-safe — mas a classe 6 tem DOIS pontos cegos que
