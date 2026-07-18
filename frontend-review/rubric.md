@@ -601,6 +601,21 @@ click, drive them separately for now (interaction steps are a planned engine fea
   ícone: uma **bandeira em opacidade baixa (estado não-selecionado)** pode perder a identidade
   (Espanha vermelho-amarelo-vermelho dimmed ≈ Alemanha escuro-ouro-escuro) — confira a
   reconhecibilidade no estado dim, não só no selecionado. (Cruza com Pillar 3 · i18n.)
+- **2026-07-18 (via CoinHub — capturar feature atrás de MÚLTIPLOS gates em sequência):** Para revisar ao
+  vivo uma feature de dashboard atrás de login, o cookie de sessão sozinho NÃO basta se a app tem gates
+  ENCADEADOS antes do dashboard — aqui a conta descartável (signup + `email_verified_at=NOW()` no DB + login)
+  ainda caía na **página de aceite de Termos+Privacidade** (o `clickText` da aba "não encontrado" era o
+  sintoma: a aba nem existia porque o dashboard não montou). Cada gate server-side (verificação de e-mail,
+  aceite de termos versionado, step-up) tem que ser satisfeito ANTES de capturar: aceitei via
+  `POST /account/agreement/accept {version}` (leia a `current_version` do próprio endpoint — ela é
+  versionada). Método geral: quando o `clickText`/seletor de uma aba "não é encontrado" mas a base carrega,
+  **leia o 1º screenshot** — quase sempre é um gate (consent/terms/verify/paywall) interceptando, não um bug
+  de seletor; satisfaça o gate e recapture. E o **rótulo de aba com ícone colado** (`🔒B3 / Investidor10`
+  sem espaço, para não-admin) ainda casa por `clickText` com o texto ("B3 / Investidor10" é substring) — o
+  que quebrou foi o gate, não o match. (Cruza com o método de auth-gated de 2026-06-21 e 2026-07-11:
+  signup→promover no DB→**satisfazer TODOS os gates**→injetar cookie→dirigir com `--scenarios`.) Bônus: num
+  painel de dado denso (tabela 8 col) o combo certo é métricas-em-chips (`flex-wrap`) ACIMA + tabela em
+  `overflow-x:auto` — `overflowX=false` com a métrica principal nos chips é o padrão aprovado, não achado.
 - **2026-07-18 (via tictacverse — provar ESTADOS TRANSIENTES de animação/timing):** o capture.mjs tem
   ~0,5–1s de overhead por shot full-page (CDP + página canvas pesada) — janelas de sub-segundo (ex.:
   "a CPU só joga após 550ms", "o modal só sobe após 1,65s") NÃO são prováveis com a cadeia de actions
