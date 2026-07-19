@@ -640,3 +640,14 @@ click, drive them separately for now (interaction steps are a planned engine fea
   settle ≥1,5s antes do primeiro clique de cada tela, e desconfie quando a partida "seguiu outro rumo"
   (o rumo errado é sintoma de clique perdido, não de bug do app). E `tinyTargets` em Flutter web acusa
   sempre o `flt-semantics-placeholder` 1×1 — artefato do framework, não é achado.
+- **2026-07-19 (via bobagi.space portfólio — full-page shot × scroll-reveal):** página com reveal por
+  IntersectionObserver (conteúdo nasce `opacity:0` e só aparece ao entrar na viewport) rende um
+  full-page screenshot quase todo PRETO abaixo do fold — parece runtime error, mas não é: o
+  `fullPage:true` do puppeteer não dispara os observers das seções nunca intersectadas. Antes de
+  diagnosticar "página quebrada", cheque consoleErrors no manifest (0 erros + vazio visual = reveal).
+  Método que funciona: cenário com N× `{"press":"PageDown"}` + waits curtos até o fim da página e SÓ
+  ENTÃO o shot full-page (jump direto com End pode pular seções sem intersectar; PageDown passo a
+  passo revela todas). Alternativa: emular `prefers-reduced-motion` se o site tiver o bypass. E ao
+  adicionar cards novos numa grade existente, o check mais barato de consistência é diff visual card
+  novo × card antigo na MESMA captura (insets, chips, foot) — herdar o padrão é o critério, não a
+  estética absoluta do card.
