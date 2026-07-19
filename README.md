@@ -54,6 +54,7 @@ ou `bash <repo>/sync.sh`. Depois, **reinicie o Claude** (um `claude` novo) para 
 | `google-ads` | `/gads` | Relatórios Google Ads via API (somente leitura): status/orçamento de campanha, gasto por dia, CPI, conversões por campanha/grupo. Exige developer token com acesso Básico aprovado (setup único em `google-ads/SETUP.md`); reusa o OAuth client do AdMob. |
 | `cloudflare` | `/cloudflare` | Gerencia o DNS da zona `bobagi.space` no Cloudflare via API (`scripts/cf-dns.sh`): cria/altera/remove subdomínios (A/CNAME, proxied/DNS-only) e registros **TXT** (`txt`/`txt-del`, usados pela verificação do Search Console). DNS é SÓ no Cloudflare (Hostinger morto desde 2026-07-06). Credenciais fora do repo (`/root/.config/cloudflare/` no VPS, chmod 600); de outra máquina, executa via skill `vps` (SSH). |
 | `google-search-console` | `/gsc` | **Cadastra e monitora sites no Google sem abrir o navegador**: verifica a posse sozinha (token DNS + TXT criado pela skill `cloudflare`), adiciona a propriedade, submete sitemap e lê desempenho de busca (cliques, impressões, CTR, posição, top queries/páginas). Reusa a service account do `google-play` — sem consent screen, sem senha do operador. Setup único em `google-search-console/SETUP.md`. |
+| `termux` | `/termux` | **Instala e configura o Claude Code no Android via Termux**: Node.js, API key, sync das skills (com `SYNC_SKIP_PLUGINS=1` para pular plugins que dependem de Chromium). Inclui tabela do que funciona no ARM Android, setup de SSH, `tmux` para sessão persistente e dica de teclado físico. |
 
 ### Plugins (marketplace `claude-plugins-official` = `anthropics/claude-plugins-official`)
 | Plugin | Para que serve |
@@ -134,6 +135,7 @@ claude-skills/
 │   ├── plugins.txt             #   lista de plugins que o sync instala
 │   └── mcp.md                  #   inventário/notas dos MCP servers
 ├── vps/SKILL.md                # skill: VPS via SSH
+├── termux/SKILL.md             # skill: Claude Code no Android (Termux)
 ├── frontend-review/            # skill: review de front-end (3 pilares)
 │   ├── SKILL.md
 │   ├── rubric.md               #   checklist/expertise versionada que cresce
