@@ -299,6 +299,23 @@ def cmd_pages(args):
         )
 
 
+def real_sitemap(url: str) -> bool:
+    """
+    O sitemap existe DE VERDADE? Uma SPA com catch-all devolve o index.html com
+    HTTP 200 para qualquer path — submeter isso registra erro no Search Console.
+    Só aceita se o corpo começar como XML de sitemap.
+    """
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "gsc.py"})
+        with urllib.request.urlopen(req, timeout=20) as r:
+            if r.status != 200:
+                return False
+            head = r.read(200).decode(errors="replace").lstrip()
+    except Exception:
+        return False
+    return head.startswith("<?xml") or head.startswith("<urlset") or head.startswith("<sitemapindex")
+
+
 def cmd_setup(args):
     """Fluxo completo: verificar posse, adicionar propriedade e submeter sitemap."""
     dom = bare(args.domain)
@@ -306,7 +323,12 @@ def cmd_setup(args):
     cmd_verify(argparse.Namespace(domain=dom))
     print()
     cmd_add(argparse.Namespace(domain=dom))
-    cmd_sitemap_submit(argparse.Namespace(domain=dom, sitemap=sitemap))
+    if real_sitemap(sitemap):
+        cmd_sitemap_submit(argparse.Namespace(domain=dom, sitemap=sitemap))
+    else:
+        print(f"sitemap PULADO — {sitemap} não é um XML de sitemap válido.")
+        print("  (sem sitemap o Google ainda rastreia seguindo links; para acelerar,")
+        print("   gere um e rode: gsc.py sitemap-submit <dominio> <url>)")
     print("\npronto — a indexação começa em horas/dias. Acompanhe com:")
     print(f"  gsc.py sitemaps {dom}    (o Google processou o sitemap?)")
     print(f"  gsc.py report {dom}      (por quais buscas o site aparece)")
