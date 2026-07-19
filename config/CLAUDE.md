@@ -81,10 +81,20 @@ teste confiável que roda e pode falhar — priorize o caminho do dinheiro) e, e
   token com acesso Básico aprovado (setup único: `google-ads/SETUP.md`); reusa o OAuth client
   do AdMob. Criar/pausar/editar campanha = operador na UI.
 - **`cloudflare`** — DNS da zona `bobagi.space` no Cloudflare via API (`scripts/cf-dns.sh`):
-  criar/alterar/remover subdomínios (A/CNAME, proxied/DNS-only). **DNS é SÓ no Cloudflare**
-  (painel Hostinger morto desde 2026-07-06 — nameservers movidos). Use ao subir/derrubar
-  serviço web no VPS ou em "crie um subdomínio"/"altere o DNS". Credenciais só no VPS
-  (`/root/.config/cloudflare/`, chmod 600); de outra máquina, executar via skill `vps` (SSH).
+  criar/alterar/remover subdomínios (A/CNAME, proxied/DNS-only) e registros **TXT**
+  (`txt`/`txt-del` — o `txt` não toca no registro A e troca o token de mesma chave em vez de
+  acumular; `delete <sub>` continua apagando TODOS os tipos do nome, cuidado). **DNS é SÓ no
+  Cloudflare** (painel Hostinger morto desde 2026-07-06 — nameservers movidos). Use ao
+  subir/derrubar serviço web no VPS ou em "crie um subdomínio"/"altere o DNS". Credenciais só
+  no VPS (`/root/.config/cloudflare/`, chmod 600); de outra máquina, executar via skill `vps`.
+- **`google-search-console`** — **cadastra e monitora sites no Google sem o operador abrir o
+  navegador**: pega o token de verificação, cria o TXT via `cloudflare`, verifica a posse,
+  adiciona a propriedade (`sc-domain:`), submete o sitemap e lê o desempenho de busca
+  (cliques, impressões, CTR, posição média, top queries e páginas). Reusa a **service account
+  do `google-play`** — sem consent screen, sem refresh token que expira e **sem senha do
+  operador**. Use em "cadastre o site no Google", "submeta o sitemap", "por quais buscas meu
+  site aparece", "relatório de SEO". Limite honesto: a API **não força indexação** (a Indexing
+  API oficial só vale p/ JobPosting/BroadcastEvent) — sitemap + tempo é o caminho legítimo.
 
 > **Limite transversal Google (Play/AdMob/Ads):** o que a API oficial não cobre (pagamentos,
 > data safety, criar ad unit/mediação, consent screen) é feito PELO OPERADOR guiado passo a

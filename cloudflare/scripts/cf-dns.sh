@@ -4,7 +4,9 @@
 # Usage:
 #   cf-dns.sh list
 #   cf-dns.sh add <subdomain> [ip] [proxied]   # defaults: ip=46.202.144.75, proxied=true (orange cloud)
-#   cf-dns.sh delete <subdomain>
+#   cf-dns.sh delete <subdomain>               # CUIDADO: remove TODOS os tipos do nome (A + TXT + ...)
+#   cf-dns.sh txt <subdomain> <value>          # upsert de TXT (não mexe no A; troca o TXT de mesmo prefixo "chave=")
+#   cf-dns.sh txt-del <subdomain> [substring]  # remove só TXT (opcionalmente só os que contêm a substring)
 set -euo pipefail
 
 ZONE_NAME="bobagi.space"
@@ -81,6 +83,46 @@ case "$cmd" in
       die_on_error "$res"; echo "CRIADO: A $name -> $ip (proxied=$proxied)"
     fi
     ;;
+  txt)
+    # Upsert de TXT sem tocar em outros tipos (o A do site convive com o TXT).
+    # Se o valor tem forma "chave=valor" (ex.: google-site-verification=...),
+    # substitui o TXT existente de MESMA chave — assim rotacionar o token não
+    # acumula registros duplicados nem apaga TXT de terceiros (SPF, DKIM...).
+    sub="${2:?uso: cf-dns.sh txt <subdominio> <valor>}"
+    value="${3:?uso: cf-dns.sh txt <subdominio> <valor>}"
+    name="$(fqdn "$sub")"
+    zid="$(zone_id)"
+    existing="$(cf GET "/zones/$zid/dns_records?type=TXT&name=$name&per_page=100")"
+    die_on_error "$existing"
+    key=""
+    case "$value" in *=*) key="${value%%=*}=" ;; esac
+    rid=""
+    if [ -n "$key" ]; then
+      rid="$(jq -r --arg k "$key" '.result[] | select(.content | startswith($k)) | .id' <<<"$existing" | head -1)"
+    fi
+    body="$(jq -n --arg name "$name" --arg v "$value" '{type:"TXT", name:$name, content:$v, ttl:1}')"
+    if [ -n "$rid" ]; then
+      res="$(cf PUT "/zones/$zid/dns_records/$rid" "$body")"
+      die_on_error "$res"; echo "ATUALIZADO: TXT $name = $value"
+    else
+      res="$(cf POST "/zones/$zid/dns_records" "$body")"
+      die_on_error "$res"; echo "CRIADO: TXT $name = $value"
+    fi
+    ;;
+  txt-del)
+    sub="${2:?uso: cf-dns.sh txt-del <subdominio> [substring]}"
+    match="${3:-}"
+    name="$(fqdn "$sub")"
+    zid="$(zone_id)"
+    existing="$(cf GET "/zones/$zid/dns_records?type=TXT&name=$name&per_page=100")"
+    die_on_error "$existing"
+    ids="$(jq -r --arg m "$match" '.result[] | select($m == "" or (.content | contains($m))) | .id' <<<"$existing")"
+    [ -n "$ids" ] || { echo "Nenhum TXT em $name${match:+ contendo '$match'}"; exit 0; }
+    for rid in $ids; do
+      res="$(cf DELETE "/zones/$zid/dns_records/$rid")"
+      die_on_error "$res"; echo "REMOVIDO: TXT $rid de $name"
+    done
+    ;;
   delete)
     sub="${2:?uso: cf-dns.sh delete <subdominio>}"
     name="$(fqdn "$sub")"
@@ -95,7 +137,7 @@ case "$cmd" in
     done
     ;;
   *)
-    echo "uso: cf-dns.sh {list | add <sub> [ip] [proxied] | delete <sub>}" >&2
+    echo "uso: cf-dns.sh {list | add <sub> [ip] [proxied] | delete <sub> | txt <sub> <valor> | txt-del <sub> [substr]}" >&2
     exit 1
     ;;
 esac
