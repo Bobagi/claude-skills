@@ -651,3 +651,12 @@ click, drive them separately for now (interaction steps are a planned engine fea
   adicionar cards novos numa grade existente, o check mais barato de consistência é diff visual card
   novo × card antigo na MESMA captura (insets, chips, foot) — herdar o padrão é o critério, não a
   estética absoluta do card.
+- **2026-07-19b (via bobagi.space — classe de estado × classe base):** um botão que ganha uma classe
+  utilitária de visibilidade (`.burger{display:none}`) mas TAMBÉM carrega a classe base do design
+  system (`.toggle{display:...}`) fica visível se a regra base vier DEPOIS no CSS — especificidade
+  igual, ordem decide. Sempre escope a classe de estado à base (`.toggle.burger`) ou verifique a ordem;
+  e o teste barato é capturar o viewport ONDE o elemento deveria sumir (desktop para um hambúrguer),
+  não só onde ele aparece. Checklist novo de portfólio/efetividade: além do visual, julgue POSICIONAMENTO
+  (o hero vende a senioridade real? CTA primário = objetivo do site?), PROVA (números reais vs enfeite),
+  e PRÓXIMO PASSO do visitante convencido (CV baixável / contato) — um site pode passar em todos os
+  checks visuais e falhar como produto.
