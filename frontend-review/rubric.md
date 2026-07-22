@@ -660,3 +660,16 @@ click, drive them separately for now (interaction steps are a planned engine fea
   (o hero vende a senioridade real? CTA primário = objetivo do site?), PROVA (números reais vs enfeite),
   e PRÓXIMO PASSO do visitante convencido (CV baixável / contato) — um site pode passar em todos os
   checks visuais e falhar como produto.
+- **2026-07-22 (via Coin Hub — tabela com coluna de texto livre):** numa tabela de dados, a PRIMEIRA
+  coluna costuma ser a única com texto livre (nome/título vindo de fonte externa) — e é sempre a que
+  quebra. Linha `flex` com `white-space:nowrap` + `min-width` NÃO contém texto longo: ele pinta POR CIMA
+  das colunas vizinhas (não empurra, não corta, não gera overflow no manifest — o `overflowX:false`
+  mente). Padrão correto: `display:grid` com `minmax(<piso>, Nfr)` na coluna de texto +
+  `white-space:normal; overflow-wrap:anywhere; align-items:start`, para o texto quebrar em mais linhas
+  DENTRO da própria célula e a linha crescer em altura. Teste com o **pior dado real** (consulte o banco
+  por `ORDER BY length(campo) DESC`, não pelo que está na tela). Segunda lição, sobre o breakpoint do
+  reflow em cards: escolha-o pela **largura MEDIDA** que a tabela recebe (`el.clientWidth` no browser
+  headless, por viewport), não pelo default 600px herdado de outra tabela — se o piso do grid é maior
+  que o espaço disponível, a faixa entre 600px e o piso vira scroll horizontal INTERNO e some com as
+  últimas colunas sem nenhum affordance. Prova objetiva de que ficou certo: `scrollWidth-clientWidth==0`
+  do menor ao maior viewport, mais um par de medidas em volta do breakpoint (939 vs 941).
