@@ -37,9 +37,33 @@ $ConfigPairs = @(
 )
 
 # --- helpers ----------------------------------------------------------------
+# ordena recursivamente as chaves p/ comparar JSON por CONTEÚDO, não por bytes
+function Normalize-Json($obj) {
+  if ($null -eq $obj) { return $null }
+  if ($obj -is [System.Management.Automation.PSCustomObject]) {
+    $out = [ordered]@{}
+    foreach ($p in ($obj.PSObject.Properties | Sort-Object Name)) { $out[$p.Name] = (Normalize-Json $p.Value) }
+    return [pscustomobject]$out
+  }
+  if (($obj -is [System.Collections.IEnumerable]) -and -not ($obj -is [string])) {
+    return @($obj | ForEach-Object { Normalize-Json $_ })
+  }
+  return $obj
+}
+
+# .json é comparado por CONTEÚDO (chaves normalizadas): o próprio Claude Code
+# reescreve o settings.json quando você muda tema/effort/modelo pela UI e
+# reordena as chaves — mesmo conteúdo, não deve virar alerta de drift.
 function Files-Equal($a, $b) {
   if (-not (Test-Path $a) -or -not (Test-Path $b)) { return $false }
-  return (Get-FileHash -Algorithm SHA256 $a).Hash -eq (Get-FileHash -Algorithm SHA256 $b).Hash
+  if ((Get-FileHash -Algorithm SHA256 $a).Hash -eq (Get-FileHash -Algorithm SHA256 $b).Hash) { return $true }
+  if ([System.IO.Path]::GetExtension($a) -ne '.json') { return $false }
+  try {
+    $ja = Normalize-Json ((Get-Content -Raw $a) | ConvertFrom-Json)
+    $jb = Normalize-Json ((Get-Content -Raw $b) | ConvertFrom-Json)
+    if ($null -eq $ja -or $null -eq $jb) { return $false }
+    return (($ja | ConvertTo-Json -Depth 30 -Compress) -eq ($jb | ConvertTo-Json -Depth 30 -Compress))
+  } catch { return $false }
 }
 
 function Emit($msg) {

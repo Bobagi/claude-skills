@@ -90,10 +90,18 @@ ou `bash <repo>/sync.sh`. Depois, **reinicie o Claude** (um `claude` novo) para 
 ## 🔄 Auto-sync (hooks + `scripts/claude-sync.sh`)
 
 Depois do primeiro `sync.sh`, manter as máquinas em dia é **automático** — sem precisar lembrar de
-`git pull`/`push`. Funciona em **Linux, macOS e Windows**: cada hook tem duas variantes em
-`config/settings.json` (`shell: bash` → `claude-sync.sh`; `shell: powershell` → `claude-sync.ps1`), e o
-Claude Code escolhe a do SO. O caminho é sempre o portável `~/.claude/skills/scripts/...` (resolve via
-symlink no Linux/Mac e via junction no Windows). Os dois scripts têm a **mesma** lógica:
+`git pull`/`push`. Cada hook em `config/settings.json` tem **uma** variante, `shell: bash` →
+`claude-sync.sh`, que roda em **Linux, macOS e Windows** (lá via Git Bash, que o Claude Code já exige
+para a ferramenta Bash). O caminho é sempre o portável `~/.claude/skills/scripts/...` (resolve via
+symlink no Linux/Mac e via junction no Windows). A lógica:
+
+> **Por que não há hook `shell: "powershell"`:** o Claude Code **não tem hook condicional por SO** — se a
+> variante PowerShell está declarada, ele tenta rodá-la em toda sessão e, numa máquina sem `pwsh`
+> (qualquer Linux/VPS), o resultado é um **erro visível de hook** na abertura (`SessionStart:startup hook
+> error … no PowerShell executable was found`). Por isso o `settings.json` versionado declara só a
+> variante bash. O **`claude-sync.ps1` continua mantido** (mesma semântica) para uso manual em Windows
+> nativo — `/sync-claude` o documenta — e uma máquina Windows sem Git Bash pode declarar o hook
+> PowerShell no **`settings.local.json`** dela, que não é versionado nem entra no check de drift.
 
 - **`SessionStart` → `claude-sync.sh pull`**: a cada nova sessão dá `git pull --ff-only` no repo (skills
   e commands, por serem symlink, já ficam atuais na hora). Updates de config que estavam **em sync** são
@@ -125,8 +133,8 @@ sentido (`frontend-design` cria → `frontend-review` audita → `simplify`/`cod
 claude-skills/
 ├── sync.sh                     # bootstrap/sync idempotente (curl|bash ou /sync-claude)
 ├── scripts/
-│   ├── claude-sync.sh          # auto-sync (bash: Linux/Mac/Git-Bash): pull/check/save
-│   └── claude-sync.ps1         # auto-sync (PowerShell: Windows nativo): mesmo pull/check/save
+│   ├── claude-sync.sh          # auto-sync (bash: Linux/Mac/Git-Bash) — é o que os hooks chamam
+│   └── claude-sync.ps1         # mesma lógica em PowerShell: uso MANUAL em Windows nativo (sem hook)
 ├── config/                     # config aplicada em ~/.claude/ pelo sync
 │   ├── CLAUDE.md               #   -> ~/.claude/CLAUDE.md (instruções globais)
 │   ├── settings.json           #   -> ~/.claude/settings.json (model/effort/theme/plugins/hook)

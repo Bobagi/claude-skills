@@ -35,6 +35,25 @@ CONFIG_PAIRS=(
 )
 
 # --- helpers ----------------------------------------------------------------
+# Compara dois arquivos. Arquivos .json são comparados por CONTEÚDO (normalizado
+# com jq), não byte-a-byte: o próprio Claude Code reescreve o settings.json
+# quando você muda tema/effort/modelo pela UI e reordena as chaves — isso é o
+# MESMO conteúdo e não deve virar alerta de drift na abertura de toda sessão.
+files_equal() {
+  local a="$1" b="$2" na nb
+  [ -f "$a" ] && [ -f "$b" ] || return 1
+  cmp -s "$a" "$b" && return 0
+  case "$a" in
+    *.json)
+      command -v jq >/dev/null 2>&1 || return 1
+      na="$(jq -S -c . "$a" 2>/dev/null)" || return 1
+      nb="$(jq -S -c . "$b" 2>/dev/null)" || return 1
+      [ -n "$na" ] && [ "$na" = "$nb" ]
+      ;;
+    *) return 1 ;;
+  esac
+}
+
 emit() {  # imprime {"systemMessage": "..."} (mostrado ao usuário na UI)
   local msg="$1"
   msg="${msg//\\/\\\\}"; msg="${msg//\"/\\\"}"; msg="${msg//$'\n'/\\n}"
@@ -46,7 +65,7 @@ drift_report() {  # ecoa os motivos de drift; vazio = sem drift
   for pair in "${CONFIG_PAIRS[@]}"; do
     repo_rel="${pair%%:*}"; live="${pair#*:}"; src="$REPO_DIR/$repo_rel"
     [ -f "$src" ] || continue
-    if [ ! -f "$live" ] || ! cmp -s "$src" "$live"; then
+    if ! files_equal "$src" "$live"; then
       out+="• $(basename "$live") difere do repo"$'\n'
     fi
   done
@@ -67,7 +86,7 @@ cmd_pull() {
   local pair repo_rel live src
   for pair in "${CONFIG_PAIRS[@]}"; do
     repo_rel="${pair%%:*}"; live="${pair#*:}"; src="$REPO_DIR/$repo_rel"
-    if [ -f "$src" ] && [ -f "$live" ] && cmp -s "$src" "$live"; then
+    if files_equal "$src" "$live"; then
       insync["$repo_rel"]=1
     else
       insync["$repo_rel"]=0
@@ -82,7 +101,7 @@ cmd_pull() {
   for pair in "${CONFIG_PAIRS[@]}"; do
     repo_rel="${pair%%:*}"; live="${pair#*:}"; src="$REPO_DIR/$repo_rel"
     [ -f "$src" ] || continue
-    if [ "${insync[$repo_rel]:-0}" = "1" ] && ! cmp -s "$src" "$live"; then
+    if [ "${insync[$repo_rel]:-0}" = "1" ] && ! files_equal "$src" "$live"; then
       cp "$live" "$BACKUP_DIR/$(basename "$live").bak-$(date +%Y%m%d-%H%M%S)" 2>/dev/null || true
       cp "$src" "$live" 2>/dev/null || true
     fi
@@ -111,7 +130,7 @@ cmd_save() {
   for pair in "${CONFIG_PAIRS[@]}"; do
     repo_rel="${pair%%:*}"; live="${pair#*:}"; src="$REPO_DIR/$repo_rel"
     [ -f "$live" ] || continue
-    cmp -s "$live" "$src" || cp "$live" "$src"
+    files_equal "$live" "$src" || cp "$live" "$src"
   done
 
   git -C "$REPO_DIR" add -A
