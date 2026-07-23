@@ -48,6 +48,7 @@ ou `bash <repo>/sync.sh`. Depois, **reinicie o Claude** (um `claude` novo) para 
 | `test-forge` | `/test-forge` | **Cria e RODA testes úteis e confiáveis** (determinísticos, que podem falhar), priorizando o caminho crítico (dinheiro/auth/limites/parsers/idempotência) sobre % de cobertura; roda até passar e conserta o código se um teste acha bug. Use em "crie testes"/"o projeto não tem testes" **e** ao fim de toda feature crítica. |
 | `code-standards` | `/code-standards` | Audita **padrões de código e boas práticas** (consistência com o próprio repo, camadas, erros, código morto, i18n completa, linter) e aplica correções seguras. Use em "está seguindo os padrões?"/"boas práticas". Complementa `/code-review` e `/simplify`. |
 | `resume` | `/resume` | Resume um vídeo do YouTube a partir do link. |
+| `linkedin` | `/linkedin` | **Lê, edita e audita o perfil do LinkedIn** via CDP no Chrome do sistema (sem baixar browser). CLI único (`li.mjs`) com **escrita dry-run por padrão** — só `--commit` salva, e o próprio comando recarrega a página para provar que persistiu. `audit` pontua 15 checagens quantitativas de visibilidade para recrutador. As armadilhas destrutivas do LinkedIn (form que renderiza vazio e apagaria a vaga, limpeza de campo que concatena, listas virtualizadas cujo readback mente) estão em `linkedin/references/dom-notes.md`. |
 | `sync-claude` | `/sync-claude` | Roda o `sync.sh` (padroniza a config desta máquina). |
 | `google-play` | `/gplay` | Releases na Play Store via Play Developer API (service account): sobe AAB, tracks, promoção, rollout gradual, reviews e listing. Credenciais fora do repo (`~/.config/bobagi-google/`); setup único do operador em `google-play/SETUP.md`. |
 | `admob` | `/admob` | Relatórios AdMob via API (receita, eCPM, impressões por dia/ad unit/país) + inventário de ad units. OAuth do dono da conta (setup único em `admob/SETUP.md`); escrita de inventário é restrita pelo Google (fallback manual documentado). |
@@ -147,9 +148,17 @@ claude-skills/
 │   ├── rubric.md               #   checklist/expertise versionada que cresce
 │   └── scripts/capture.mjs     #   screenshots multi-viewport (Puppeteer headless)
 ├── resume/SKILL.md             # skill: resumo de vídeo do YouTube
+├── linkedin/                   # skill: ler/editar/auditar o perfil do LinkedIn
+│   ├── SKILL.md
+│   ├── config.json             #   URL do perfil + endereço do CDP
+│   ├── references/             #   capabilities (o que NÃO faz), mapa do DOM, boas práticas
+│   └── scripts/
+│       ├── li.mjs              #   CLI único: doctor/stats/read/get/audit/set-*/add-*
+│       └── lib.mjs             #   conexão CDP, dedupe de texto, limpeza segura de campo
 └── commands/                   # slash-commands espelho (-> ~/.claude/commands)
     ├── vps.md
     ├── frontend-review.md
+    ├── linkedin.md
     └── sync-claude.md
 ```
 

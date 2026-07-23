@@ -1,0 +1,9 @@
+{
+  "name": "linkedin-skill-scripts",
+  "private": true,
+  "type": "module",
+  "description": "CLI de leitura/edicao do perfil LinkedIn via CDP no Chrome do sistema",
+  "dependencies": {
+    "playwright": "^1.49.0"
+  }
+}
