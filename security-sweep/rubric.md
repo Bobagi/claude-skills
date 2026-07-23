@@ -26,8 +26,11 @@ lock), **é vulnerável**: N requests concorrentes leem o mesmo estado velho e t
 - [ ] Constraints do banco cobrem o invariante real. **Cuidado: um índice único que não é o invariante
   mascara o bug** — ex.: unique `(user, tipo, item)` NÃO impede furar um limite de CONTAGEM com itens
   DIFERENTES.
-- **▶ Testar ao vivo:** dispare **N requests concorrentes** (`for ...; do curl ... & done; wait`, ou
-  `Promise.all`) contra o endpoint. Faça **DUAS** rodadas: (a) idênticos e (b) **DISTINTOS no eixo do
+- **▶ Testar ao vivo:** dispare **N requests concorrentes**. **PREFIRA um cliente de processo único
+  (`Promise.all` num script Node/Python) — `for ...; do curl ... & done; wait` frequentemente NÃO é
+  concorrente o bastante** (o custo de fork/TLS/DNS de cada `curl` serializa as chegadas) e produz um
+  **falso "limite respeitado"**; se usar shell, use `xargs -P`/`ab`/`hey` e confirme que a rajada
+  realmente se sobrepôs. Faça **DUAS** rodadas: (a) idênticos e (b) **DISTINTOS no eixo do
   invariante** (ex.: moedas/itens diferentes — este é o teste que expõe o bypass de contagem; sem ele o
   índice único finge que está seguro). Depois **conte no DB**: se passou do limite, é P0/P1. **LIÇÃO
   DURÁVEL: garanta que cada request é distinto no eixo certo, senão você testa a constraint errada e tem
@@ -241,6 +244,27 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
 ---
 
 ## Learnings log (append-only, geral)
+- **2026-07-23 (via todo — o MÉTODO do teste de race pode mentir; + Express 4 e handlers async):**
+  Três lições. **(1) `for i in $(seq N); do curl ... & done; wait` NÃO prova ausência de race.**
+  Contra um `SELECT COUNT → INSERT` sabidamente vulnerável, 30 curls em background devolveram
+  **exatamente o limite** (falso "seguro"): cada `curl` paga fork + resolve + handshake, então as
+  chegadas se espalham e o servidor processa quase em série. O MESMO endpoint, atacado por **40
+  `fetch` em `Promise.all` dentro de UM processo Node**, criou **40 linhas com limite 12** na hora.
+  Regra durável: **teste de concorrência usa cliente de processo único (`Promise.all`/`asyncio`) ou
+  `xargs -P`/`hey`; `curl &` só serve como sanity-check.** Se o resultado der exatamente o limite,
+  DESCONFIE do harness antes de declarar seguro — um bypass de race quase nunca acerta o número
+  exato. **(2) Corolário da lição 2026-07-08 (semeie ABAIXO do limite):** ao testar a race do
+  limite de itens, semear até o limite exato faz a rajada voltar 100% de 400 **por limite**, o que
+  parece "defendido" e mascara a race; semeie o limite **menos a rajada** (ex.: 480 de 500 e
+  dispare 40) — aí o número final prova o invariante. **(3) Express 4 + handler `async`:** uma
+  rejeição não tratada **não** vira 500, ela **pendura a request para sempre** (o Express 4 não
+  encaminha promessas rejeitadas) — todo handler async precisa de um `wrap(fn)` que faça
+  `.catch(next)`. E o **error handler default do Express serializa o `err.stack` na RESPOSTA**
+  sempre que `NODE_ENV !== "production"` (que é o default quando ninguém setou a env no Dockerfile)
+  — ou seja, classe 13 aberta por omissão, não por código errado. Fix: handler de erro próprio
+  (genérico 500 + log server-side) e, nele, tratar o `SyntaxError` do `express.json()` como **400**
+  em vez de 500. **▶ Testar:** mande `-d 'not json'` (deve dar 400, não 500) e provoque um throw
+  real (a resposta não pode conter `at `/`node_modules`/caminho de arquivo).
 - **2026-07-18 (via CoinHub — importador que reivindica cota ANTES do fetch externo caro):** Quando um
   endpoint (a) gasta uma **quota finita por usuário** (ex.: "1 import a cada 30 min") E (b) dispara um
   **fetch server-side caro a um 3º**, a ordem certa é **reivindicar a cota atomicamente ANTES do fetch** —
