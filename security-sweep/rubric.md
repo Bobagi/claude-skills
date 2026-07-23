@@ -466,3 +466,22 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   usuário direto) = SSRF de path baixo risco; nunca deixe o host/scheme vir do input. Cacheie em banco com
   TTL longo (dado de wiki quase não muda) para não martelar o site de 3º. LIÇÃO META: "fonte confiável" não
   é sanitização — todo conteúdo de 3º renderizado passa por sanitização-na-origem + textContent, ponto.
+- **2026-07-23 (via cartomania — a hardcoded JWT fallback secret in a PUBLIC repo = total auth bypass;
+  and the timing-oracle hides in an INVALID placeholder hash):** Two durable lessons on an auth surface.
+  **(1) `secretOrKey: process.env.JWT_SECRET || 'dev-secret'` is a P0 the moment the repo is public** —
+  anyone reads the literal, signs `{role:"ADMIN"}` and is admin. **Prove it live** (don't just read the
+  code): forge `HS256({sub:<real admin id>, role:"ADMIN"}, "dev-secret")` and hit `/auth/me` — 200 = owned.
+  The tell that it's live-exploitable and not just theoretical: the secret is ABSENT from the deploy's
+  `.env` (so the `|| fallback` is what's actually running). Fix = fail-closed resolver: throw in production
+  if the secret is missing/weak/known (`dev-secret`/`changeme`/<32 chars); generate a strong one into
+  `.env`; set `NODE_ENV=production`. Re-test: the same forged token now 401s. **(2) Constant-time login
+  needs a VALID decoy hash.** A "no such user" branch that runs `bcrypt.compare(pw, "$2a$12$0000…")` to
+  look constant-time actually SHORT-CIRCUITS — bcrypt rejects a malformed hash instantly, so the
+  nonexistent-user path returns ~8× faster than a real user (cost-12 KDF ≈ 80ms) and the timing leaks
+  existence even though the status+body are identical. **▶ Testar ao vivo:** 5 samples each of
+  (real user, wrong pw) vs (nonexistent user); if the medians differ by an order of magnitude, it's an
+  oracle. Fix: compare against a REAL `bcrypt.hash("decoy",12)` constant so both branches run the full KDF.
+  Method note: the FIRST post-restart request is warmup noise — average ≥5 samples before judging timing.
+  Re-validated firm here: same-origin CSRF guard must match the Origin EXACTLY or with a `/` boundary —
+  `source.startsWith("https://good.host")` PASSES `https://good.host.evil.com` (prefix bypass); use
+  `source === allowed || source.startsWith(allowed + "/")`.

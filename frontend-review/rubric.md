@@ -694,3 +694,12 @@ click, drive them separately for now (interaction steps are a planned engine fea
   que o espaço disponível, a faixa entre 600px e o piso vira scroll horizontal INTERNO e some com as
   últimas colunas sem nenhum affordance. Prova objetiva de que ficou certo: `scrollWidth-clientWidth==0`
   do menor ao maior viewport, mais um par de medidas em volta do breakpoint (939 vs 941).
+- **2026-07-23 (via cartomania — a legal "last updated" date is a CONTENT bug when it lags the acceptance
+  version):** When an app has a versioned Terms/Privacy re-acceptance gate, the "Last updated: <date>"
+  shown on the /terms and /privacy pages must MATCH the version the gate forces users to accept. A stale
+  date (page says "June 26" while the gate demands version "2026-07-23") is a real contradiction a user
+  will notice, not a nit — flag it P2 and fix by tying the displayed date to the same version constant.
+  Also re-validated: a strict CSP (`script-src 'self' 'nonce-…'`, no unsafe-inline) can ship on a
+  canvas-heavy SPA with 0 console violations IF inline `style=""` attrs are covered by
+  `style-src-attr 'unsafe-inline'` and external font/img hosts are allow-listed — verify by loading every
+  key route (incl. a live game screen) headless and counting CSP violations, don't assume.

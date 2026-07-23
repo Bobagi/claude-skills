@@ -147,3 +147,11 @@ Pule: getters/setters triviais, o que o compilador/framework já garante, UI pur
   (Morphics/Orokin Cell são recursos avulsos) — com um **fallback de lista curada** para recursos que o
   dataset lista como componente mas não cataloga como item próprio (Orokin Cell/Morphics ficam num Misc não
   ingerido). Testar os dois lados: a peça vira sub-doc, o recurso avulso não.
+- **2026-07-23 (via cartomania — assert on WRITTEN STATE via an in-memory fake, and don't let bcrypt cost
+  blow the timeout):** For a service that persists via an ORM (Prisma/TypeORM), a tiny **in-memory fake**
+  that stores real rows lets tests assert on the OBSERVABLE effect (what got written) instead of "a method
+  was called" — e.g. `register` must write `role: USER` and Google-auth must NOT create a row for an
+  UNVERIFIED email. Mutation-proof it: disable the `!email_verified` guard and the test must go red.
+  Gotcha: seeding login-lockout tests with real `bcrypt.hash(pw, 12)` and then doing ~19 compares blows
+  Jest's 5s timeout in ts-jest — the tests exercise the lockout COUNTER, not bcrypt strength, so seed with
+  cost 4 (identical logic, ~10× faster). Keep the production hashing at 12; only the test fixture drops.

@@ -294,3 +294,15 @@ de dinheiro que você criar — construir sem ela é criar a fraude junto.**
   fator) → promovido a **módulo 21 (opcional, acima do mínimo)**. Billing, quando existir, cai inteiro na
   Regra transversal nº1 (atomicidade + idempotência de webhook). Modo diagnóstico deve sempre gerar a matriz
   (módulo→estado→evidência/gap) como artefato em `.claude/app-essentials/<data>/report.md`.
+- **2026-07-23 (via cartomania — OAuth where the BACKEND is localhost-only behind a web proxy):** When the
+  app is a web tier (SvelteKit/Next SSR) that proxies to a localhost-only API, the secure split for Google
+  OAuth is: **web owns the browser dance** (random `state` in an HttpOnly cookie + the consent redirect),
+  **backend owns the code→token→userinfo exchange** (client secret never leaves the backend). Why it
+  matters: the public web proxy usually forwards ANY path to the backend, so a naive `POST /auth/google
+  {googleId, email}` endpoint would let anyone inject an identity — but if the backend instead takes the
+  single-use `code` and exchanges it with Google, a forged/absent code just fails (the code is the proof).
+  Adapting the module-3 pattern to a stack with NO email on legacy accounts: add `email`/`googleId`
+  (unique-nullable) + `emailVerified`, make `passwordHash` nullable, and a DB CHECK that every row has a
+  password OR a googleId (no credential-less ghost). The versioned-acceptance gate (module 8) must keep the
+  displayed "last updated" date on the /terms|/privacy pages IN SYNC with `CURRENT_AGREEMENT_VERSION` — a
+  date mismatch makes the re-accept gate contradict the page (caught by frontend-review, not the backend).
