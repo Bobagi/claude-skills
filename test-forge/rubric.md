@@ -48,6 +48,24 @@ Pule: getters/setters triviais, o que o compilador/framework já garante, UI pur
   (só 1 passou, saldo consistente) — em Go use goroutines + `-race`; em app rodando, N requests paralelos.
 
 ## Learnings log (append-only, geral)
+- **2026-07-23 (via todo — o teste de rejeição que passa PELO MOTIVO ERRADO):** Ao afirmar que uma
+  requisição hostil é **rejeitada** (`assert status === 400/403`), o teste só prova alguma coisa se a
+  requisição for **válida em todo o resto** — senão ela morre num guard ANTERIOR e o guard que você
+  queria testar nunca roda. Caso real: para provar "usuário B não pode mover item para um local do
+  usuário A", mandei `{itemIds: [], toLocationId: <local de A>}`; deu 400 e o teste ficou verde —
+  mas o 400 veio do `itemIds required`, e a checagem de posse do DESTINO nunca foi alcançada. Quem
+  denunciou foi o **mutation check**: removi o `AND user_id=$2` da consulta do destino e o teste
+  continuou **verde** (mutação sobreviveu = teste inútil). Correção: montar o cenário REAL — B cria
+  um item PRÓPRIO e tenta movê-lo para o local de A — e afirmar **duas** coisas: o status E o
+  **estado final** (o item de B continua apontando pro local de B). Regras duráveis: (1) todo teste
+  de rejeição precisa de uma mutação que o prove vermelho — status esperado igual (400) por caminhos
+  diferentes é o falso-positivo mais comum em API com várias camadas de validação; (2) quando vários
+  guards devolvem o MESMO status, asserte também a **mensagem/efeito**, não só o código; (3) prefira
+  afirmar o **estado depois** do ataque (o dado não mudou) — isso não tem como passar pelo motivo
+  errado. Bônus de método: para mutation check em app Dockerizada, **monte o arquivo mutado como
+  volume** (`docker compose run --rm -v /tmp/mut.js:/app/rota.js --entrypoint npm web test`) — roda
+  em segundos, não exige rebuild, e o fonte real nunca é tocado (mata de vez o risco do
+  `git checkout` das lições de 2026-07-07 e 2026-07-16).
 - **2026-07-18 (via CoinHub — mutation check que COMPILA, não build-fail):** Ao mutar um guard cuja quebra
   deixaria um símbolo **não-usado** (ex.: neutralizar `if host != H && !strings.HasSuffix(host, "."+H) {`
   removendo o corpo torna `H`/`strings` órfãos → em Go isso é **erro de compilação**, não teste vermelho).
