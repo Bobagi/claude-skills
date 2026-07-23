@@ -156,6 +156,27 @@ click, drive them separately for now (interaction steps are a planned engine fea
 ---
 
 ## Learnings log (append-only; this is how the reviewer improves)
+
+- **2026-07-23 (via todo — o controle que gerencia uma faixa rolável NÃO pode morar dentro dela):**
+  Quando uma coleção é exibida numa **faixa com `overflow-x:auto`** (abas, chips de filtro, pills de
+  categoria), o botão que **gerencia** essa coleção (⚙ "Gerenciar", "+ Novo", "Editar") não pode ser o
+  último item da faixa: ele sai do campo de visão **exatamente quando a coleção fica grande**, que é
+  quando o usuário precisa dele — e se aquela for a ÚNICA porta para criar/renomear/apagar, a
+  funcionalidade vira inalcançável sem que nada pareça quebrado (screenshot sem overflow, sinal
+  `overflowX:false`, zero erro de console). Regra: **o controle de gestão fica FORA do container que
+  rola** (barra de ferramentas, header, ou canto fixo). Checar sempre: para cada faixa rolável, onde
+  está a ação que a administra? Corolário de a11y/descoberta: um item cortado na borda direita sem
+  gradiente/fade não comunica "há mais" — se a faixa precisa rolar, dê a affordance.
+- **2026-07-23 (via todo — dois pegadinhas de método):** (1) **`.btn { width: 100% }` como regra
+  BASE** (comum em apps mobile-first) transforma qualquer botão colocado numa linha flex em um item
+  que estica e **espreme os irmãos** — no caso, um "Clear" empurrou o contador "3 selected" para duas
+  linhas. Antes de compor uma toolbar/linha flex, **leia a regra base de `button`/`.btn` do projeto** e
+  neutralize com `width:auto; flex:0 0 auto` no modificador. (2) **App servida de dentro de uma imagem
+  Docker (`COPY . .`) NÃO reflete edições do fonte até o rebuild** — rodei uma rodada inteira de
+  captura contra o container velho e "corrigi" achados que continuavam na tela. Antes de confiar nos
+  screenshots, **prove que o asset servido contém sua mudança** (`curl -s <base>/js/app/x.js | grep
+  <trecho novo>`); se o projeto tem bind-mount de dev, use-o. Vale para qualquer front atrás de
+  build/bundle/CDN com cache.
 > Add a dated, **general** lesson whenever a review surfaces a check worth keeping. Keep it
 > project-agnostic. Promote recurring lessons into the checklists above.
 
