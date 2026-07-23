@@ -171,6 +171,23 @@ click, drive them separately for now (interaction steps are a planned engine fea
 
 ## Learnings log (append-only; this is how the reviewer improves)
 
+- **2026-07-23 (via todo — CRITIQUE O ESTADO OCIOSO, e não esconda ícone com opacity:0):** Duas
+  lições que se reforçam. (1) **Capture e critique o estado DEFAULT/ocioso de todo componente novo,
+  não só o happy path.** Uma rodada anterior validou um checkbox e um dropdown só em cenários que já
+  forçavam seleção/abertura — e deixou passar (a) um ✓ que aparecia SEM seleção e (b) um gatilho de
+  dropdown com borda quase invisível. Ambos os defeitos só existem no estado ocioso (nada
+  selecionado / fechado). Ao revisar um controle com estados, capture SEMPRE: vazio/ocioso, hover,
+  aberto, ativo/selecionado — o primeiro é o mais fácil de esquecer e o que o usuário vê primeiro.
+  (2) **Não esconda um ícone/glyph com `opacity:0` e revele com uma classe — RENDERIZE-O
+  condicionalmente.** Um `<i>` de ícone-fonte (Phosphor/FontAwesome) com `opacity:0` **ainda é
+  pintado por alguns browsers mobile** (visto no Chrome do Galaxy S24): o check "escondido" aparecia
+  fraco em toda linha. Fix robusto: só inserir o elemento no DOM quando ativo
+  (`selected ? e("i",{className:"check"}) : null`), de modo que o estado inativo não tenha glyph
+  algum — imune a qualquer diferença de repaint/opacity entre engines. Vale para qualquer overlay de
+  estado (badge, check, spinner) sobre um controle. (3) Consistência: um controle novo colocado ao
+  lado de uma família existente (aqui um dropdown ao lado de 4 `.iconbtn`) deve REUSAR a mesma
+  linguagem visual (mesma borda/raio/altura) — uma pílula de borda fraca ao lado de quadrados de
+  borda clara lê como "quebrado", mesmo tecnicamente tendo borda.
 - **2026-07-23 (via todo — o controle que gerencia uma faixa rolável NÃO pode morar dentro dela):**
   Quando uma coleção é exibida numa **faixa com `overflow-x:auto`** (abas, chips de filtro, pills de
   categoria), o botão que **gerencia** essa coleção (⚙ "Gerenciar", "+ Novo", "Editar") não pode ser o
