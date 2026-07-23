@@ -71,6 +71,14 @@ Every finding must carry: **what** (the problem), **where** (route + viewport + 
 - [ ] Shadows/borders consistent (one elevation system).
 - [ ] No layout shift or jank on load; loading states present for async areas.
 
+### Product effectiveness (for landing / marketing / entry screens)
+- [ ] **Does a stranger see the PRODUCT, or a form?** On an entry screen, the heaviest object should be
+  what the product IS (the art, the board, a demo), not a credentials field.
+- [ ] **CTA hierarchy matches WHO ARRIVES.** A first-time visitor has no account: "Log in" as the loud
+  primary with "Create account" as a faint ghost is inverted. Primary = the action a newcomer can take.
+- [ ] **Is there a reason to believe below the fold?** Hero straight into footer = nothing sells the
+  product. Look for: how it works, real proof/content, a closing call.
+
 ### States (look for all, not just the happy path)
 - [ ] Empty state (no data) is designed, not a blank gap.
 - [ ] Loading state (skeleton/spinner) exists for async content.
@@ -100,6 +108,12 @@ Every finding must carry: **what** (the problem), **where** (route + viewport + 
   row that holds multiple inline items and confirm it can reflow (`flex-wrap`, `min-width:0`, or a mobile
   media query) — a no-wrap flex row with intrinsic/fixed-width children **will** overflow on narrow screens
   even when today's data happens to fit. Flag fixed `width`/`min-width` px on content that must fit a phone.
+- [ ] **A horizontal scroller inflates its ancestors unless they are capped.** `overflow-x:auto` on a
+  rail does NOT stop its min-content propagating up through an `overflow:visible` parent — the
+  grandparent's implicit `auto` grid track grows to the rail's full content width and the WHOLE page
+  goes wider than the viewport. Give stacking containers `grid-template-columns: minmax(0, 1fr)` and
+  the scroller's wrapper `min-width: 0`. Prefer `justify-content: safe center` over `center` on any
+  row that can overflow (plain `center` puts the first item where scrolling cannot reach it).
 - [ ] **No undefined CSS custom properties.** Grep every `var(--x)` reference and diff against the
   tokens defined in `:root`. An undefined token **with no fallback** renders the wrong value silently
   (e.g. `var(--text-muted)` when the token is `--muted` → text shows full-bright, not muted — a real
@@ -177,6 +191,56 @@ click, drive them separately for now (interaction steps are a planned engine fea
   screenshots, **prove que o asset servido contém sua mudança** (`curl -s <base>/js/app/x.js | grep
   <trecho novo>`); se o projeto tem bind-mount de dev, use-o. Vale para qualquer front atrás de
   build/bundle/CDN com cache.
+- **2026-07-23 (via cartomania — o landing que é um FORMULÁRIO de login, e 3 armadilhas de layout):**
+  **(a) Julgamento de PRODUTO antes do visual.** Numa landing de produto/jogo, a primeira pergunta
+  não é "o padding está certo?" e sim **"o visitante vê o PRODUTO ou vê um formulário?"**. Caso real:
+  a home de um card game passava em todos os checks visuais (0 overflow, contraste ok, foco ok) e
+  ainda assim falhava no objetivo do dono ("quero que dê vontade de jogar") — o objeto mais pesado da
+  tela era um campo de senha, a melhor arte do projeto (o tabuleiro de duelo) não aparecia em lugar
+  nenhum, e a página acabava no fold. Checklist novo para qualquer landing: (1) o que a tela mostra do
+  produto EM SI? (2) a **hierarquia de CTA está certa PARA QUEM CHEGA** — um visitante novo não tem
+  conta, então "Log in" gigante dourado + "Criar conta" fantasma minúsculo é hierarquia INVERTIDA;
+  (3) existe conteúdo ABAIXO do fold que dá motivo para acreditar (como funciona, prova, coleção), ou
+  a página é só herói + rodapé? Um site pode passar em todo o Pilar 1 e falhar como produto.
+  **(b) BUG CLASS — a faixa rolável INFLA o container que a contém.** Um `overflow-x:auto` no rail
+  **não** impede que o min-content dele suba pela árvore quando há um pai intermediário
+  `overflow:visible`: o track implícito `auto` do grid avô cresce até a largura TOTAL do conteúdo do
+  rail (medido: 1318px dentro de uma caixa de 1120px) e **TODAS as seções da página** passam a ser
+  mais largas que a viewport — scrollbar horizontal no documento inteiro, em todos os viewports.
+  Regra: todo container que empilha seções precisa de **`grid-template-columns: minmax(0, 1fr)`** e o
+  wrapper de qualquer scroller horizontal precisa de **`min-width: 0`**. Isso NÃO aparece como
+  "elemento X estourou" — aparece como a página inteira larga demais, o que confunde o diagnóstico.
+  **(c) `justify-content: center` numa flex row que ESTOURA torna o primeiro item inalcançável** —
+  o conteúdo transborda para os DOIS lados e não há scroll negativo. Use **`justify-content: safe
+  center`** (centraliza quando cabe, cai para flex-start quando não cabe). Sintoma: "o primeiro card
+  aparece cortado pela metade e não dá para rolar até ele".
+  **(d) Porcentagem em elemento `position:absolute` pode resolver contra caixa inesperada** —
+  `width: min(430px, 92%)` renderizou **424px dentro de uma caixa de 350px** só no mobile (17px de
+  overflow de página). Não confie na conta mental do containing block: **meça**, e blinde com
+  `max-width: 100%` + `overflow-x: clip` no pai (`clip`, não `hidden`: não cria scroll container e
+  não corta a sombra/brilho vertical).
+  **MÉTODO que pegou os três (e que a screenshot NÃO pegaria):** um probe puppeteer que imprime
+  `getBoundingClientRect()` + `scrollWidth`/`clientWidth` de cada ancestral suspeito e compara
+  `documentElement.scrollWidth` com `clientWidth`. Depois de CADA correção, re-meça — não olhe o PNG.
+- **2026-07-23b (via cartomania — barra fixa inferior precisa RESERVAR o próprio espaço):** uma barra
+  `position:fixed` no rodapé (consentimento, notificação, "instale o app") **cobre permanentemente** o
+  que estiver no fim da página se a página não tiver altura sobrando — no caso real ela escondia o
+  card de login INTEIRO no mobile e nenhuma rolagem liberava. Padrão correto: renderizar um **spacer
+  no fluxo** junto com a barra, com altura **medida** (`bind:clientHeight` / ResizeObserver) e
+  fallback em CSS responsivo para SSR/primeiro paint (a barra quebra em mais linhas conforme estreita,
+  então uma altura fixa única erra). **Teste objetivo, não visual:** rolar até o fim
+  (`scrollTo(0, scrollHeight)`) e afirmar que `últimoConteúdo.getBoundingClientRect().bottom <=
+  barra.getBoundingClientRect().top` em cada viewport. NÃO teste com `scrollIntoView({block:'center'})`
+  — centralizar o elemento na viewport faz qualquer barra inferior "sobrepor" e dá falso positivo
+  (errei isso primeiro). Vale para qualquer overlay fixo em borda.
+- **2026-07-23c (via cartomania — imagem `loading="lazy"` mente no screenshot full-page):** cards/
+  imagens abaixo do fold com `loading="lazy"` saem **em branco** no screenshot `fullPage` do puppeteer
+  (o viewport nunca "passa" por elas de verdade) — parece feature quebrada, não é. É primo da lição de
+  2026-07-19 (scroll-reveal por IntersectionObserver), mas aqui o culpado é o atributo nativo. Antes de
+  reportar "a seção X não renderiza", **prove por estado**: `el.scrollIntoView()` + wait + asserção
+  `[...imgs].filter(i=>i.naturalWidth>0).length`. Só chame de bug se `naturalWidth===0` com o elemento
+  visível. E cheque `consoleErrors` do manifest (0 erros + vazio visual = artefato de carregamento).
+
 > Add a dated, **general** lesson whenever a review surfaces a check worth keeping. Keep it
 > project-agnostic. Promote recurring lessons into the checklists above.
 
