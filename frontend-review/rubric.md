@@ -171,6 +171,23 @@ click, drive them separately for now (interaction steps are a planned engine fea
 
 ## Learnings log (append-only; this is how the reviewer improves)
 
+- **2026-07-23 (via todo — emoji de bandeira quebra no Windows; e valide a classe QUE O APP EMITE):**
+  Duas lições. (1) **Nunca use emoji de bandeira (🇧🇷) em UI que precisa funcionar cross-OS.** A fonte
+  do Windows (**Segoe UI Emoji) não tem glyphs de bandeira** por decisão da Microsoft — ela renderiza
+  as duas letras do "regional indicator" (BR, ES, DE…) no lugar. macOS/iOS (Apple Color Emoji) e muitos
+  Android/Linux (Noto Color Emoji) desenham; então o bug **não aparece no Mac do dev** e passa fácil.
+  Fix agnóstico: **bandeiras em SVG inline** (data-URI no CSS `background-image`, ou `<svg>`), que
+  renderizam idênticas em todo SO e independem de fonte de emoji. Headless Linux costuma TER Noto e
+  mostrar a bandeira — então o screenshot do CI/skill esconde o bug do Windows; trate "emoji flag" como
+  defeito por construção, não confie no screenshot. (2) **Ao trocar um símbolo por classe/asset keyed
+  por um "código", a chave da classe tem que casar com o código que o COMPONENTE realmente emite.**
+  Nomeei `.flag--br`/`.flag--us` (país) mas o código gera `flag--<lang>` = `flag--pt`/`flag--en`
+  (idioma) → só as 4 em que idioma==país (es/fr/de/it) funcionaram; pt/en ficaram sem background. Pior:
+  ao depurar, consultei `getComputedStyle(.flag--br)` (que EXISTIA no CSS) em vez de `.flag--pt` (o que
+  o app renderiza) — e o "computed style OK" me mandou pro lado errado por duas rodadas. **Regra: quando
+  um estilo não aparece, INSPECIONE a classe/atributo que o DOM VIVO realmente tem no elemento
+  (`el.className` no browser), não a classe que você ASSUME que existe.** A distância entre "a regra CSS
+  existe" e "o elemento tem essa classe" é onde o bug se esconde.
 - **2026-07-23 (via todo — CRITIQUE O ESTADO OCIOSO, e não esconda ícone com opacity:0):** Duas
   lições que se reforçam. (1) **Capture e critique o estado DEFAULT/ocioso de todo componente novo,
   não só o happy path.** Uma rodada anterior validou um checkbox e um dropdown só em cenários que já
