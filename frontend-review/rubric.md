@@ -320,7 +320,16 @@ click, drive them separately for now (interaction steps are a planned engine fea
   width or height) and let the ratio supply the other. Corollary for "make them all identical": also
   check nobody `scale()`s one instance relative to its siblings (a hero fan's centre card was
   `scale(1.07)`, 7% bigger); use lift/z-index/shadow for emphasis, never a size change. Promoted a
-  Pillar-2 check.
+  Pillar-2 check. (3) **Transparency test for content inside a framed/masked container:** when an image
+  sits inside a PNG frame (or any mask) with a transparent window and the owner reports "gaps on the
+  sides showing what is behind", put a BRIGHT SOLID plane (pure red) directly behind the element and
+  screenshot: any red bleeding through is a real transparent gap. The usual cause is the inner content
+  padded to end EXACTLY at the frame window edge, so sub-pixel rounding leaves a see-through sliver
+  (invisible on a dark page, glaring when elements overlap and the thing behind is another card). Fix:
+  make the content overlap UNDER the opaque frame border (smaller padding) AND give the container an
+  opaque background so residual sub-pixels show the backing, never the layer behind. This kind of gap is
+  invisible in a normal screenshot and in a pixel-diff of two matching contexts; only the solid-colour
+  backdrop reveals it.
 > Add a dated, **general** lesson whenever a review surfaces a check worth keeping. Keep it
 > project-agnostic. Promote recurring lessons into the checklists above.
 

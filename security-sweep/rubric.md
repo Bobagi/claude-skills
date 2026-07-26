@@ -515,3 +515,20 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   único em `LOWER(email)` — não o `SELECT ... LOWER(email)` pré-check — é a defesa real de concorrência,
   espelhando o índice de `LOWER(username)`); forja de ID token Google (`alg:none`/HS256/lixo → 400, a
   assinatura RS256+audience barra antes de qualquer criação de conta).
+- **2026-07-26 (via todo — um endpoint "sempre 200" ainda ENUMERA por TIMING se fizer o trabalho antes de
+  responder):** `forgot-password` retornava status+corpo idênticos p/ e-mail existente vs inexistente
+  (classe 3, correto no papel) — mas media o tempo: existente **21,5ms** (lookup + invalidar tokens +
+  INSERT + montar link) vs inexistente **3,4ms** (sai cedo) = **6,3×**. Resposta uniforme não basta se o
+  **tempo** de resposta depende do estado do e-mail. **Regra durável:** endpoints anti-enumeração
+  ("sempre 200": forgot-password, às vezes signup) devem **responder ANTES de qualquer trabalho** que só
+  ocorra no ramo "existe" — mova lookup/insert/envio para depois do `res.json()` (IIFE async
+  fire-and-forget), ou faça exatamente o mesmo trabalho nos dois ramos. **▶ Testar ao vivo (o que fecha):**
+  ≥5 amostras com um valor que EXISTE vs um que NÃO existe; mediana (descarte o warmup); ratio > ~3× =
+  oráculo mesmo com corpo idêntico; prove o fix trazendo pra ~1–2×. **Custo do fix (não esquecer):**
+  responder-antes torna a escrita **assíncrona** → o teste de "o token foi criado" precisa de **poll** (não
+  leia o banco logo após o 200), e requests rápidos sucessivos podem auto-competir no "invalidar-anteriores"
+  (deixe assentar entre eles ou serialize; ter 2 tokens uso-único válidos por 1h não é falha). Re-validado
+  firme: token de reset = `randomBytes(32)`, **só o sha256 no banco** (64-hex; cru só no e-mail), uso-único
+  via `SELECT ... FOR UPDATE`+`used_at`, 100 tokens aleatórios ⇒ 0 aceitos; **revogação de sessão num app
+  JWT-stateless** provada ao vivo (classe 9): o JWT pré-reset dá 401 depois porque o reset bumpa
+  `users.token_version` (embutido no JWT, re-checado no guard).

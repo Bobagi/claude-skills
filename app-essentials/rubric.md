@@ -352,3 +352,24 @@ de dinheiro que você criar — construir sem ela é criar a fraude junto.**
   gerando uma "falha fantasma" que some sozinha numa aba anônima. **Nota conceitual p/ não confundir o operador:**
   "igual ao CoinHub" nem sempre é copiar-colar — CoinHub usa **code-flow server-side** (redirect URI + secret),
   todo usa **GIS ID-token** (JavaScript origin, sem secret); são dois fluxos legítimos e distintos do Google.
+- **2026-07-26 (via todo — módulos 5/8/10 num app JWT-stateless, adaptando o CoinHub Go→Node):** Implementar
+  **reset de senha** (módulo 5) + e-mail transacional (10) + alinhar termos/privacidade (8) num app Express/JWT
+  rendeu quatro lições de adaptação. **(1) Revogação de sessão sem sessão server-side:** o CoinHub apaga a
+  sessão opaca; num app **JWT-stateless** o equivalente é um `token_version` inteiro no usuário, **embutido no
+  JWT** e **re-checado contra o banco no guard** a cada request (1 lookup de PK barato). O reset faz
+  `token_version = token_version+1` → todo JWT antigo morre (linha ausente = user apagado = 401). Sem isso,
+  "reset revoga sessões" é mentira num app JWT. **(2) `forgot-password` "sempre 200" precisa responder ANTES
+  do trabalho** (senão enumera por timing — a security-sweep pega 6×); consequência: a criação do token vira
+  **assíncrona**, então o test-forge do "token foi emitido" usa **poll**, não leitura imediata. **(3) A tabela
+  `auth_tokens(user_id,purpose,token_hash,expires_at,used_at)` do CoinHub porta 1:1** (só o sha256, uso-único
+  via `SELECT ... FOR UPDATE`, emitir novo invalida anteriores, TTL 1h) — o mesmo esquema serve reset E
+  verificação de e-mail (é só o `purpose`). Conta **social sem senha**: forgot fica em **silêncio** (não há o
+  que resetar; revelar vazaria o método). **(4) Termos/Privacidade (módulo 8) — a política TEM que casar com o
+  que o app faz AGORA:** ao auditar, a política dizia "não mantemos registros de acesso" mas o app já gravava
+  `access_logs` (IP/UA) e carregava analytics (Umami) sem citar — é **bug de conformidade** (a rubric avisa).
+  Fix: reescrever listando TODO dado real (conta+e-mail, hash de senha, conteúdo, access_logs+retenção, dados
+  do Google, analytics cookieless, tokens de reset), e **bumpar a versão** (v1→v2) + a data das páginas junto
+  com a constante `*_VERSION` do aceite. **(5) SMTP reusado** do app irmão (mesmo Gmail app password), só
+  trocando `SMTP_FROM_NAME` — **cuidado ao copiar segredo entre `.env`: nunca ecoar** (um `grep`+print de
+  máscara mal feito vazou o app password no chat → rotacionar). E-mail segue **config-driven/no-op** sem
+  `SMTP_*` (inclusive nos testes: o harness zera `SMTP_*` p/ não disparar e-mail real).
