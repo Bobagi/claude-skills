@@ -873,3 +873,12 @@ click, drive them separately for now (interaction steps are a planned engine fea
   canvas-heavy SPA with 0 console violations IF inline `style=""` attrs are covered by
   `style-src-attr 'unsafe-inline'` and external font/img hosts are allow-listed - verify by loading every
   key route (incl. a live game screen) headless and counting CSP violations, don't assume.
+- **2026-07-26 (via a ranked decision table added to a finance dashboard):** When a NEW multi-column
+  table lands next to an EXISTING one that reflows to cards at a different breakpoint, judge the
+  in-between window deliberately (one in table mode, one in cards): acceptable only if neither
+  overflows there. Prefer reflowing a decision table to cards BEFORE its grid would enter a
+  "barely scrolls" zone - hidden columns behind a tiny internal scroll are worse for a comparison
+  surface than a longer page of cards. And in label/value card reflow, a status cell that can carry
+  TWO chips (state + warning) must be `flex-wrap` so the second chip drops to its own line instead
+  of colliding with the `::before` label - verify with a row that actually has both chips, not just
+  the common single-chip case.
