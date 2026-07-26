@@ -72,8 +72,23 @@ de dinheiro que você criar — construir sem ela é criar a fraude junto.**
   = não-sensíveis → publicar o consent screen **não exige verificação** do Google; **não suba logo custom**
   no consent, dispara "brand verification"). Avatar do provedor: **proxy server-side** com host pinado
   (anti-SSRF), não `<img src>` direto (CSP).
+- **Variante client-side (GIS / botão "Sign in with Google" → ID token):** quando NÃO há tier de servidor
+  fazendo o code-flow (SPA pura), usa-se o **Google Identity Services**: o botão roda no browser e devolve um
+  **ID token (JWT)** ao callback, que vai pro `POST /google-login`; o servidor faz `verifyIdToken`
+  (`audience==client_id`, `email_verified`, casa por `sub`/`google_id`, nunca auto-link por e-mail).
+  Aqui o campo do Google Cloud é **Authorized JavaScript origins** (NÃO redirect URI) e **não há client
+  secret**. ⚠️ **ARMADILHA de front que trava o login inteiro (agnóstica de fluxo):** no callback de sucesso
+  você faz `setToken(novo)` (state assíncrono) — **NÃO** chame o fetch de dados (ex.: `fetchTabs()`) na mesma
+  função: o closure ainda tem o token **antigo/null** → o request sai **sem Authorization** → 401 → e se o
+  handler de 401 limpa a sessão (`setToken(null)`+`localStorage.removeItem`), ele **apaga o token recém-salvo**
+  e volta pro login. Sintoma: o social login "funciona" (linha de usuário criada, 200 devolvido) mas a UI
+  recarrega pro login, enquanto e-mail/senha funciona (porque NÃO chama o fetch direto). **Fix:** deixe o
+  efeito de mudança de estado (`useEffect([token])`) carregar os dados com o token novo — igual ao caminho
+  e-mail/senha — ou passe o token novo explicitamente ao fetch. Ao trocar o client id injetado, **bumpe o
+  service worker** (senão o browser serve a página cacheada com o id velho → `aud` não bate → falha fantasma).
 - **Passo do OPERADOR (documentar, não automatizar):** criar o OAuth client no Google Cloud Console, o
-  redirect URI, publicar o consent screen. **Nunca** dirigir navegador logado no Google na VPS.
+  redirect URI (code-flow) **ou** a JavaScript origin (GIS), publicar o consent screen. **Nunca** dirigir
+  navegador logado no Google na VPS. O Google **não tem API** p/ criar client OAuth nem editar origens/redirects.
 - **🛡 Blinda com:** classe 9 (state/subject-match no step-up), classe 6 (SSRF do avatar), classe 2 (o
   link-por-e-mail não pode sequestrar conta alheia).
 - **🔒 Trava com:** test-forge — auto-link só com e-mail verificado; state inválido rejeitado.
@@ -318,3 +333,22 @@ de dinheiro que você criar — construir sem ela é criar a fraude junto.**
   password RESET bumps it and forces a fresh login (kicks the attacker). **(3) Reuse the org's existing SMTP**
   rather than provisioning: the same owner's Gmail app password already lived in a sibling app — copy `SMTP_*`,
   change only `SMTP_FROM_NAME`. Email stays config-driven (no-op without `SMTP_*`) so the app still boots without it.
+- **2026-07-26 (via todo — GIS client-side login "succeeds" but the app never enters; the token-nuking race):**
+  Ligar o "Entrar com Google" numa **SPA sem tier de servidor** (fluxo **GIS / ID token**, não o code-flow do
+  módulo 3) expôs uma armadilha de front **agnóstica de fluxo** que trava o login inteiro sem tocar no backend.
+  Fingerprint: o botão do Google funciona (usuário escolhe a conta), o backend cria a linha do usuário e devolve
+  **200 + token**, mas a UI **recarrega pro login** — enquanto e-mail/senha entra normal. Causa: no callback de
+  sucesso o handler fazia `setToken(novo)` (state React, assíncrono) **e chamava o fetch de dados na mesma função**
+  (`fetchTabs()`); o closure ainda tinha o token **antigo/null**, então o request saiu **sem `Authorization`** →
+  **401** → e o handler de 401 (que limpa a sessão: `setToken(null)` + `localStorage.removeItem`) **apagou o token
+  recém-salvo** e voltou pro login. E-mail/senha não sofria porque **não** chamava o fetch direto — confiava no
+  `useEffect([token])`. **Regra durável:** depois de um login client-side, **nunca** dispare o fetch protegido no
+  mesmo handler com o token do closure; deixe o efeito de mudança de estado carregar os dados com o token novo, ou
+  passe o token novo **explicitamente**. **Método de diagnóstico que economiza horas:** o `catch {}` do endpoint de
+  verificação **engolia o erro** (nem logava) → 1ª ação é logar `err.message` server-side; e **cheque o banco**: se
+  a linha do usuário FOI criada e veio 200, o backend está OK e o bug é **100% front** (não perca tempo em
+  audience/egress/clock). **Colateral de deploy (PWA):** ao trocar o client id injetado, **bumpe o `VERSION` do
+  service worker** — senão o browser serve a página **cacheada com o id velho** e o `aud` do token não bate,
+  gerando uma "falha fantasma" que some sozinha numa aba anônima. **Nota conceitual p/ não confundir o operador:**
+  "igual ao CoinHub" nem sempre é copiar-colar — CoinHub usa **code-flow server-side** (redirect URI + secret),
+  todo usa **GIS ID-token** (JavaScript origin, sem secret); são dois fluxos legítimos e distintos do Google.
