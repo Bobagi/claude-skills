@@ -496,3 +496,22 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   RAW MIME (`nodemailer streamTransport`, print the message) and confirming the link is `token=3D<hex>` (correct);
   prove token single-use/expiry with unit tests instead. Delivery-proven + correct-link-proven + consume-proven
   compose to a working flow without a headless click.
+- **2026-07-26 (via todo — o oráculo de timing do login se esconde no OPERADOR `||`, não só num hash decoy
+  ruim; e contas sociais sem senha caem no ramo rápido):** Reconfirmação viva da lição 2026-07-23 (classe 3),
+  com uma manifestação DIFERENTE que um review estático engole: `if (!user || !(await bcrypt.compare(pw,
+  user.password || "")))`. Quando o usuário **não existe**, o `||` faz **short-circuit** e o `bcrypt.compare`
+  **nunca é avaliado** — não é "decoy malformado que curto-circuita", é o próprio operador lógico pulando o
+  KDF. Medido ao vivo: usuário real+senha errada **78ms** vs inexistente **3ms** = **~25×** (status e corpo
+  idênticos, mas o tempo denuncia a existência). **Corolário novo:** uma conta de **login social (Google) com
+  `password` NULL** também cai no ramo rápido (`bcrypt.compare(pw, "")` rejeita hash inválido na hora) — então
+  apps com login social + senha têm DUAS entradas para o mesmo oráculo. **Fix único que cobre os dois:** um
+  `DECOY_HASH = bcrypt.hashSync(..., custo)` no load; o handler roda **sempre exatamente um** `bcrypt.compare`
+  (contra o hash do user, ou o decoy quando o user falta OU não tem senha), e só depois decide `if (!user ||
+  !user.password || !ok)`. **▶ Testar ao vivo (o que fecha):** ≥5 amostras de (user real, senha errada) vs
+  (user inexistente); mediana (descarte o 1º = warmup); ratio > ~3× = oráculo. Prove o fix baixando o ratio a
+  ~1×. Unit test trava só a **paridade de status+corpo** e "conta sem senha não loga por senha" — o TEMPO é
+  flaky em unit, deixe pro sweep ao vivo. Re-validado firme no mesmo app: **race de unicidade de e-mail** (25
+  signups concorrentes, MESMO e-mail em caixas misturadas → exatamente 1×200 e 1 linha no DB, porque um índice
+  único em `LOWER(email)` — não o `SELECT ... LOWER(email)` pré-check — é a defesa real de concorrência,
+  espelhando o índice de `LOWER(username)`); forja de ID token Google (`alg:none`/HS256/lixo → 400, a
+  assinatura RS256+audience barra antes de qualquer criação de conta).

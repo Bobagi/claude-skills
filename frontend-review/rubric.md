@@ -136,6 +136,12 @@ Every finding must carry: **what** (the problem), **where** (route + viewport + 
   so the rule can't cascade into a nested instance. This is a top cause of "this element isn't configured
   like its twin" inconsistencies - verify suspect twins by rendering them adjacent (a faithful mock if auth-gated).
 - [ ] No duplicated style blocks that should be a shared class/component; component reuse over copy-paste.
+- [ ] **A reusable component meant to look identical everywhere actually renders identically.** Give it
+  ONE clean dimension anchor (explicit width OR height) and derive the rest from `aspect-ratio`; a
+  `container-type:size` / `contain:size` element cannot size from its content, so `aspect-ratio` alone in
+  the wrapper leaves it ambiguous and slightly stretched between call sites. Never `scale()` one instance
+  vs its siblings (use lift/z-index/shadow for emphasis). Verify with `offsetWidth/offsetHeight` (NOT
+  `getBoundingClientRect`, which includes `rotate()` and lies) plus a pixel-diff of the same item in two contexts.
 - [ ] No dead CSS / unused classes; no `!important` wars.
 - [ ] Layout uses fl/grid intentionally; avoid absolute positioning for flow content.
 - [ ] Conditional rendering covers loading/empty/error, not just data-present.
@@ -298,6 +304,23 @@ click, drive them separately for now (interaction steps are a planned engine fea
   plain hyphen). When reviewing copy, grep the strings for U+2014 (`grep -rnP "\x{2014}" <dir>`) and flag
   any hit. Watch the fold cost of longer, truer copy: a 2-line promise that grows to 3 lines can push the
   primary CTA behind a fixed consent bar, so re-measure `ctaBottom` vs the cookie bar's `top` after a copy change.
+- **2026-07-26 (via cartomania, "the same component renders subtly differently in two places"):**
+  When one reusable component (a card, a tile, an avatar) is expected to look IDENTICAL everywhere and
+  the owner says one instance is "slightly off", do NOT eyeball it and do NOT trust
+  `getBoundingClientRect`. Two hard lessons: (1) **Measure the intrinsic aspect with
+  `offsetWidth/offsetHeight`, never `getBoundingClientRect`** - the latter returns the axis-aligned
+  bounding box AFTER transforms, so any `rotate()` (a fanned hand of cards, a tilted thumbnail) makes an
+  UNDISTORTED element report a false, stretched aspect. I chased a "stretched card in the arena" for a
+  whole pass; offsetWidth showed every card was actually the correct ratio and the real culprit was the
+  fan rotation in my measurement. Then **prove sameness with a pixel-diff of the SAME item cropped from
+  two contexts** (normalise to one size, ImageChops.difference, mean diff near 0 = identical). (2) **A
+  CSS-containment element (`container-type:size` / `contain:size`) cannot size itself from its content**,
+  so a wrapper that gives it only `aspect-ratio` and no width/height leaves the size ambiguous and it
+  renders slightly stretched/inconsistent between call sites. Fix: anchor ONE real dimension (an explicit
+  width or height) and let the ratio supply the other. Corollary for "make them all identical": also
+  check nobody `scale()`s one instance relative to its siblings (a hero fan's centre card was
+  `scale(1.07)`, 7% bigger); use lift/z-index/shadow for emphasis, never a size change. Promoted a
+  Pillar-2 check.
 > Add a dated, **general** lesson whenever a review surfaces a check worth keeping. Keep it
 > project-agnostic. Promote recurring lessons into the checklists above.
 
