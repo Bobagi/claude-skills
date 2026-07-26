@@ -28,6 +28,10 @@ function parseArgs(argv) {
   for (let i = 0; i < argv.length; i++) {
     const t = argv[i];
     if (t.startsWith('--')) {
+      // suporta --chave=valor (necessario quando o VALOR comeca com "--",
+      // ex.: --chrome-args="--disable-gpu")
+      const eq = t.indexOf('=');
+      if (eq > 2) { a[t.slice(2, eq)] = t.slice(eq + 1); continue; }
       const key = t.slice(2);
       const next = argv[i + 1];
       if (next === undefined || next.startsWith('--')) { a[key] = true; }
@@ -198,8 +202,12 @@ if (args.storage && existsSync(String(args.storage))) {
 console.log(`capture: chrome=${chrome}`);
 console.log(`capture: base=${base}  routes=${routes.length}  viewports=${viewports.map(v => v.label).join(',')}  out=${outDir}`);
 
+// --chrome-args "--flag-a --flag-b": extra Chromium flags. Ex.: apps canvas/
+// WebGL (Phaser, three.js) podem TRAVAR o main thread no init do SwiftShader
+// em maquina pequena -> passe --chrome-args "--disable-gpu" (renderer 2D).
+const extraChromeArgs = String(args['chrome-args'] || '').split(/\s+/).filter(Boolean);
 const browser = await puppeteer.launch({ executablePath: chrome, headless: 'new',
-  args: ['--no-sandbox', '--disable-dev-shm-usage', '--force-color-profile=srgb'] });
+  args: ['--no-sandbox', '--disable-dev-shm-usage', '--force-color-profile=srgb', ...extraChromeArgs] });
 
 const manifest = { base, generatedAt: new Date().toISOString(), shots: [], errors: [] };
 
@@ -235,13 +243,28 @@ async function capturePage({ label, url, vp, actions, full }) {
   const consoleErrors = [];
   page.on('console', m => { if (m.type() === 'error') consoleErrors.push(m.text().slice(0, 200)); });
   page.on('pageerror', e => consoleErrors.push(String(e).slice(0, 200)));
+  // track in-flight requests so a navigation timeout can say WHAT hung
+  const pending = new Map();
+  page.on('request', r => pending.set(r.url(), Date.now()));
+  page.on('requestfinished', r => pending.delete(r.url()));
+  page.on('requestfailed', r => pending.delete(r.url()));
   await page.setViewport({ width: vp.w, height: vp.h, deviceScaleFactor: scale });
   const allCookies = [...cookies, ...storageCookies];
   if (allCookies.length) { try { await page.setCookie(...allCookies); } catch { /* ignore */ } }
   const wantFull = full != null ? full : fullPage;
   const file = path.join(outDir, `${label}__${vp.label}.png`);
   try {
-    await page.goto(url, { waitUntil: 'networkidle2', timeout: 35000 });
+    try {
+      // --wait-until load|domcontentloaded|networkidle0|networkidle2 (default
+      // networkidle2). Canvas/jogo (Phaser etc.): networkidle pode NUNCA
+      // assentar em alguns ambientes -> use --wait-until load + --wait maior.
+      const waitUntil = String(args['wait-until'] || 'networkidle2');
+      await page.goto(url, { waitUntil, timeout: 35000 });
+    } catch (navErr) {
+      const stuck = [...pending.keys()].slice(0, 5);
+      if (stuck.length) navErr.message += ` | pending: ${stuck.join(' , ')}`;
+      throw navErr;
+    }
     await new Promise(r => setTimeout(r, extraWait));
     if (actions && actions.length) { await applyActions(page, actions); await new Promise(r => setTimeout(r, 600)); }
     const signals = await page.evaluate(collectSignals);
@@ -270,7 +293,11 @@ async function capturePage({ label, url, vp, actions, full }) {
 
 // Optional scenarios file: [{label, url?, viewport?, actions?, full?}] for tabs/modals/sub-tabs/states.
 let scenarios = [];
-if (args.scenarios && existsSync(String(args.scenarios))) {
+if (args.scenarios && String(args.scenarios).trim().startsWith('[')) {
+  // JSON inline (alem de caminho de arquivo)
+  try { scenarios = JSON.parse(String(args.scenarios)); }
+  catch (e) { fail('bad --scenarios inline json: ' + e); }
+} else if (args.scenarios && existsSync(String(args.scenarios))) {
   try { scenarios = JSON.parse(readFileSync(String(args.scenarios), 'utf8')); }
   catch (e) { fail('bad --scenarios json: ' + e); }
 }

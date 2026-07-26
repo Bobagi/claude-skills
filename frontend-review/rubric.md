@@ -330,6 +330,23 @@ click, drive them separately for now (interaction steps are a planned engine fea
   opaque background so residual sub-pixels show the backing, never the layer behind. This kind of gap is
   invisible in a normal screenshot and in a pixel-diff of two matching contexts; only the solid-colour
   backdrop reveals it.
+- **2026-07-26 (via bobagi-blocks, capturar página de JOGO/canvas):** duas armadilhas de engine e uma
+  de CSS. (1) **`networkidle` pode NUNCA assentar numa página de jogo/canvas** (Phaser etc.): o Chrome
+  emite `networkIdle` para os about:blank mas nunca `networkAlmostIdle` para o loader da página real,
+  mesmo com ZERO requests pendentes (diagnóstico via `DEBUG='puppeteer:*'` contando
+  `Page.lifecycleEvent` por loaderId), e o init de WebGL/SwiftShader pode travar o `load` inteiro em
+  VPS pequena. O engine ganhou: `--wait-until load|domcontentloaded|networkidle0|networkidle2`
+  (use `load` + `--wait` maior para apps canvas), `--chrome-args="--disable-gpu"` (o parser agora
+  aceita `--chave=valor`, obrigatório quando o VALOR começa com `--`), `--scenarios` aceita JSON
+  inline além de arquivo, e timeout de navegação agora lista os requests pendentes. Regra prática:
+  se uma rota canvas/jogo dá Navigation timeout enquanto as rotas estáticas passam, troque para
+  `--wait-until load` antes de caçar fantasmas. (2) **`place-items:center` numa grid com vários
+  filhos NÃO agrupa o conteúdo**, cada filho centraliza NA SUA track e eles se espalham na altura;
+  para agrupar o bloco todo no centro use `place-content:center` (items vs content). Sintoma:
+  "ring no topo, label no meio, legenda embaixo" num botão-overlay que deveria ler como um grupo.
+  (3) Reforço da lição de estado ocioso: decoração adicionada ao estado idle (blocos fake atrás de
+  um play button) sobrepôs a legenda; todo retoque "cosmético" num estado precisa de screenshot
+  próprio ANTES de ir pro ar, e quando a decoração compete com o texto, remova a decoração.
 > Add a dated, **general** lesson whenever a review surfaces a check worth keeping. Keep it
 > project-agnostic. Promote recurring lessons into the checklists above.
 
