@@ -485,3 +485,14 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   Re-validated firm here: same-origin CSRF guard must match the Origin EXACTLY or with a `/` boundary —
   `source.startsWith("https://good.host")` PASSES `https://good.host.evil.com` (prefix bypass); use
   `source === allowed || source.startsWith(allowed + "/")`.
+- **2026-07-26 (via cartomania — proving session revocation + not trusting a mail-reader's decode):** Two method
+  lessons. **(1) Session-revocation is a LIVE-testable property, class 9:** register → token1; change password
+  (authed) → token2; assert token1 now 401 and token2 200 on a protected route; and register → token → DELETE
+  account → token 401. If the old token still works, the JWT is unrevokable (no `tokenVersion`/DB check in the
+  guard) — a stolen token lives its full TTL. Fire it; don't assume. **(2) When verifying an emailed link end to
+  end, don't trust the MAIL CLIENT's decode of the token.** A quoted-printable body encodes the URL's `=` as
+  `=3D`; a real client decodes it fine, but an API/MCP read of the message may mis-decode it (dropped/again-escaped
+  bytes) so the token you extract is wrong and "verify" 400s — a FALSE bug. Settle it by rendering the sender's
+  RAW MIME (`nodemailer streamTransport`, print the message) and confirming the link is `token=3D<hex>` (correct);
+  prove token single-use/expiry with unit tests instead. Delivery-proven + correct-link-proven + consume-proven
+  compose to a working flow without a headless click.

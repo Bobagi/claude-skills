@@ -155,3 +155,14 @@ Pule: getters/setters triviais, o que o compilador/framework já garante, UI pur
   Gotcha: seeding login-lockout tests with real `bcrypt.hash(pw, 12)` and then doing ~19 compares blows
   Jest's 5s timeout in ts-jest — the tests exercise the lockout COUNTER, not bcrypt strength, so seed with
   cost 4 (identical logic, ~10× faster). Keep the production hashing at 12; only the test fixture drops.
+- **2026-07-26 (via cartomania — an in-memory fake that runs the REAL collaborator + mutation testing with
+  REDUNDANT guards):** Two lessons. **(1)** For a service that persists via an ORM, a small in-memory fake that
+  supports the ops your code actually uses — including `{ increment }` updates and a full one-time-token
+  lifecycle (create / findUnique-by-hash / conditional updateMany) — lets you construct the REAL token/collaborator
+  service against it, so token single-use/expiry/wrong-purpose are genuinely exercised (not stubbed). Assert on the
+  written STATE (the row's `usedAt`, the user's `tokenVersion`), never on "a method was called". **(2) Redundant
+  defense-in-depth defeats single-point mutation testing:** if a token's replay is rejected by BOTH a `usedAt !=
+  null` check AND a conditional `updateMany ... WHERE usedAt IS NULL` (count!=1), breaking EITHER one alone leaves
+  the test green — the other still catches it. That's correct hardening, but to prove the test actually bites you
+  must break BOTH guards at once and watch it go red (then restore). A "mutation survived" on one guard is not a
+  weak test here; confirm by mutating the whole invariant.

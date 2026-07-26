@@ -306,3 +306,15 @@ de dinheiro que você criar — construir sem ela é criar a fraude junto.**
   password OR a googleId (no credential-less ghost). The versioned-acceptance gate (module 8) must keep the
   displayed "last updated" date on the /terms|/privacy pages IN SYNC with `CURRENT_AGREEMENT_VERSION` — a
   date mismatch makes the re-accept gate contradict the page (caught by frontend-review, not the backend).
+- **2026-07-26 (via cartomania — email features on a USERNAME-identity app + revoking STATELESS JWT sessions):**
+  Three durable lessons adding reset/verify/linking to an app whose login identity was **username, not email**.
+  **(1)** Modules 4/5 (verification/reset) and the module-3 "auto-link by verified email" are DEAD until signup
+  actually COLLECTS an email — retrofit: make registration require a unique email, and let existing username-only
+  accounts add one on the account page. **(2) A stateless JWT can't be revoked**, so "reset revokes all sessions"
+  (module 5) and "delete account kills the token" need a **`tokenVersion` integer on the user, embedded in the
+  JWT and RE-CHECKED against the DB in the auth guard** (also catches deleted users). Cost: one cheap DB lookup
+  per authed request — fine, and strictly more secure than a 1-day unrevokable token. Password CHANGE should bump
+  tokenVersion AND return a fresh token so the current device stays in while others are kicked (re-set the cookie);
+  password RESET bumps it and forces a fresh login (kicks the attacker). **(3) Reuse the org's existing SMTP**
+  rather than provisioning: the same owner's Gmail app password already lived in a sibling app — copy `SMTP_*`,
+  change only `SMTP_FROM_NAME`. Email stays config-driven (no-op without `SMTP_*`) so the app still boots without it.
