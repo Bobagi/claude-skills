@@ -532,3 +532,17 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   via `SELECT ... FOR UPDATE`+`used_at`, 100 tokens aleatórios ⇒ 0 aceitos; **revogação de sessão num app
   JWT-stateless** provada ao vivo (classe 9): o JWT pré-reset dá 401 depois porque o reset bumpa
   `users.token_version` (embutido no JWT, re-checado no guard).
+- **2026-07-26 (via a client-side finance panel that persists user assumptions to localStorage):**
+  Two scoped classes worth re-validating on ANY feature that (a) renders upstream/user strings in a
+  framework template and (b) restores config from localStorage/URL. XSS: a value placed in an HTML
+  `title=`/attribute binding is safe in Svelte/React/Vue because the framework quotes attribute values
+  (a `">` payload cannot break out) — but ONLY confirm by loading the payload headless and checking the
+  attribute is a data value with no injected element/dialog; don't assume from reading. localStorage
+  poisoning: the sanitize function MUST (1) build a fresh object literal reading ONLY known keys (never
+  spread the parsed candidate — that carries `__proto__`/junk keys), (2) reject non-finite numbers
+  (`Infinity`/`NaN` from `1e309`/`"x"`) to a default, (3) clamp to documented min/max, and ideally
+  (4) rewrite storage clean on boot so poisoned state self-heals. Test by poisoning the key BEFORE app
+  boot (`evaluateOnNewDocument`) with junk types + `1e309` + `__proto__` + out-of-range, then assert
+  `Object.prototype.<key>` is undefined and the effective values are clamped. Also: extreme upstream
+  numerics (e.g. a huge dividend yield) must degrade to bounded, formatted output — grep the rendered
+  body for `NaN`/`Infinity` after seeding an absurd value.
