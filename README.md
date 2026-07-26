@@ -55,6 +55,7 @@ ou `bash <repo>/sync.sh`. Depois, **reinicie o Claude** (um `claude` novo) para 
 | `google-ads` | `/gads` | Relatórios Google Ads via API (somente leitura): status/orçamento de campanha, gasto por dia, CPI, conversões por campanha/grupo. Exige developer token com acesso Básico aprovado (setup único em `google-ads/SETUP.md`); reusa o OAuth client do AdMob. |
 | `cloudflare` | `/cloudflare` | Gerencia o DNS da zona `bobagi.space` no Cloudflare via API (`scripts/cf-dns.sh`): cria/altera/remove subdomínios (A/CNAME, proxied/DNS-only) e registros **TXT** (`txt`/`txt-del`, usados pela verificação do Search Console). DNS é SÓ no Cloudflare (Hostinger morto desde 2026-07-06). Credenciais fora do repo (`/root/.config/cloudflare/` no VPS, chmod 600); de outra máquina, executa via skill `vps` (SSH). |
 | `google-search-console` | `/gsc` | **Cadastra e monitora sites no Google sem abrir o navegador**: verifica a posse sozinha (token DNS + TXT criado pela skill `cloudflare`), adiciona a propriedade, submete sitemap e lê desempenho de busca (cliques, impressões, CTR, posição, top queries/páginas). Reusa a service account do `google-play` — sem consent screen, sem senha do operador. Setup único em `google-search-console/SETUP.md`. |
+| `product-review` | `/product-review` | **Atua como Product Manager do portfolio inteiro do VPS.** Coleta dados reais de todos os produtos (tráfego do nginx separando humano/robô/ataque, usuários nos bancos, receita do Google Ads/AdMob, SEO do Search Console, tráfego/estrelas do GitHub, consumo e saúde do box), analisa o que tem valor / consome / é usado, e gera ou atualiza um **Artifact único** (republicado no mesmo link) com diagnóstico e recomendações priorizadas P0/P1/P2. Roda no VPS (docker + bancos + skills google + gh); assets versionados em `product-review/assets/` (coletor, analisador de log, builder de fontes, template HTML). Doc operacional em `/opt/pm-dashboard/README.md`. Use em "revisão de produto"/"como estão os projetos"/"atualize o dashboard de produto". |
 
 ### Plugins (marketplace `claude-plugins-official` = `anthropics/claude-plugins-official`)
 | Plugin | Para que serve |
@@ -148,6 +149,9 @@ claude-skills/
 │   ├── rubric.md               #   checklist/expertise versionada que cresce
 │   └── scripts/capture.mjs     #   screenshots multi-viewport (Puppeteer headless)
 ├── resume/SKILL.md             # skill: resumo de vídeo do YouTube
+├── product-review/             # skill: PM do portfolio (coleta + analisa + publica Artifact)
+│   ├── SKILL.md
+│   └── assets/                 #   collect.sh, analyze_logs.py, build.py, template.html, fonts/*.woff2
 ├── linkedin/                   # skill: ler/editar/auditar o perfil do LinkedIn
 │   ├── SKILL.md
 │   ├── config.json             #   URL do perfil + endereço do CDP

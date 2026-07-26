@@ -1,0 +1,969 @@
+<title>Revisão de Produto - Bobagi VPS</title>
+<style>
+@font-face{font-family:"Sora";src:url(data:font/woff2;base64,__SORA__) format("woff2");font-weight:800;font-style:normal;font-display:swap}
+@font-face{font-family:"JBMono";src:url(data:font/woff2;base64,__JBMONO__) format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"Inter";src:url(data:font/woff2;base64,__INTER4__) format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"Inter";src:url(data:font/woff2;base64,__INTER6__) format("woff2");font-weight:600;font-style:normal;font-display:swap}
+
+:root{
+  --ground:#E9ECED; --panel:#FCFDFD; --panel2:#F2F5F5; --sunk:#E3E8E9;
+  --ink:#10181B; --ink2:#3B484C; --muted:#6A787C; --line:#D2D9DA; --line2:#C0CACC;
+  --accent:#00809B; --brass:#8F6A22; --good:#2A6E48; --warn:#96631B; --crit:#A3312C;
+  --noise:#93A2A6; --accent-wash:rgba(0,128,155,.09); --crit-wash:rgba(163,49,44,.08);
+  --shadow:0 1px 2px rgba(16,24,27,.06),0 8px 24px -12px rgba(16,24,27,.18);
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --ground:#0B1113; --panel:#121A1D; --panel2:#182226; --sunk:#0E1518;
+    --ink:#DFE8EA; --ink2:#AEBDC0; --muted:#7C8D91; --line:#243136; --line2:#2E3E43;
+    --accent:#3FBCD6; --brass:#C9A15A; --good:#4FA377; --warn:#D9A441; --crit:#DE6A62;
+    --noise:#68767A; --accent-wash:rgba(63,188,214,.12); --crit-wash:rgba(222,106,98,.11);
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0B1113; --panel:#121A1D; --panel2:#182226; --sunk:#0E1518;
+  --ink:#DFE8EA; --ink2:#AEBDC0; --muted:#7C8D91; --line:#243136; --line2:#2E3E43;
+  --accent:#3FBCD6; --brass:#C9A15A; --good:#4FA377; --warn:#D9A441; --crit:#DE6A62;
+  --noise:#68767A; --accent-wash:rgba(63,188,214,.12); --crit-wash:rgba(222,106,98,.11);
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
+}
+:root[data-theme="light"]{
+  --ground:#E9ECED; --panel:#FCFDFD; --panel2:#F2F5F5; --sunk:#E3E8E9;
+  --ink:#10181B; --ink2:#3B484C; --muted:#6A787C; --line:#D2D9DA; --line2:#C0CACC;
+  --accent:#00809B; --brass:#8F6A22; --good:#2A6E48; --warn:#96631B; --crit:#A3312C;
+  --noise:#93A2A6; --accent-wash:rgba(0,128,155,.09); --crit-wash:rgba(163,49,44,.08);
+  --shadow:0 1px 2px rgba(16,24,27,.06),0 8px 24px -12px rgba(16,24,27,.18);
+}
+
+*{box-sizing:border-box}
+html{overflow-x:clip}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:"Inter",system-ui,sans-serif; font-size:15px; line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  /* as tooltips (::after, opacity:0) ficam no fluxo e inflam o scrollWidth em telas
+     estreitas; clip garante que a página nunca role na horizontal e, ao contrário de
+     hidden, não cria contexto de rolagem - o position:sticky da topbar continua valendo. */
+  overflow-x:clip;
+}
+h1,h2,h3{font-family:"Sora",system-ui,sans-serif;font-weight:800;text-wrap:balance;margin:0;letter-spacing:-.022em;line-height:1.1}
+.mono{font-family:"JBMono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+a{color:var(--accent);text-underline-offset:2px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:2px}
+
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+
+/* ── top bar ── */
+.topbar{
+  position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--ground) 88%,transparent);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line);
+}
+.topbar .wrap{display:flex;align-items:center;gap:20px;height:52px}
+.brand{font-family:"JBMono",monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);white-space:nowrap}
+.brand b{color:var(--accent);font-weight:400}
+.navjump{display:flex;gap:2px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+.navjump::-webkit-scrollbar{display:none}
+.navjump a{
+  font-family:"JBMono",monospace;font-size:11px;letter-spacing:.04em;color:var(--muted);
+  text-decoration:none;padding:5px 9px;border-radius:3px;white-space:nowrap;
+}
+.navjump a:hover{color:var(--ink);background:var(--panel2)}
+
+/* ── verdict ── */
+.verdict{padding:56px 0 40px;border-bottom:1px solid var(--line)}
+.eyebrow{
+  font-family:"JBMono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;
+}
+.eyebrow .tick{width:22px;height:1px;background:var(--line2)}
+h1{font-size:clamp(30px,4.6vw,50px);max-width:20ch}
+.thesis{
+  margin:22px 0 0;max-width:64ch;font-size:17px;line-height:1.62;color:var(--ink2);
+}
+.thesis strong{color:var(--ink);font-weight:600}
+
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-top:38px;border-radius:5px;overflow:hidden}
+.kpi{background:var(--panel);padding:18px 18px 16px}
+.kpi .lbl{font-family:"JBMono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:9px}
+.kpi .val{font-family:"Sora",sans-serif;font-weight:800;font-size:29px;line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.kpi .sub{font-family:"JBMono",monospace;font-size:11px;color:var(--muted);margin-top:7px;display:block;line-height:1.45}
+.v-crit{color:var(--crit)} .v-warn{color:var(--warn)} .v-good{color:var(--good)} .v-acc{color:var(--accent)} .v-brass{color:var(--brass)}
+
+/* ── sections ── */
+section{padding:52px 0;border-bottom:1px solid var(--line);scroll-margin-top:64px}
+.shead{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.snum{font-family:"JBMono",monospace;font-size:11px;color:var(--accent);letter-spacing:.1em}
+h2{font-size:clamp(21px,2.6vw,27px)}
+.sdesc{color:var(--ink2);max-width:72ch;margin:12px 0 30px;font-size:15px}
+
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:6px;box-shadow:var(--shadow)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:20px}
+
+/* ── tables ── */
+.tscroll{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:var(--panel);box-shadow:var(--shadow)}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:720px}
+thead th{
+  font-family:"JBMono",monospace;font-size:10px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);text-align:left;padding:12px 14px;border-bottom:1px solid var(--line2);
+  background:var(--panel2);white-space:nowrap;font-weight:400;position:sticky;top:0;
+}
+tbody td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--panel2)}
+td.num,th.num{text-align:right;font-family:"JBMono",monospace;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pname{font-weight:600;color:var(--ink);display:block}
+.pmeta{font-family:"JBMono",monospace;font-size:11px;color:var(--muted);display:block;margin-top:3px}
+
+.chip{
+  display:inline-block;font-family:"JBMono",monospace;font-size:10px;letter-spacing:.05em;
+  padding:3px 7px;border-radius:3px;border:1px solid;white-space:nowrap;line-height:1.35;
+}
+.c-good{color:var(--good);border-color:color-mix(in srgb,var(--good) 40%,transparent);background:color-mix(in srgb,var(--good) 9%,transparent)}
+.c-warn{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 40%,transparent);background:color-mix(in srgb,var(--warn) 9%,transparent)}
+.c-crit{color:var(--crit);border-color:color-mix(in srgb,var(--crit) 42%,transparent);background:color-mix(in srgb,var(--crit) 9%,transparent)}
+.c-mute{color:var(--muted);border-color:var(--line2);background:var(--panel2)}
+.c-acc{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 40%,transparent);background:var(--accent-wash)}
+
+/* ── charts ── */
+.chart{padding:20px}
+.ctitle{font-family:"JBMono",monospace;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink2);margin-bottom:4px}
+.csub{font-size:12.5px;color:var(--muted);margin-bottom:18px;line-height:1.5}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.lg{display:flex;align-items:center;gap:7px;font-family:"JBMono",monospace;font-size:11px;color:var(--ink2)}
+.sw{width:11px;height:11px;border-radius:2px;flex:none}
+
+.hbars{display:flex;flex-direction:column;gap:9px}
+.hbrow{display:grid;grid-template-columns:118px 1fr;gap:12px;align-items:center}
+.hblabel{font-family:"JBMono",monospace;font-size:11px;color:var(--ink2);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hbtrack{display:flex;height:17px;background:var(--sunk);border-radius:3px;overflow:hidden;position:relative}
+.hbseg{height:100%;transition:filter .12s}
+.hbseg:hover{filter:brightness(1.12)}
+.hbseg:first-child{border-radius:3px 0 0 3px}
+.hbseg+.hbseg{margin-left:2px}
+.hbval{font-family:"JBMono",monospace;font-size:11px;color:var(--muted);padding-left:9px;align-self:center;white-space:nowrap}
+
+.vbars{display:flex;align-items:flex-end;gap:3px;height:132px;padding-top:10px}
+.vb{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;position:relative}
+.vbfill{width:100%;background:var(--accent);border-radius:3px 3px 0 0;min-height:2px;transition:filter .12s}
+.vb:hover .vbfill{filter:brightness(1.15)}
+.vbaxis{display:flex;gap:3px;margin-top:7px}
+.vbaxis span{flex:1;text-align:center;font-family:"JBMono",monospace;font-size:9px;color:var(--muted)}
+
+.tip{position:relative}
+.tip::after{
+  content:attr(data-tip);position:absolute;bottom:calc(100% + 7px);left:50%;transform:translateX(-50%);
+  background:var(--ink);color:var(--ground);font-family:"JBMono",monospace;font-size:10.5px;line-height:1.5;
+  padding:6px 9px;border-radius:4px;white-space:pre;opacity:0;pointer-events:none;transition:opacity .12s;z-index:20;
+}
+.tip:hover::after,.tip:focus-visible::after{opacity:1}
+
+/* ── recommendations ── */
+.recs{display:flex;flex-direction:column;gap:14px}
+.rec{
+  background:var(--panel);border:1px solid var(--line);border-radius:6px;box-shadow:var(--shadow);
+  display:grid;grid-template-columns:4px 1fr;overflow:hidden;
+}
+.rstripe{background:var(--muted)}
+.rec[data-p="P0"] .rstripe{background:var(--crit)}
+.rec[data-p="P1"] .rstripe{background:var(--warn)}
+.rec[data-p="P2"] .rstripe{background:var(--accent)}
+.rbody{padding:18px 20px}
+.rtop{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:9px}
+.rp{font-family:"JBMono",monospace;font-size:10px;letter-spacing:.08em;padding:3px 7px;border-radius:3px;font-weight:400}
+.rec[data-p="P0"] .rp{color:var(--crit);background:var(--crit-wash);border:1px solid color-mix(in srgb,var(--crit) 40%,transparent)}
+.rec[data-p="P1"] .rp{color:var(--warn);background:color-mix(in srgb,var(--warn) 10%,transparent);border:1px solid color-mix(in srgb,var(--warn) 40%,transparent)}
+.rec[data-p="P2"] .rp{color:var(--accent);background:var(--accent-wash);border:1px solid color-mix(in srgb,var(--accent) 40%,transparent)}
+.rtitle{font-weight:600;font-size:15.5px;color:var(--ink);flex:1;min-width:230px}
+.rec p{margin:0 0 11px;color:var(--ink2);font-size:14px;max-width:76ch}
+.rec p:last-child{margin-bottom:0}
+.rwhy{
+  font-size:13px;color:var(--muted);border-left:2px solid var(--line2);padding-left:12px;margin-top:12px;
+}
+.rwhy b{color:var(--ink2);font-weight:600}
+.ract{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
+
+/* ── notes / callouts ── */
+.note{background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:0 5px 5px 0;padding:15px 18px;margin:22px 0;font-size:14px;color:var(--ink2)}
+.note strong{color:var(--ink)}
+.note.crit{border-left-color:var(--crit)}
+.note.warn{border-left-color:var(--warn)}
+
+ul.tight{margin:10px 0 0;padding-left:19px;color:var(--ink2);font-size:14px}
+ul.tight li{margin-bottom:7px}
+ul.tight li::marker{color:var(--muted)}
+
+footer{padding:44px 0 64px;color:var(--muted);font-size:13px}
+footer .mono{font-size:11.5px;line-height:1.85}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:26px;margin-top:20px}
+footer h3{font-family:"JBMono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2);font-weight:400;margin-bottom:9px}
+
+@media (max-width:640px){
+  .wrap{padding:0 16px}
+  .verdict{padding:36px 0 30px}
+  .hbrow{grid-template-columns:96px 1fr}
+  .topbar .wrap{height:46px}
+  .navjump{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="topbar"><div class="wrap">
+  <span class="brand"><b>◈</b> Revisão de Produto · Bobagi</span>
+  <nav class="navjump">
+    <a href="#panorama">Panorama</a>
+    <a href="#scorecard">Produtos</a>
+    <a href="#dinheiro">Dinheiro</a>
+    <a href="#descoberta">Descoberta</a>
+    <a href="#risco">Risco</a>
+    <a href="#acoes">Ações</a>
+  </nav>
+</div></div>
+
+<div class="wrap">
+
+<header class="verdict">
+  <div class="eyebrow"><span>Levantamento completo</span><span class="tick"></span><span class="mono">23 jul 2026</span><span class="tick"></span><span class="mono">janela 14-30 d</span></div>
+  <h1>Você construiu 14 produtos. Quem visita são robôs.</h1>
+  <p class="thesis">
+    O box está <strong>tecnicamente saudável</strong> - 23 contêineres no ar, healthcheck limpo, TLS válido,
+    firewall correto. O problema não é engenharia, é <strong>distribuição</strong>. Em 14 dias entraram
+    82.827 requisições e cerca de <strong>9% vieram de um humano externo</strong>. Em 30 dias, as 11 propriedades
+    no Search Console somaram <strong>zero cliques</strong>. Enquanto isso, a campanha do Tic Tac Verse gastou
+    <strong>R$ 199,31</strong> comprando instalações num app com <strong>a monetização desligada</strong>.
+    O único ativo que o Google realmente entrega para pessoas é um <strong>guia de servidor no GitHub</strong>
+    escrito de graça.
+  </p>
+
+  <div class="kpis">
+    <div class="kpi">
+      <span class="lbl">Tráfego humano</span>
+      <span class="val v-acc">~9%</span>
+      <span class="sub">7.450 de 82.827 reqs<br>51% é varredura de ataque</span>
+    </div>
+    <div class="kpi">
+      <span class="lbl">Cliques orgânicos · 30 d</span>
+      <span class="val v-crit">0</span>
+      <span class="sub">11 propriedades no GSC<br>9 impressões no total</span>
+    </div>
+    <div class="kpi">
+      <span class="lbl">Ads · 30 d</span>
+      <span class="val v-brass">R$ 199</span>
+      <span class="sub">706 instalações · CPI R$&thinsp;0,28<br>receita: R$&thinsp;0,00</span>
+    </div>
+    <div class="kpi">
+      <span class="lbl">Usuários reais</span>
+      <span class="val">19</span>
+      <span class="sub">9 Cartomania · 5 Coin Hub<br>5 Todo · 1 ativo em 7 d</span>
+    </div>
+    <div class="kpi">
+      <span class="lbl">Bases sem backup</span>
+      <span class="val v-crit">3<span style="font-size:18px;color:var(--muted)"> de 4</span></span>
+      <span class="sub">só o Coin Hub tem rotina<br>e ela é local, no mesmo disco</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════ PANORAMA ══════════════ -->
+<section id="panorama">
+  <div class="shead"><span class="snum">01</span><h2>O que roda, e o que consome</h2></div>
+  <p class="sdesc">
+    23 contêineres, 2 apps PM2, 16 vhosts, um VPS de 8 GB / 96 GB. O healthcheck passou limpo em todas as
+    camadas. O detalhe que importa para produto: <strong>os maiores consumidores da máquina não são produtos.</strong>
+  </p>
+
+  <div class="grid2">
+    <div class="panel chart">
+      <div class="ctitle">Memória - top 8 contêineres</div>
+      <div class="csub">O servidor de Terraria (uso privado, com amigos) sozinho consome mais RAM que todos os produtos web somados.</div>
+      <div class="hbars" id="ramchart"></div>
+    </div>
+
+    <div class="panel chart">
+      <div class="ctitle">Rede acumulada por contêiner - top 5</div>
+      <div class="csub"><strong>Os dois earners (<span class="mono">repocket</span> e <span class="mono">tm</span>) foram removidos em 23/07.</strong> Com eles fora, o maior consumidor de banda passou a ser um produto de verdade - a API do Coin Hub - em vez de tráfego de estranhos.</div>
+      <div class="hbars" id="netchart"></div>
+    </div>
+  </div>
+
+  <div class="note warn">
+    <strong>Leitura de PM:</strong> a máquina ainda gasta ~1,3 GB de RAM e 4,2% de CPU num servidor de jogo para amigos -
+    o maior consumidor de RAM do box não é um produto. Mas o lado da banda foi resolvido: os <strong>dois earners
+    saíram em 23/07</strong>, então o tráfego que antes era de estranhos (risco de reputação no IP compartilhado) agora
+    é do próprio Coin Hub. Não era problema de custo (o VPS está a 65% de disco e sobra RAM), mas o box ficou mais limpo.
+  </div>
+
+  <div class="panel chart" style="margin-top:20px">
+    <div class="ctitle">Composição do tráfego - 14 dias, 82.827 requisições</div>
+    <div class="csub">Requisições com user-agent de navegador contra varredura automatizada. Os números aparecem à direita de cada barra e na tabela da seção seguinte.</div>
+    <div class="legend">
+      <span class="lg"><span class="sw" style="background:var(--accent)"></span>UA de navegador</span>
+      <span class="lg"><span class="sw" style="background:var(--noise)"></span>Robôs e varredura de ataque</span>
+    </div>
+    <div class="hbars" id="trafchart"></div>
+    <div class="note crit" style="margin-bottom:0">
+      <strong>Dois desses números são falsos positivos e você precisa saber:</strong>
+      os 9.220 de <span class="mono">analytics</span> são <strong>133 IPs de Hong Kong e Singapura</strong> varrendo
+      <span class="mono">/h5</span>, <span class="mono">/wap</span>, <span class="mono">/api/stock/one</span> - um scanner
+      procurando um app chinês de apostas, com UA de navegador. E os 8.863 de <span class="mono">coin</span> são
+      majoritariamente o <strong>próprio dashboard fazendo polling</strong> (<span class="mono">/api/v1/system/status</span>,
+      2.867 chamadas). Descontando os dois, o tráfego humano externo real do box inteiro é de <strong>~7.450 requisições
+      em 14 dias</strong>.
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ SCORECARD ══════════════ -->
+<section id="scorecard">
+  <div class="shead"><span class="snum">02</span><h2>Placar dos produtos</h2></div>
+  <p class="sdesc">
+    Ordenado por valor real entregue hoje, não por esforço investido. "Humanos 14 d" é requisição com UA de
+    navegador; onde o número engana, a coluna de estado explica.
+  </p>
+
+  <div class="tscroll">
+    <table>
+      <thead><tr>
+        <th>Produto</th>
+        <th class="num">Usuários</th>
+        <th class="num">Humanos 14 d</th>
+        <th class="num">IPs únicos</th>
+        <th>Receita</th>
+        <th>Estado</th>
+      </tr></thead>
+      <tbody id="scoretable"></tbody>
+    </table>
+  </div>
+
+  <div class="grid2" style="margin-top:22px">
+    <div class="note" style="margin:0">
+      <strong>O mais maduro é o Coin Hub.</strong> Tem 20 tabelas, credenciais de Binance, robôs de trading,
+      auditoria de exclusão de conta, aceite de termos versionado e 196 execuções de operação registradas.
+      É o único produto do box que <strong>toca dinheiro real</strong> - e o único com rotina de backup.
+      Também é o único com <strong>1 usuário ativo nos últimos 7 dias</strong>.
+    </div>
+    <div class="note" style="margin:0">
+      <strong>O mais bem construído é o Warframe Farm Helper.</strong> 107 testes, i18n em 4 idiomas, SSR com
+      JSON-LD, sitemap de 4.406 URLs, security-sweep e frontend-review aprovados. Resultado em 30 dias:
+      <strong>2 impressões e 0 cliques</strong> no Google. Dos 2.355 acessos "humanos", <strong>1.359 vieram de
+      um único IP brasileiro</strong> - o seu.
+    </div>
+  </div>
+
+  <div class="panel chart" style="margin-top:20px">
+    <div class="ctitle">Warframe Farm Helper - acessos humanos por dia</div>
+    <div class="csub">O pico é o lançamento (16-18 jul). Sem canal de distribuição, a curva volta a zero em cinco dias. É o padrão que se repete em todo lançamento do portfólio.</div>
+    <div id="wfchart"></div>
+  </div>
+</section>
+
+<!-- ══════════════ DINHEIRO ══════════════ -->
+<section id="dinheiro">
+  <div class="shead"><span class="snum">03</span><h2>O dinheiro</h2></div>
+  <p class="sdesc">
+    Um único produto tem distribuição de verdade: o Tic Tac Verse, com 706 instalações em 30 dias. E é exatamente
+    nele que está o vazamento.
+  </p>
+
+  <div class="note crit">
+    <strong>A campanha está comprando instalações num app que não pode exibir anúncio.</strong>
+    Desde a v1.7.0+16 (18/07) os banners estão desligados por flag
+    (<span class="mono">adsSuspended = true</span>), e a conta do AdMob segue suspensa - a API respondeu
+    <span class="mono">401 UNAUTHENTICATED</span> agora há pouco, com reativação automática prevista para
+    <strong>~07/08/2026</strong>. Ou seja: <strong>R$ 199,31 gastos em 30 dias por R$ 0,00 de receita</strong>,
+    e o gasto continuou hoje (R$ 6,01 até agora).
+  </div>
+
+  <div class="panel chart">
+    <div class="ctitle">Gasto diário - Google Ads, últimos 18 dias com veiculação</div>
+    <div class="csub">Orçamento de R$ 10/dia. Passe o mouse para ver instalações e CPI do dia.</div>
+    <div class="vbars" id="spendchart"></div>
+    <div class="vbaxis" id="spendaxis"></div>
+  </div>
+
+  <div class="grid2" style="margin-top:20px">
+    <div class="panel chart">
+      <div class="ctitle">Para onde vão as instalações - top 10 países</div>
+      <div class="csub">Instalações em 30 dias. O Brasil não aparece nem no top 25.</div>
+      <div class="hbars" id="geochart"></div>
+    </div>
+    <div class="panel chart">
+      <div class="ctitle">Por grupo de anúncio</div>
+      <div class="csub">Os três grupos são separados por idioma, não por país - e sem segmentação geográfica o leilão entrega onde o clique é mais barato.</div>
+      <div class="hbars" id="groupchart"></div>
+      <div class="note warn" style="margin-bottom:0;margin-top:18px">
+        O grupo <strong>BR</strong> gastou R$ 45,08 e trouxe 167 instalações - mas praticamente
+        <strong>nenhuma do Brasil</strong>. Ele veicula em português para qualquer lugar do mundo.
+      </div>
+    </div>
+  </div>
+
+  <div class="note crit">
+    <strong>O problema não é só o gasto - é o ativo que ele constrói.</strong>
+    Índia, Bangladesh, Nepal, Paquistão, Sudão, Irã, Iraque e Iêmen estão entre os mercados de <strong>menor
+    eCPM do mundo</strong> para anúncio mobile. Quando o AdMob voltar em ~07/08, essas 700+ instalações
+    valerão uma fração do que valeriam vindas de BR, EUA ou Europa. Você está pagando barato por um usuário
+    que também vale pouco - e pagando <em>agora</em> para receber <em>talvez</em>, dali a duas semanas.
+  </div>
+</section>
+
+<!-- ══════════════ DESCOBERTA ══════════════ -->
+<section id="descoberta">
+  <div class="shead"><span class="snum">04</span><h2>Descoberta: o que o Google realmente entrega</h2></div>
+  <p class="sdesc">
+    Você fez o trabalho de SEO certo - sitemaps aceitos, SSR, JSON-LD, robots corrigido, propriedades verificadas
+    por API. E o retorno é zero. Ao mesmo tempo, um ativo em que você não investiu nada de SEO é o único que
+    recebe visita de busca todo dia.
+  </p>
+
+  <div class="grid2">
+    <div class="panel chart">
+      <div class="ctitle">Search Console - 30 dias, todas as propriedades</div>
+      <div class="csub">Sitemaps aceitos sem erro ≠ páginas indexadas.</div>
+      <div class="tscroll" style="border:none;box-shadow:none">
+        <table style="min-width:0">
+          <thead><tr><th>Propriedade</th><th class="num">URLs no sitemap</th><th class="num">Impr.</th><th class="num">Cliques</th></tr></thead>
+          <tbody class="mono">
+            <tr><td>warframe</td><td class="num">4.406</td><td class="num">2</td><td class="num v-crit">0</td></tr>
+            <tr><td>bobagi.space</td><td class="num">10</td><td class="num">7</td><td class="num v-crit">0</td></tr>
+            <tr><td>terraria</td><td class="num">1</td><td class="num">0</td><td class="num v-crit">0</td></tr>
+            <tr><td>cartomania</td><td class="num">6</td><td class="num">0</td><td class="num v-crit">0</td></tr>
+            <tr><td>vsdragon</td><td class="num">9</td><td class="num">0</td><td class="num v-crit">0</td></tr>
+            <tr><td>+ 6 outras</td><td class="num">8</td><td class="num">0</td><td class="num v-crit">0</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel chart">
+      <div class="ctitle">GitHub - visitantes únicos em 14 dias</div>
+      <div class="csub">O guia do Project Zomboid recebe 61 visitas <em>vindas do Google</em> em 14 dias. É o único canal orgânico funcionando no portfólio inteiro.</div>
+      <div class="hbars" id="ghchart"></div>
+      <div class="note" style="margin-bottom:0;margin-top:18px">
+        <strong>22 estrelas, 2 forks, 10 clones/14 d.</strong> O guia do Terraria foi feito no mesmo molde,
+        é mais completo e tem <strong>0 estrelas e 4 visitantes</strong>. A diferença não é qualidade - é que
+        o do Zomboid responde a uma pergunta que as pessoas <em>já digitam no Google</em>.
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    <strong>A conversão do portfólio, em números honestos:</strong> 751 acessos à home do
+    <span class="mono">bobagi.space</span> em 14 dias produziram <strong>13 requisições ao CV</strong>,
+    <strong>9 visitas a case study</strong>, <strong>1 referral do LinkedIn</strong> e <strong>3 do Google</strong>.
+    A maior parte dos 751 é robô. O site está bem construído - o que falta é alguém chegar nele.
+  </div>
+</section>
+
+<!-- ══════════════ RISCO ══════════════ -->
+<section id="risco">
+  <div class="shead"><span class="snum">05</span><h2>Risco operacional</h2></div>
+  <p class="sdesc">O healthcheck passa. Estes são os riscos que ele não cobre.</p>
+
+  <div class="tscroll">
+    <table>
+      <thead><tr><th>Risco</th><th>Situação hoje</th><th>Impacto se acontecer</th><th>Gravidade</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="pname">Bases sem backup</span><span class="pmeta">cartomania · todo · umami</span></td>
+          <td>Só o Coin Hub tem rotina (diária, 04:23, 14 dias). As outras três <strong>nunca</strong> foram salvas.</td>
+          <td>Perda definitiva de 9 jogadores + 156 partidas, 5 usuários e todo o histórico de analytics.</td>
+          <td><span class="chip c-crit">Crítico</span></td>
+        </tr>
+        <tr>
+          <td><span class="pname">Backup sem cópia externa</span><span class="pmeta">/root/coinhub-db-backups</span></td>
+          <td>14 dumps, mas no <strong>mesmo disco</strong> do banco que eles protegem.</td>
+          <td>Falha de disco ou perda do VPS leva banco e backup juntos - inclusive dados de trading.</td>
+          <td><span class="chip c-crit">Crítico</span></td>
+        </tr>
+        <tr>
+          <td><span class="pname">fail2ban não bloqueia mais HTTP</span><span class="pmeta">nginx-botsearch · limit-req · http-auth</span></td>
+          <td><strong>0 banimentos desde sempre</strong> nas três jails HTTP - o Cloudflare fica na frente, então o pacote chega de um IP da CF. Só a jail SSH funciona (2 banidos).</td>
+          <td>Os 133 IPs que varrem o Umami há 14 dias seguem indefinidamente. Bloqueio HTTP hoje só existiria via WAF do Cloudflare, que não está configurado.</td>
+          <td><span class="chip c-warn">Alto</span></td>
+        </tr>
+        <tr>
+          <td><span class="pname">Reativação do AdMob</span><span class="pmeta">~07/08/2026</span></td>
+          <td>Suspensão por auto-clique. Reincidência = <strong>encerramento permanente</strong> da conta.</td>
+          <td>Perda definitiva do único caminho de receita do único produto distribuído.</td>
+          <td><span class="chip c-crit">Crítico</span></td>
+        </tr>
+        <tr>
+          <td><span class="pname">IP compartilhado com earners</span><span class="pmeta">repocket + traffmonetizer</span></td>
+          <td><strong>Resolvido em 23/07:</strong> os dois earners foram removidos. Nenhum tráfego de terceiros sai mais pelo IP do box.</td>
+          <td>Era o risco de blocklist de reputação afetando e-mail e sites. Eliminado na origem.</td>
+          <td><span class="chip c-good">Resolvido</span></td>
+        </tr>
+        <tr>
+          <td><span class="pname">Superfície exposta sem uso</span><span class="pmeta">develop · dumbdocker · analytics · studio.todo</span></td>
+          <td>Painéis administrativos e uma cópia do site principal, públicos. <span class="mono">develop</span> levou 5.457 requisições de ataque em 14 dias.</td>
+          <td>Cada um é uma porta a mais para uma falha que você ainda não conhece.</td>
+          <td><span class="chip c-warn">Médio</span></td>
+        </tr>
+        <tr>
+          <td><span class="pname">Disco em 65%</span><span class="pmeta">62 GB de 96 GB</span></td>
+          <td>Build cache do Docker de volta a <strong>13,57 GB</strong>, dos quais 9,5 GB recuperáveis. SDK Android + Flutter + tictacverse somam 7,3 GB.</td>
+          <td>Sem swap na máquina, encher o disco derruba tudo de uma vez.</td>
+          <td><span class="chip c-mute">Baixo</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note" style="margin-bottom:0">
+    <strong>O que está certo e não deve ser mexido:</strong> firewall <span class="mono">DKR-HARDEN</span>
+    (só 7777 aberto), UFW aceitando 443 apenas de faixas Cloudflare, todos os serviços em
+    <span class="mono">127.0.0.1</span>, 15 certificados válidos com renovação automática, healthcheck
+    agendado no boot e diário, e todas as políticas de restart em <span class="mono">unless-stopped</span>
+    ou <span class="mono">always</span>.
+  </div>
+</section>
+
+<!-- ══════════════ AÇÕES ══════════════ -->
+<section id="acoes">
+  <div class="shead"><span class="snum">06</span><h2>O que eu faria, em ordem</h2></div>
+  <p class="sdesc">
+    P0 é dinheiro saindo ou dado em risco agora. P1 muda o rumo do portfólio. P2 é higiene.
+    O selo indica quem consegue executar: <span class="chip c-acc">Claude</span> eu faço na próxima sessão;
+    <span class="chip c-mute">Operador</span> exige a sua conta ou o seu navegador.
+  </p>
+
+  <div class="recs">
+
+    <div class="rec" data-p="P0"><div class="rstripe"></div><div class="rbody">
+      <div class="rtop"><span class="rp">P0</span><span class="rtitle">Segmentar geograficamente a campanha do Ads - ou pausá-la até 07/08</span></div>
+      <p>
+        Hoje a campanha não tem segmentação de país. O leilão entrega onde o clique é mais barato, e o resultado
+        são 706 instalações concentradas em Índia, Bangladesh, Nepal, Sudão e Iêmen - os menores eCPM do mundo -
+        num app com os anúncios desligados por flag e a conta do AdMob suspensa.
+      </p>
+      <p>
+        <strong>Recomendo segmentar, não pausar.</strong> Pausar zera o momento de ASO que você escolheu manter
+        em 15/07. Adicionar Brasil, EUA e Europa mantém o volume subindo e troca a instalação de R$ 0,28 que não
+        monetiza por uma de R$ 1-3 que monetiza de verdade quando o AdMob voltar. Se preferir não gastar mais nada
+        até lá, aí sim pause - mas não deixe rodando sem geo.
+      </p>
+      <div class="rwhy"><b>Evidência:</b> R$ 199,31 / 30 d · 706 instalações · CPI R$ 0,28 · receita R$ 0,00 · Brasil fora do top 25 de países · R$ 6,01 gastos hoje.</div>
+      <div class="ract"><span class="chip c-mute">Operador · UI do Google Ads</span><span class="chip c-acc">Claude verifica o efeito por API</span></div>
+    </div></div>
+
+    <div class="rec" data-p="P0"><div class="rstripe"></div><div class="rbody">
+      <div class="rtop"><span class="rp">P0</span><span class="rtitle">Criar backup de Cartomania, Todo e Umami - e tirar os dumps do disco</span></div>
+      <p>
+        Três bancos em produção nunca foram salvos uma única vez. E o único backup que existe, o do Coin Hub,
+        mora no mesmo disco do banco que protege - o que não protege contra o cenário mais provável, que é perder
+        a máquina inteira.
+      </p>
+      <p>
+        Posso generalizar o <span class="mono">/opt/CoinHub/scripts/db-backup.sh</span> para as quatro bases,
+        agendar no mesmo cron e adicionar destino externo. Preciso só que você diga <strong>para onde</strong>:
+        Google Drive (você já tem MCP conectado), um bucket, ou outra máquina via SSH.
+      </p>
+      <div class="rwhy"><b>Evidência:</b> cartomania = 9 jogadores / 156 partidas / cadastro novo em 23/07 · todo = 5 usuários · umami = todo o histórico de analytics · <span class="mono">/root/coinhub-db-backups</span> = 14 dumps, mesmo disco.</div>
+      <div class="ract"><span class="chip c-acc">Claude implementa</span><span class="chip c-mute">Operador escolhe o destino externo</span></div>
+    </div></div>
+
+    <div class="rec" data-p="P0"><div class="rstripe"></div><div class="rbody">
+      <div class="rtop"><span class="rp">P0</span><span class="rtitle">Preparar a reativação do AdMob antes de 07/08 - nesta ordem</span></div>
+      <p>
+        A suspensão foi por auto-clique e a reincidência encerra a conta em definitivo, com retenção de até
+        60 dias de ganhos. A sequência segura tem uma ordem que não pode ser invertida:
+      </p>
+      <ul class="tight">
+        <li><strong>Primeiro</strong> cadastrar todos os aparelhos seus e de quem testa como dispositivos de teste no AdMob. Ser tester na Play <em>não</em> protege - isso vale só para compras; a build da loja mostra anúncio real.</li>
+        <li><strong>Depois</strong> rodar <span class="mono">admob.py doctor</span> para confirmar que a API voltou.</li>
+        <li><strong>Só então</strong> trocar <span class="mono">adsSuspended</span> para <span class="mono">false</span>, subir versão e publicar.</li>
+      </ul>
+      <div class="rwhy"><b>Evidência:</b> API respondeu <span class="mono">401 "The publisher could not be authenticated"</span> na verificação de hoje · flag confirmada em <span class="mono">lib/services/ads_configuration.dart</span>.</div>
+      <div class="ract"><span class="chip c-mute">Operador · AdMob</span><span class="chip c-acc">Claude faz o build e publica</span></div>
+    </div></div>
+
+    <div class="rec" data-p="P1"><div class="rstripe"></div><div class="rbody">
+      <div class="rtop"><span class="rp">P1</span><span class="rtitle">Repetir a fórmula do guia do Project Zomboid - é o seu único canal que funciona</span></div>
+      <p>
+        Um repositório que você escreveu de graça traz 61 visitas do Google em 14 dias, tem 22 estrelas e 2 forks.
+        Nenhum dos seus produtos com SEO caprichado chega perto disso. O guia do Terraria, feito no mesmo molde e
+        mais completo, tem 4 visitantes - porque responde a uma pergunta que quase ninguém faz.
+      </p>
+      <p>
+        A lição não é "escrever mais guias", é <strong>escrever para uma busca que já existe</strong>. Vale
+        levantar o volume de busca real antes de escrever o próximo, e revisar o título e o H1 do guia do Terraria
+        para casar com o que as pessoas de fato digitam.
+      </p>
+      <div class="rwhy"><b>Evidência:</b> PZ = 67 visitantes únicos / 14 d, 61 referidos pelo Google, 22 ★ · Terraria = 4 únicos, referrer só yandex, 0 ★ · todos os demais repos ≈ 0 visitas.</div>
+      <div class="ract"><span class="chip c-acc">Claude pesquisa e escreve</span></div>
+    </div></div>
+
+    <div class="rec" data-p="P1"><div class="rstripe"></div><div class="rbody">
+      <div class="rtop"><span class="rp">P1</span><span class="rtitle">Descobrir por que 4.406 páginas do Warframe não estão indexadas</span></div>
+      <p>
+        O sitemap foi aceito em 19/07 com 4.406 URLs, 0 erros e 0 avisos - e o site tem <strong>2 impressões</strong>.
+        Sitemap aceito não é página indexada. Falta checar a cobertura real e, principalmente, backlinks: um domínio
+        novo sem nenhum link de fora não sai do fundo da fila, por melhor que seja o SSR.
+      </p>
+      <p>
+        Isso vale a pena porque o produto <em>já está pronto</em>. É o app mais bem construído do portfólio e o
+        custo marginal de tentar distribuí-lo é quase zero perto do que já foi investido nele.
+      </p>
+      <div class="rwhy"><b>Evidência:</b> 4.406 URLs no sitemap · 2 impressões / 0 cliques em 30 d · acessos caíram de 945/dia (17/07) para 11/dia (23/07) · 1.359 dos 2.355 acessos "humanos" vieram do seu próprio IP.</div>
+      <div class="ract"><span class="chip c-acc">Claude investiga</span><span class="chip c-mute">Operador para divulgar em comunidade</span></div>
+    </div></div>
+
+    <div class="rec" data-p="P1"><div class="rstripe"></div><div class="rbody">
+      <div class="rtop"><span class="rp">P1</span><span class="rtitle">Decidir o que o Coin Hub é: produto ou ferramenta pessoal</span></div>
+      <p>
+        É de longe o software mais sério do box - trading real, credenciais de Binance, auditoria, aceite de termos,
+        exclusão de conta. Tem 5 usuários cadastrados, 1 ativo na última semana e 196 execuções de operação registradas.
+      </p>
+      <p>
+        As duas decisões são legítimas e levam a caminhos opostos. Se é <strong>produto</strong>, ele é o candidato
+        mais forte do portfólio a gerar receita de verdade e merece o próximo ciclo de trabalho.
+        Se é <strong>ferramenta sua</strong>, então o esforço de app-essentials, termos e LGPD nele foi caro demais
+        e deveria migrar para onde há usuários. O que não faz sentido é manter a ambiguidade.
+      </p>
+      <div class="rwhy"><b>Evidência:</b> 5 usuários · 1 ativo em 7 d · 4 sessões em 30 d · 2 credenciais Binance · 6 robôs · 91 operações · 196 execuções · único produto com backup.</div>
+      <div class="ract"><span class="chip c-mute">Operador decide</span></div>
+    </div></div>
+
+    <div class="rec" data-p="P1"><div class="rstripe"></div><div class="rbody">
+      <div class="rtop"><span class="rp">P1</span><span class="rtitle">Configurar regras de WAF no Cloudflare - o fail2ban virou decorativo no HTTP</span></div>
+      <p>
+        As três jails HTTP do fail2ban têm <strong>zero banimentos na história da máquina</strong>. Não é bug: desde
+        que o Cloudflare entrou na frente, os pacotes chegam de IPs da Cloudflare, então banir por IP no servidor
+        não tem efeito. O log mostra o IP real, mas o bloqueio não acontece mais.
+      </p>
+      <p>
+        Metade de todo o tráfego do box (51%) é varredura de ataque, e 133 IPs varrem o Umami há 14 dias sem
+        consequência. Uma regra de rate limit e um bloqueio de padrões óbvios (<span class="mono">wp-*</span>,
+        <span class="mono">.env</span>, <span class="mono">.git</span>, <span class="mono">.aws/credentials</span>)
+        no WAF resolvem - e de quebra reduzem o log.
+      </p>
+      <div class="rwhy"><b>Evidência:</b> 41.955 requisições de ataque em 14 d · nginx-botsearch / limit-req / http-auth = 0 banimentos totais · jail SSH funciona normalmente (2 banidos).</div>
+      <div class="ract"><span class="chip c-mute">Operador · painel Cloudflare</span><span class="chip c-acc">Claude escreve as regras</span></div>
+    </div></div>
+
+    <div class="rec" data-p="P2"><div class="rstripe"></div><div class="rbody">
+      <div class="rtop"><span class="rp">P2</span><span class="rtitle">Fechar o que está exposto sem motivo</span></div>
+      <p>
+        <span class="mono">develop.bobagi.space</span> é uma cópia pública do site principal que já recebeu 5.457
+        requisições de ataque; <span class="mono">dumbdocker</span> e <span class="mono">analytics</span> são painéis
+        administrativos abertos à internet; <span class="mono">studio.todo</span> já foi derrubado mas o DNS ainda resolve.
+        Todos poderiam ficar atrás do Cloudflare Access ou restritos ao seu IP, como já é feito no 443.
+      </p>
+      <p>
+        No mesmo lote: o certificado de <span class="mono">investidor10.bobagi.space</span> continua renovando
+        sozinho apesar de não existir mais vhost - o host responde 444 em 100% das requisições.
+      </p>
+      <div class="ract"><span class="chip c-acc">Claude executa</span></div>
+    </div></div>
+
+    <div class="rec" data-p="P2"><div class="rstripe"></div><div class="rbody">
+      <div class="rtop"><span class="rp">P2</span><span class="rtitle">Recuperar 9,5 GB de disco (earners já removidos)</span></div>
+      <p>
+        O build cache do Docker voltou a 13,57 GB com 9,5 GB recuperáveis - um <span class="mono">docker builder prune</span>
+        devolve ~10% do disco. A máquina está em 65% <strong>sem swap</strong>, então a folga importa.
+      </p>
+      <p>
+        <strong>Os dois earners (<span class="mono">repocket</span> e <span class="mono">tm</span>) foram removidos em 23/07</strong> -
+        containers, imagens e o cron de truncagem que só existia por causa do repocket. O box agora roda
+        <strong>zero apps de renda passiva</strong>, e nenhum tráfego de desconhecidos sai mais pelo IP que serve seu
+        portfólio, os sites dos clientes e o <span class="mono">app-ads.txt</span> do app na Play.
+      </p>
+      <div class="rwhy"><b>Estado atual:</b> <span class="mono">repocket</span> ✓ eliminado · <span class="mono">tm</span> ✓ eliminado ·
+      falta só o <span class="mono">docker builder prune</span> para devolver ~9,5 GB de disco.</div>
+      <div class="ract"><span class="chip c-good">earners removidos</span><span class="chip c-acc">Claude executa o prune</span></div>
+    </div></div>
+
+    <div class="rec" data-p="P2"><div class="rstripe"></div><div class="rbody">
+      <div class="rtop"><span class="rp">P2</span><span class="rtitle">Instrumentar o que não é medido</span></div>
+      <p>
+        O Umami está instalado e funcionando, mas os dois produtos com maior alcance orgânico -
+        <span class="mono">warframe</span> e <span class="mono">terraria</span> - <strong>não têm rastreamento</strong>.
+        Toda a análise deles aqui saiu de log de nginx, que não distingue sessão nem mede retenção.
+      </p>
+      <p>
+        E fechar o backlog aberto do Tic Tac Verse: o SnackBar de "já está na versão mais recente" ainda aparece
+        atrás do modal de configurações, e os pinned repos do GitHub continuam por fixar (não há API - é clique seu).
+      </p>
+      <div class="ract"><span class="chip c-acc">Claude instrumenta e corrige</span><span class="chip c-mute">Operador fixa os repos</span></div>
+    </div></div>
+
+  </div>
+</section>
+
+<footer>
+  <div class="fgrid">
+    <div>
+      <h3>Como estes números foram levantados</h3>
+      <p class="mono">
+        nginx access log · 14 d · 82.827 linhas<br>
+        Google Ads API · 30 d · leitura<br>
+        Search Console API · 11 propriedades<br>
+        Play Developer API · tracks e ficha<br>
+        AdMob API · 401, suspensão confirmada<br>
+        GitHub API · tráfego e estrelas<br>
+        Postgres · contagem direta nas bases<br>
+        docker stats · ss · certbot · fail2ban
+      </p>
+    </div>
+    <div>
+      <h3>O que não foi possível medir</h3>
+      <p class="mono">
+        Retenção D1/D7 do app - exige Play Console<br>
+        Receita do AdMob - conta suspensa<br>
+        Avaliações da Play - API só expõe semanas recentes<br>
+        Sessões em warframe e terraria - sem Umami<br>
+        LinkedIn - exige o seu navegador
+      </p>
+    </div>
+    <div>
+      <h3>Atualização</h3>
+      <p class="mono">
+        Coletado em 23 jul 2026, 11:0x UTC<br>
+        Fonte dos dados: <span style="color:var(--ink2)">/opt/pm-dashboard/</span><br>
+        Recoleta: <span style="color:var(--ink2)">collect.sh</span><br><br>
+        Esta página é republicada na mesma URL a cada revisão.
+      </p>
+    </div>
+  </div>
+</footer>
+
+</div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const fmt = (n) => n.toLocaleString("pt-BR");
+
+/* ── consumo ── */
+const RAM = [
+  ["tmodloader", 1338, "servidor de jogo"],
+  ["dumbdocker web", 421, "painel interno"],
+  ["umami", 261, "analytics"],
+  ["dumbdocker api", 179, "painel interno"],
+  ["warframe", 147, "produto"],
+  ["investidor10", 52, "interno (coin-hub)"],
+  ["cartomania api", 52, "produto"],
+  ["cheri", 38, "site de cliente"],
+];
+const NET = [
+  ["coin-hub api", 518, "produto · 406 MB↓ / 112 MB↑"],
+  ["tmodloader", 51, "servidor de jogo · 42,6 MB↓ / 8,68 MB↑"],
+  ["cartomania db", 20, "produto · 12,5 MB↓ / 7,89 MB↑"],
+  ["warframe", 17, "produto · 14,6 MB↓ / 2,87 MB↑"],
+  ["dumbdocker web", 8, "painel · 7,26 MB↓ / 1,12 MB↑"],
+];
+function simpleBars(el, rows, unit, colorFn) {
+  const max = Math.max(...rows.map((r) => r[1]));
+  el.innerHTML = rows.map(([name, v, note]) => `
+    <div class="hbrow">
+      <span class="hblabel" title="${name}">${name}</span>
+      <div style="display:flex;align-items:center;min-width:0">
+        <div class="hbtrack" style="flex:1">
+          <div class="hbseg tip" style="width:${(v / max) * 100}%;background:${colorFn(name)}"
+               data-tip="${name}&#10;${fmt(v)} ${unit}&#10;${note}" tabindex="0" role="img"
+               aria-label="${name}: ${fmt(v)} ${unit}. ${note}"></div>
+        </div>
+        <span class="hbval">${fmt(v)}&thinsp;${unit}</span>
+      </div>
+    </div>`).join("");
+}
+const isEarner = (n) => /repocket|tm\b|earner/i.test(n);
+const isGame = (n) => /tmodloader/i.test(n);
+const col = (n) => isEarner(n) ? "var(--noise)" : isGame(n) ? "var(--brass)" : "var(--accent)";
+simpleBars($("#ramchart"), RAM, "MB", col);
+simpleBars($("#netchart"), NET, "MB", col);
+
+/* ── tráfego humano vs robô ── */
+const TRAF = [
+  ["analytics", 9220, 1472],
+  ["coin", 8863, 8431],
+  ["warframe", 2355, 7077],
+  ["bobagi.space", 1767, 6259],
+  ["dumbdocker", 549, 7266],
+  ["terraria", 498, 352],
+  ["game", 430, 1952],
+  ["cartomania", 361, 3324],
+  ["vsdragon", 258, 358],
+  ["investidor10", 225, 1511],
+  ["todo", 223, 1341],
+  ["cheri", 207, 296],
+  ["develop", 185, 5660],
+  ["primordium", 122, 9235],
+];
+const tmax = Math.max(...TRAF.map(([, h, b]) => h + b));
+$("#trafchart").innerHTML = TRAF.map(([name, h, b]) => {
+  const tot = h + b;
+  return `<div class="hbrow">
+    <span class="hblabel" title="${name}">${name}</span>
+    <div style="display:flex;align-items:center;min-width:0">
+      <div class="hbtrack" style="flex:1">
+        <div class="hbseg tip" style="width:${(h / tmax) * 100}%;background:var(--accent)"
+             data-tip="${name}&#10;UA de navegador: ${fmt(h)}&#10;robôs/ataque: ${fmt(b)}" tabindex="0"
+             role="img" aria-label="${name}: ${fmt(h)} com UA de navegador"></div>
+        <div class="hbseg tip" style="width:${(b / tmax) * 100}%;background:var(--noise)"
+             data-tip="${name}&#10;robôs/ataque: ${fmt(b)}&#10;de ${fmt(tot)} no total" tabindex="0"
+             role="img" aria-label="${name}: ${fmt(b)} robôs e ataque"></div>
+      </div>
+      <span class="hbval">${fmt(h)} <span style="color:var(--line2)">/</span> ${fmt(tot)}</span>
+    </div>
+  </div>`;
+}).join("");
+
+/* ── placar ── */
+const SCORE = [
+  ["Tic Tac Verse", "app Android · Play Store", "706 inst./30 d", "-", "-", "R$ 0,00", "crit",
+   "Ads desligados por flag + AdMob suspenso até ~07/08. Único produto com distribuição real."],
+  ["Coin Hub", "coin.bobagi.space · trading", "5 cadastrados", "8.863", "58", "-", "warn",
+   "196 execuções de trading reais. 1 usuário ativo em 7 dias. Único com backup."],
+  ["Cartomania", "cartomania.bobagi.space", "9 jogadores", "361", "72", "-", "warn",
+   "156 partidas · cadastro novo em 23/07. Maior engajamento por usuário do portfólio."],
+  ["Guias no GitHub", "Project Zomboid + Terraria", "22 ★ · 2 forks", "-", "67", "-", "good",
+   "61 visitas do Google em 14 d. O único canal de descoberta orgânica que funciona."],
+  ["Warframe Helper", "warframe.bobagi.space", "-", "2.355", "122", "-", "warn",
+   "Melhor engenharia do box. 1.359 dos acessos são do seu próprio IP. Curva já voltou a zero."],
+  ["Terraria (jogo + status)", "servidor 7777 + página", "amigos", "498", "92", "-", "good",
+   "Funciona como se propõe. Maior consumidor de RAM e CPU da máquina."],
+  ["Portfólio", "bobagi.space", "-", "1.767", "540", "-", "warn",
+   "751 acessos → 13 CV, 9 case studies, 1 referral do LinkedIn. Bem feito, sem audiência."],
+  ["Chéri · VS.Dragon", "sites de cliente", "clientes", "465", "138", "entregue", "good",
+   "Entregas pagas e no ar. Tráfego baixo é responsabilidade do cliente, não sua."],
+  ["Clonador", "APK em bobagi.space/clonador", "-", "29 downloads", "-", "-", "mute",
+   "Play Store inviável (política de REQUEST_INSTALL_PACKAGES). Distribuição só por link."],
+  ["Todo", "todo.bobagi.space", "5 usuários", "223", "37", "R$ 0,00", "mute",
+   "25 tarefas. Cobrança construída (billing, entitlements) e nunca usada: 0 pagamentos."],
+  ["Primordium · RetroASM · Rhyme · game", "vitrine", "-", "670", "134", "-", "mute",
+   "Vitrine de portfólio. Sem uso mensurável - o que é aceitável para o papel que exercem."],
+  ["dumb-docker", "painel interno", "você", "549", "291", "-", "warn",
+   "Ficou 15 dias fora do ar sem ninguém notar (corrigido em 22/07). Isso responde sobre o uso."],
+];
+const chipFor = { crit: "c-crit", warn: "c-warn", good: "c-good", mute: "c-mute" };
+const labelFor = { crit: "Vazando dinheiro", warn: "Atenção", good: "Saudável", mute: "Dormente" };
+$("#scoretable").innerHTML = SCORE.map(([n, meta, users, human, ips, rev, state, note]) => `
+  <tr>
+    <td><span class="pname">${n}</span><span class="pmeta">${meta}</span></td>
+    <td class="num">${users}</td>
+    <td class="num">${human}</td>
+    <td class="num">${ips}</td>
+    <td class="num" style="color:${rev === "R$ 0,00" ? "var(--crit)" : "var(--muted)"}">${rev}</td>
+    <td><span class="chip ${chipFor[state]}">${labelFor[state]}</span>
+        <div style="color:var(--muted);font-size:12.5px;margin-top:7px;max-width:44ch;line-height:1.5">${note}</div></td>
+  </tr>`).join("");
+
+/* ── warframe decay ── */
+const WF = [["16/07", 683], ["17/07", 945], ["18/07", 443], ["19/07", 168], ["20/07", 30], ["21/07", 69], ["22/07", 6], ["23/07", 11]];
+(function () {
+  const w = 640, h = 150, pad = { t: 12, r: 12, b: 4, l: 40 };
+  const max = 1000;
+  const iw = w - pad.l - pad.r, ih = h - pad.t - pad.b;
+  const x = (i) => pad.l + (i / (WF.length - 1)) * iw;
+  const y = (v) => pad.t + ih - (v / max) * ih;
+  const line = WF.map((d, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(d[1]).toFixed(1)}`).join(" ");
+  const area = `${line} L${x(WF.length - 1).toFixed(1)},${(pad.t + ih).toFixed(1)} L${pad.l},${(pad.t + ih).toFixed(1)} Z`;
+  const grid = [0, 250, 500, 750, 1000].map((v) =>
+    `<line x1="${pad.l}" y1="${y(v)}" x2="${w - pad.r}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/>
+     <text x="${pad.l - 7}" y="${y(v) + 3.5}" text-anchor="end" font-size="9" font-family="JBMono,monospace" fill="var(--muted)">${v}</text>`).join("");
+  const dots = WF.map((d, i) => `
+    <circle cx="${x(i)}" cy="${y(d[1])}" r="${i === 1 || i === WF.length - 1 ? 4.5 : 3}"
+      fill="var(--accent)" stroke="var(--panel)" stroke-width="2"><title>${d[0]} - ${d[1]} acessos humanos</title></circle>`).join("");
+  $("#wfchart").innerHTML = `
+    <svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto;display:block;overflow:visible" role="img"
+         aria-label="Acessos humanos ao Warframe Helper por dia: pico de 945 em 17 de julho, queda para 11 em 23 de julho">
+      ${grid}
+      <path d="${area}" fill="var(--accent-wash)"/>
+      <path d="${line}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+      ${dots}
+      <text x="${x(1)}" y="${y(945) - 11}" text-anchor="middle" font-size="10" font-family="JBMono,monospace" fill="var(--ink2)">945</text>
+      <text x="${x(WF.length - 1)}" y="${y(11) - 11}" text-anchor="end" font-size="10" font-family="JBMono,monospace" fill="var(--ink2)">11</text>
+    </svg>
+    <div style="display:flex;justify-content:space-between;margin-top:6px;padding-left:40px;font-family:JBMono,monospace;font-size:9px;color:var(--muted)">
+      ${WF.map((d) => `<span>${d[0]}</span>`).join("")}
+    </div>`;
+})();
+
+/* ── gasto diário ── */
+const SPEND = [
+  ["06/07", 20.06, 24], ["07/07", 10.96, 56], ["08/07", 9.67, 45], ["09/07", 10.72, 36],
+  ["10/07", 9.53, 31], ["11/07", 9.28, 29], ["12/07", 8.46, 27], ["13/07", 9.10, 35],
+  ["14/07", 9.52, 31], ["15/07", 8.73, 29], ["16/07", 9.67, 32], ["17/07", 11.77, 45],
+  ["18/07", 15.14, 51], ["19/07", 11.78, 57], ["20/07", 14.67, 54], ["21/07", 12.36, 46],
+  ["22/07", 11.87, 52], ["23/07", 6.01, 26],
+];
+(function () {
+  const max = Math.max(...SPEND.map((d) => d[1]));
+  $("#spendchart").innerHTML = SPEND.map(([d, c, inst]) => `
+    <div class="vb tip" tabindex="0" role="img"
+         data-tip="${d}&#10;R$ ${c.toFixed(2).replace(".", ",")}&#10;${inst} instalações&#10;CPI R$ ${(c / inst).toFixed(2).replace(".", ",")}"
+         aria-label="${d}: R$ ${c.toFixed(2)}, ${inst} instalações">
+      <div class="vbfill" style="height:${(c / max) * 100}%;${d === "23/07" ? "opacity:.55" : ""}"></div>
+    </div>`).join("");
+  $("#spendaxis").innerHTML = SPEND.map(([d], i) =>
+    `<span>${i % 3 === 0 || i === SPEND.length - 1 ? d.slice(0, 2) : ""}</span>`).join("");
+})();
+
+/* ── geo ── */
+const GEO = [
+  ["Índia", 120, 34.40], ["Bangladesh", 104, 26.84], ["Nepal", 53, 13.22], ["Paquistão", 47, 10.45],
+  ["Sudão", 40, 11.98], ["Irã", 26, 6.55], ["Iraque", 23, 5.99], ["Iêmen", 23, 4.40],
+  ["RD Congo", 21, 5.77], ["Argélia", 15, 5.15],
+];
+(function () {
+  const max = GEO[0][1];
+  $("#geochart").innerHTML = GEO.map(([n, v, c], i) => {
+    const shade = 100 - i * 6;
+    return `<div class="hbrow">
+      <span class="hblabel">${n}</span>
+      <div style="display:flex;align-items:center;min-width:0">
+        <div class="hbtrack" style="flex:1">
+          <div class="hbseg tip" tabindex="0" role="img"
+               style="width:${(v / max) * 100}%;background:color-mix(in srgb,var(--accent) ${shade}%,var(--sunk))"
+               data-tip="${n}&#10;${v} instalações&#10;R$ ${c.toFixed(2).replace(".", ",")} gastos&#10;CPI R$ ${(c / v).toFixed(2).replace(".", ",")}"
+               aria-label="${n}: ${v} instalações, R$ ${c.toFixed(2)}"></div>
+        </div>
+        <span class="hbval">${v}</span>
+      </div>
+    </div>`;
+  }).join("") + `<div style="font-family:JBMono,monospace;font-size:10.5px;color:var(--muted);margin-top:12px;padding-left:130px">Brasil: fora do top 25</div>`;
+})();
+
+/* ── grupos ── */
+const GROUPS = [["Ad group EN", 91.24, 323], ["Ad group ES", 63.00, 216], ["Ad group BR", 45.08, 167]];
+(function () {
+  const max = GROUPS[0][1];
+  $("#groupchart").innerHTML = GROUPS.map(([n, c, inst]) => `
+    <div class="hbrow">
+      <span class="hblabel">${n.replace("Ad group ", "")}</span>
+      <div style="display:flex;align-items:center;min-width:0">
+        <div class="hbtrack" style="flex:1">
+          <div class="hbseg tip" tabindex="0" role="img" style="width:${(c / max) * 100}%;background:var(--brass)"
+               data-tip="${n}&#10;R$ ${c.toFixed(2).replace(".", ",")}&#10;${inst} instalações&#10;CPI R$ ${(c / inst).toFixed(2).replace(".", ",")}"
+               aria-label="${n}: R$ ${c.toFixed(2)}, ${inst} instalações"></div>
+        </div>
+        <span class="hbval">R$&thinsp;${c.toFixed(2).replace(".", ",")}</span>
+      </div>
+    </div>`).join("");
+})();
+
+/* ── github ── */
+const GH = [
+  ["Project Zomboid", 67, "22 ★ · 61 visitas vindas do Google"],
+  ["Terraria guide", 4, "0 ★ · referrer só yandex"],
+  ["warframe-helper", 2, "0 ★ · sem descoberta"],
+  ["tictacverse", 1, "0 ★ · sem descoberta"],
+  ["clonador", 0, "0 ★ · sem descoberta"],
+];
+(function () {
+  const max = 67;
+  $("#ghchart").innerHTML = GH.map(([n, v, note], i) => `
+    <div class="hbrow">
+      <span class="hblabel" title="${n}">${n}</span>
+      <div style="display:flex;align-items:center;min-width:0">
+        <div class="hbtrack" style="flex:1">
+          <div class="hbseg tip" tabindex="0" role="img"
+               style="width:${Math.max((v / max) * 100, v ? 1.5 : 0)}%;background:${i === 0 ? "var(--good)" : "var(--noise)"}"
+               data-tip="${n}&#10;${v} visitantes únicos / 14 d&#10;${note}" aria-label="${n}: ${v} visitantes únicos"></div>
+        </div>
+        <span class="hbval">${v}</span>
+      </div>
+    </div>`).join("");
+})();
+</script>

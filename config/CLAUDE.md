@@ -108,6 +108,15 @@ teste confiável que roda e pode falhar - priorize o caminho do dinheiro) e, em 
   operador**. Use em "cadastre o site no Google", "submeta o sitemap", "por quais buscas meu
   site aparece", "relatório de SEO". Limite honesto: a API **não força indexação** (a Indexing
   API oficial só vale p/ JobPosting/BroadcastEvent) - sitemap + tempo é o caminho legítimo.
+- **`product-review`** - **atua como Product Manager do portfolio inteiro do VPS**: coleta dados
+  reais de todos os produtos (tráfego do nginx separando humano/robô/ataque, usuários nos bancos,
+  receita do Google Ads/AdMob, SEO do Search Console, tráfego/estrelas do GitHub, consumo e saúde
+  do box), analisa o que tem valor / consome / é usado, e gera ou atualiza um **Artifact único**
+  (sempre republicado no mesmo link) com diagnóstico e recomendações priorizadas P0/P1/P2. Reusa as
+  skills google + o `gh` + os bancos. Roda no VPS; assets versionados na própria skill; diretório de
+  trabalho e doc operacional em `/opt/pm-dashboard/`. Um cron de sistema já deixa o `metrics-<data>.txt`
+  fresco (segundas), mas quem publica o Artifact é o Claude numa sessão. Use em "revisão de produto",
+  "como estão os projetos", "relatório de PM", "atualize o dashboard de produto".
 
 > **Limite transversal Google (Play/AdMob/Ads):** o que a API oficial não cobre (pagamentos,
 > data safety, criar ad unit/mediação, consent screen) é feito PELO OPERADOR guiado passo a
