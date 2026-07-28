@@ -882,3 +882,15 @@ click, drive them separately for now (interaction steps are a planned engine fea
   TWO chips (state + warning) must be `flex-wrap` so the second chip drops to its own line instead
   of colliding with the `::before` label - verify with a row that actually has both chips, not just
   the common single-chip case.
+- **2026-07-28 (via assumption fields in a finance panel that stepped up/down across a row):** When
+  items in a flex/grid row are misaligned by a CONSISTENT offset and only the first (or last) item is
+  in the "right" place, suspect a **global class-name collision**, not a wrapping/height issue. A
+  component that reuses a common utility class name (`.field`, `.card`, `.row`, `.col`, `.item`) silently
+  inherits the global design-system rule for that class — classically a vertical-stacking `margin-top`
+  with a `:first-child { margin-top: 0 }` reset, which pushes every item BUT the first down by one
+  spacing unit. Diagnose by measuring each item's `getBoundingClientRect().top` (labels AND inputs) and
+  grepping the global stylesheet for `.<class>` and `.<class>:first-child` / `label { margin }`. Fix with
+  a higher-specificity scoped reset (e.g. `.wrapper label { margin: 0 }`) or a unique class name, then
+  re-measure at several widths (the collision hides at the width where everything is one line). Lesson
+  for the reviewer itself: judging a per-item step from a screenshot alone is unreliable — a 1-spacing-unit
+  offset reads as intentional breathing room; always measure box tops when a row "looks slightly off".
