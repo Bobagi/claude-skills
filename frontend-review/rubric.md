@@ -347,6 +347,21 @@ click, drive them separately for now (interaction steps are a planned engine fea
   (3) Reforço da lição de estado ocioso: decoração adicionada ao estado idle (blocos fake atrás de
   um play button) sobrepôs a legenda; todo retoque "cosmético" num estado precisa de screenshot
   próprio ANTES de ir pro ar, e quando a decoração compete com o texto, remova a decoração.
+- **2026-07-29 (via bobagi-blocks, o overlay que so quebra COM dados + botao de container aninhado):**
+  tres licoes de uma regressao real que chegou ao aparelho do dono. (1) **Todo overlay/card tem estados
+  DEPENDENTES DE DADOS: capture cada um com dados representativos, nao so o vazio.** O game over tinha
+  uma linha extra ("+N moedas/tijolos") que so renderiza quando a sessao rendeu recurso; todos os meus
+  screenshots usavam estado zerado -> a linha nunca apareceu -> o botao colidia com ela em producao.
+  Checklist: para cada linha condicional de um card (bonus, recompensa, badge), force o dado via
+  localStorage/estado de debug e screenshote COM ela. E capture tambem em dpr>1 (o layout px*dpr muda
+  as proporcoes). (2) **Em engine canvas (Phaser e afins), botao = textura em Image direto na cena; nao
+  monte botao como Graphics dentro de container DENTRO de outro container com hit-rect manual.** No
+  aparelho real o visual e a area de toque divergiram; com Image interativa o hit e o proprio bounds da
+  textura e a classe de bug morre. (3) **Nunca deixe uma linha informativa CLICAVEL encostada num botao
+  primario**: a linha de tijolos era tambem atalho para outra tela e roubava toques do "jogar de novo"
+  (o usuario descreveu como "clique nao funciona direito"). Acao secundaria sobreposta a primaria =
+  toque ambiguo; separe espacialmente ou remova a interatividade da linha.
+
 > Add a dated, **general** lesson whenever a review surfaces a check worth keeping. Keep it
 > project-agnostic. Promote recurring lessons into the checklists above.
 
