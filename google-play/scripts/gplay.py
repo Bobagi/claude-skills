@@ -302,9 +302,9 @@ def cmd_promote(args):
         delete_edit(args.package, edit, token)
         die(f"track de origem '{args.from_track}' sem releases.")
     rel = dict(src["releases"][0])
-    rel["status"] = "completed" if args.rollout >= 1 else "inProgress"
+    rel["status"] = args.status or ("completed" if args.rollout >= 1 else "inProgress")
     rel.pop("userFraction", None)
-    if args.rollout < 1:
+    if args.rollout < 1 and rel["status"] == "inProgress":
         rel["userFraction"] = args.rollout
     api(
         "PUT",
@@ -496,6 +496,8 @@ def main():
     pr.add_argument("--from-track", required=True)
     pr.add_argument("--to-track", required=True)
     pr.add_argument("--rollout", type=float, default=1.0)
+    pr.add_argument("--status", choices=["draft", "completed", "inProgress", "halted"], default=None,
+                    help="força o status da release (app rascunho exige 'draft')")
 
     ro = sub.add_parser("rollout")
     ro.add_argument("--fraction", type=float, required=True)
