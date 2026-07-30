@@ -937,3 +937,16 @@ click, drive them separately for now (interaction steps are a planned engine fea
   specificity globally re-spaces every section at once, which is a redesign, not a review fix.
   Corollary: a full-page screenshot scaled down to fit is useless for judging a ~20px gap - it compresses
   the very difference you are judging, so take the measurement (or a 1:1 crop) before calling it.
+- **2026-07-30 (via landing estatica - reusar uma classe de layout DENTRO de um container mais
+  estreito herda a media query dela):** ao colocar uma lista/grade existente (`.steps`, `.cards`,
+  `.grid`) dentro de um **container novo e mais estreito** (um card lado a lado, uma coluna de
+  2-col), ela **carrega junto a media query que a torna multi-coluna na largura da PAGINA** - e
+  `@media (min-width:760px){.steps{grid-template-columns:repeat(3,1fr)}}` dispara pela largura do
+  VIEWPORT, nao pela do container. Resultado: 3 colunas de ~130px dentro de um card de 500px, com
+  o texto picado em 6 caracteres por linha - um defeito que **so aparece no desktop** (no mobile a
+  media query nem dispara, entao a captura de celular passa limpa e da falsa confianca). Regra:
+  toda vez que aninhar uma classe de layout num contexto mais estreito, **anule explicitamente o
+  eixo de colunas dela** no escopo novo (`.card .steps{grid-template-columns:none}`) e **capture o
+  desktop**, nao so o mobile. Container queries (`container-type:inline-size`) sao a cura de raiz
+  quando o projeto pode adota-las. Corolario de metodo: quando a mudanca e "mesmo componente, novo
+  container", a passada de revisao que importa e a LARGA, invertendo o instinto mobile-first.
