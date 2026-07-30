@@ -923,3 +923,17 @@ click, drive them separately for now (interaction steps are a planned engine fea
   `flex-wrap`, a P0 overflow if it doesn't). And when a signal like `H-OVERFLOW` fires at an extreme
   width, read the `offCanvas` element list before blaming the change - it is often a pre-existing
   unrelated element (header/account menu), and reporting it as a regression burns the reviewer's credibility.
+- **2026-07-30 (via adding one list item to a landing's changelog section):** A stylesheet rule that
+  sets rhythm on an ELEMENT selector (`section { padding: 46px 0 }`) is silently dead when every one of
+  those elements also carries a layout class that sets the same property (`.wrap { padding: 0 20px }`) -
+  class (0,1,0) beats element (0,0,1) on the same node, so the page's whole vertical rhythm is actually
+  coming from heading margins, and the author's intent in the CSS is a lie. It hides well: the middle
+  sections still look spaced (their headings have margins), and only the LAST block before the footer
+  reads glued, because there is no heading after it to donate margin. Two lessons: (1) never certify
+  spacing from the stylesheet's *intent* - measure `getBoundingClientRect()` for the last child, the
+  section box and the next landmark, and compare the transition gaps to the page's other transitions;
+  (2) when a section-padding rule turns out to be dead, prefer a LOCAL fix on the block you touched
+  (`#that-section { padding-bottom: … }`) and report the global rule as its own finding - raising the
+  specificity globally re-spaces every section at once, which is a redesign, not a review fix.
+  Corollary: a full-page screenshot scaled down to fit is useless for judging a ~20px gap - it compresses
+  the very difference you are judging, so take the measurement (or a 1:1 crop) before calling it.
