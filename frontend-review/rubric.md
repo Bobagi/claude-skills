@@ -909,3 +909,17 @@ click, drive them separately for now (interaction steps are a planned engine fea
   re-measure at several widths (the collision hides at the width where everything is one line). Lesson
   for the reviewer itself: judging a per-item step from a screenshot alone is unreliable — a 1-spacing-unit
   offset reads as intentional breathing room; always measure box tops when a row "looks slightly off".
+- **2026-07-30 (via an icon added to one tab of an existing text-only tab bar):** Putting an icon
+  inside a control that until then held ONLY text (tab, button, chip, menu item) is a layout change,
+  not a content change. Two things break quietly: (1) the control usually has no `display:flex`, so the
+  inline `<svg>` sits on the text baseline and reads a hair low - convert the control to
+  `inline-flex; align-items:center; gap:<token>`; (2) sibling children that already carried their own
+  spacing (a status glyph with `margin-right`, a badge with `margin-left`) now get **margin + gap
+  stacked**, so the controls WITH the legacy child end up spaced differently from the one with the new
+  icon. Own the spacing in ONE place: add the `gap` and delete the children's margins. Verify BOTH
+  states of the conditional child (e.g. the lock glyph only present when locked) - the un-equal spacing
+  only shows in the state you didn't screenshot. Also re-check the narrowest viewport: the longest label
+  just got wider, so a bar that used to fit on one line may now wrap (fine if the container already has
+  `flex-wrap`, a P0 overflow if it doesn't). And when a signal like `H-OVERFLOW` fires at an extreme
+  width, read the `offCanvas` element list before blaming the change - it is often a pre-existing
+  unrelated element (header/account menu), and reporting it as a regression burns the reviewer's credibility.
