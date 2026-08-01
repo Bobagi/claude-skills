@@ -183,6 +183,34 @@ click, drive them separately for now (interaction steps are a planned engine fea
 ---
 
 ## Learnings log (append-only; this is how the reviewer improves)
+- **2026-08-01 (via a canvas game app) - a bottom sheet capped by the FRAMEWORK, not by your own
+  constraint.** A sheet whose content asks for `maxHeight: 0.78 * screen` can still render clipped
+  because the host API imposes a smaller cap first (Flutter's `showModalBottomSheet` caps at 9/16 of
+  the screen unless `isScrollControlled: true`; other stacks have analogous defaults). The symptom is
+  a list **sliced mid-item at the bottom edge on every viewport**, and it reads as a layout bug rather
+  than an invitation to scroll. Two-part rule when reviewing any scrollable panel/drawer/sheet: (1)
+  check whether the container's own height constraint is actually being honoured, not just whether it
+  was written; (2) a scrollable region that fills its container needs an explicit **affordance** -
+  a bottom fade mask (a gradient with a `dstIn`-style blend over the last ~8%) is the cheap fix and
+  beats a scrollbar on touch. A cut-off item with a hard edge is a P2 on its own, independent of
+  whether scrolling technically works.
+- **2026-08-01 (via a canvas game app) - to review a state-driven UI, SEED the state, don't grind to
+  it.** Screens whose whole point is accumulated progress (levels, achievements, streaks, badges,
+  history) look empty and untestable on a fresh install, so the interesting states - partially
+  unlocked, near a threshold, many badges at once - never get reviewed. Seed the persistence layer
+  directly (localStorage/IndexedDB/a fixtures endpoint), reload, then capture. Two traps: (a) match
+  the storage layer's **exact encoding** - a wrapper that JSON-encodes values means an object must be
+  double-encoded, and getting it wrong can throw inside app bootstrap and leave the app stuck on the
+  splash with only a minified stack trace (if the app hangs at boot right after you seeded, suspect
+  your seed format before suspecting the code); (b) deliberately seed the **worst case for layout**
+  (the most badges/chips that can appear at once) and check it at the SMALLEST viewport - that is
+  where a wrapping row pushes the primary buttons out of a height-capped container.
+- **2026-08-01 (via a canvas game app) - clicks past the end of a flow silently dismiss modals.**
+  When driving a canvas/game UI blind with coordinate clicks, a scripted "click every cell" loop runs
+  past the moment the flow completes, and those extra clicks land on the **modal barrier** and close
+  the very dialog you meant to capture - producing screenshots of the screen *behind* it and a false
+  "the modal never appeared". Fix: screenshot after **each** step and pick the frame, rather than
+  acting N times and capturing once at the end.
 
 - **2026-07-23 (via todo - emoji de bandeira quebra no Windows; e valide a classe QUE O APP EMITE):**
   Duas lições. (1) **Nunca use emoji de bandeira (🇧🇷) em UI que precisa funcionar cross-OS.** A fonte
