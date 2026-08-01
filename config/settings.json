@@ -2,7 +2,7 @@
   "permissions": {
     "defaultMode": "auto"
   },
-  "model": "opus",
+  "model": "opus[1m]",
   "hooks": {
     "UserPromptSubmit": [
       {
@@ -38,6 +38,19 @@
             "shell": "bash",
             "timeout": 10,
             "statusMessage": "check config drift"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/no-em-dash-check.sh\"",
+            "timeout": 10,
+            "statusMessage": "no-em-dash check"
           }
         ]
       }

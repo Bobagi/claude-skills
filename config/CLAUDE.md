@@ -23,6 +23,15 @@ troque a ocorrência pela pontuação adequada de passagem. Verificação rápid
 code point pra não digitar o caractere): `grep -rnP "\x{2014}" <dir>` deve dar vazio no que você
 escreveu.
 
+**ISTO É EXECUTADO, não só documentado (2026-08-01):** um hook `PostToolUse` em
+`Write|Edit|NotebookEdit` roda `~/.claude/no-em-dash-check.sh` no arquivo que você acabou de
+gravar; se houver travessão ele sai com **código 2** e devolve as linhas ofensoras como feedback,
+te obrigando a corrigir antes de seguir. Ele olha SÓ o arquivo tocado (arquivo legado com
+travessão não vira ruído) e ignora binário. **Separador de título:** prefira `·` em vez de hífen.
+**Atenção ao varrer um projeto:** conteúdo derivado (banco, build, índice de busca) guarda uma
+CÓPIA do texto - trocar o fonte não basta, é preciso reprocessar o pipeline e conferir a página
+renderizada.
+
 ## ★ Política SKILL-FIRST (vale para todo comando, em todo projeto)
 
 **Antes de executar qualquer tarefa, procure ativamente uma skill ou plugin que ajude

@@ -104,6 +104,8 @@ say "Config (CLAUDE.md, settings.json, hook skill-first)"
 copy_config "$REPO_DIR/config/CLAUDE.md"                "$CLAUDE_HOME/CLAUDE.md"
 copy_config "$REPO_DIR/config/skill-first-reminder.txt" "$CLAUDE_HOME/skill-first-reminder.txt"
 copy_config "$REPO_DIR/config/settings.json"            "$CLAUDE_HOME/settings.json"
+copy_config "$REPO_DIR/config/no-em-dash-check.sh"      "$CLAUDE_HOME/no-em-dash-check.sh"
+chmod +x "$CLAUDE_HOME/no-em-dash-check.sh" 2>/dev/null || true
 warn "settings.local.json NAO e tocado (permissoes especificas da maquina)"
 
 # ---------------------------------------------------------------------------
