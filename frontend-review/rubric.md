@@ -1008,3 +1008,20 @@ click, drive them separately for now (interaction steps are a planned engine fea
   documente o residual como pre-existente em vez de assumi-lo silenciosamente. Corolario: teste as
   correcoes candidatas por medicao, nao por intuicao (aqui, "esconder o nome do usuario" nao mudou
   1px porque outra media query ja o escondia, e encolher a fonte nunca chegava a caber).
+- **2026-08-01 (revisar uma tela atras de login cujo estado real e caro/perigoso de produzir):** duas
+  licoes gerais. **(a) Sirva o BUNDLE PUBLICADO com uma API de fixtures, nao um mock de HTML/CSS.**
+  Copiar os tokens para uma pagina de mock parece rapido e envelhece: voce acaba revisando um CSS que
+  nao esta no ar. Um servidor local de ~100 linhas que serve o `dist/` real e responde as rotas da API
+  com fixtures da o estado que voce precisa (erro, carteira cheia, lista vazia) revisando o codigo que
+  o usuario ve. **ARMADILHA que custa uma hora:** a fixture tem que casar com o **formato exato da
+  resposta**, chave por chave (`{items, next_cursor}` vs `{rows, has_more}`); com a chave errada o app
+  quebra num `TypeError: reading 'filter'` **silencioso** e renderiza o estado VAZIO, que parece
+  "os dados nao chegaram" e manda voce depurar rede/auth por muito tempo. Antes de qualquer captura,
+  **registre `page.on('pageerror')`** - uma excecao nao capturada e o primeiro sinal, e ela nao aparece
+  no console de erros normal. Leia os tipos do cliente (`api.ts`/similar) para montar a fixture, nao
+  o handler do servidor. **(b) Identificador que o usuario precisa TRANSCREVER nunca pode quebrar
+  linha.** Codigo de incidente/pedido/cupom embutido em prosa quebra no hifen (`PF-` / `K7Q2XM`) e vira
+  transcricao errada. Regra: tire-o da frase, de a ele linha propria com rotulo ("Codigo para citar:"),
+  `white-space: nowrap` e `user-select: all`. Vale para qualquer string que va parar num e-mail de
+  suporte. **▶ Testar:** renderize no viewport mais estreito suportado e confirme que o codigo esta
+  numa linha so.
