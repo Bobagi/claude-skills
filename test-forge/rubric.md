@@ -48,6 +48,31 @@ Pule: getters/setters triviais, o que o compilador/framework já garante, UI pur
   (só 1 passou, saldo consistente) — em Go use goroutines + `-race`; em app rodando, N requests paralelos.
 
 ## Learnings log (append-only, geral)
+- **2026-08-01 (via app de jogo - o teste que passa porque o CENARIO nao alcanca o guard):** Ao
+  travar um guard do tipo "so conta quando a condicao C vale" (aqui: "vitoria so conta contra a
+  maquina, nao no dois jogadores"), o cenario do teste tem de ser aquele em que **o resto todo
+  levaria ao efeito**, senao o guard nunca e exercitado. Caso real: para provar "partida local nao
+  conta vitoria" montei `vsCpu:false, humanWon:false` e afirmei `cpuWins == 0`; ficou verde, mas o
+  zero vinha de `humanWon:false` (o ramo de vitoria nem era alcancado). Mutar o guard para
+  `if (vsCpu || true)` deixou o teste **verde** = inutil. Correcao: `vsCpu:false` **com
+  `humanWon:true`** (e modo/dificuldade que alimentariam TODOS os contadores), afirmando que
+  cpuWins/ultimateWins/hardWins seguem zerados **e** que uma sequencia previa de 4 nao foi tocada.
+  Variante irma no mesmo dia: um teste de "acao repetida no mesmo dia nao conta duas vezes" que
+  afirmava `streak == 1` sobreviveu a remocao do curto-circuito, porque sem ele o fluxo caia no
+  ramo de *reset* e o valor batia em 1 pelo motivo oposto; so um cenario com **estado previo nao
+  trivial** (streak ja em 2, segunda acao no mesmo dia, afirmar que continua 2) distingue
+  "nao incrementou" de "zerou". **Regra geral: quando o valor esperado do assert e o mesmo do
+  estado inicial (0, 1, vazio), desconfie - escolha um estado inicial que torne os dois caminhos
+  numericamente distintos.** O mutation check e o unico jeito barato de flagrar isso.
+- **2026-08-01 (via app Flutter - `catalog` injetavel isola a unidade sob teste):** Quando a funcao
+  central mistura duas fontes do mesmo efeito (aqui XP vinha da partida E do bonus das conquistas
+  desbloqueadas na mesma chamada), testar o valor exato fica impossivel sem reimplementar a regra
+  no teste. Solucao barata que vale pra qualquer motor com "catalogo de regras": deixe a lista de
+  regras ser **parametro do construtor** e, nos testes de XP puro, injete a lista **vazia**. Os
+  testes ficam com valor literal esperado (`expect(xp, 35)`) em vez de aritmetica duplicada, e os
+  testes de desbloqueio usam o catalogo real. Bonus: a mesma injecao permite afirmar propriedades do
+  catalogo real (ids unicos, toda meta alcancavel, nada desbloqueado num estado zerado) sem tocar no
+  motor.
 - **2026-07-23 (via todo — o teste de rejeição que passa PELO MOTIVO ERRADO):** Ao afirmar que uma
   requisição hostil é **rejeitada** (`assert status === 400/403`), o teste só prova alguma coisa se a
   requisição for **válida em todo o resto** — senão ela morre num guard ANTERIOR e o guard que você
