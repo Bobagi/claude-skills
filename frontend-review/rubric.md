@@ -965,3 +965,18 @@ click, drive them separately for now (interaction steps are a planned engine fea
   renomear desloga usuarios, zera preferencias e **faz o banner de LGPD reaparecer derrubando o
   consentimento ja dado**. Deixe-as com o nome antigo e DOCUMENTE o porque, senao a proxima sessao
   "termina o rename" e quebra estado de producao.
+- **2026-08-01 (adicionar UM elemento a um flex container existente: tres armadilhas, todas
+  invisiveis no código e óbvias no pixel):** ao inserir um icone/badge ao lado de um texto que ja
+  existia, (1) **`gap` no pai separa TEXT NODES SOLTOS**: `<Icone />Pork<span>folio</span>` sao tres
+  itens flex (o text node "Pork" vira item anonimo), entao um `gap` no container parte a palavra ao
+  meio - ponha o espacamento como `margin` do proprio icone, nunca como `gap` do pai; (2) **um
+  `gap: 0` que ja estava la costuma ser LOAD-BEARING**, neutralizando um `gap` global de
+  `button`/`.btn` do design system - apagar por parecer ruido reintroduz o defeito **so em algumas
+  telas** (as que usam `<button>`), e a assimetria faz voce declarar vitoria cedo depois de conferir
+  a tela errada; deixe-o com comentario dizendo por que fica. (3) **Antes de "consertar" um overflow
+  que apareceu, MEÇA quanto dele e seu**: remova seu elemento em runtime (`evalJs`) no mesmo
+  carregamento e compare `scrollWidth`. Se o baseline ja estourava, seu dever e **voltar ao baseline**
+  (ex.: esconder so o seu elemento no breakpoint apertado), nao redesenhar o header inteiro - e
+  documente o residual como pre-existente em vez de assumi-lo silenciosamente. Corolario: teste as
+  correcoes candidatas por medicao, nao por intuicao (aqui, "esconder o nome do usuario" nao mudou
+  1px porque outra media query ja o escondia, e encolher a fonte nunca chegava a caber).
