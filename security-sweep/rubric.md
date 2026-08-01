@@ -571,3 +571,25 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   do upsert for sobre uma **expressão** (ex.: `COALESCE(user_id,0), fingerprint`, para tratar NULL), dispare
   o upsert contra o schema REAL: `ON CONFLICT` sobre expressão compila em qualquer mock e só falha em
   produção.
+- **2026-08-01 (2ª rodada: adicionar um lock "um por usuário" numa operação LONGA):** a defesa contra
+  corrida pode criar uma indisponibilidade pior que a corrida. Um **advisory lock de sessão** do
+  Postgres (`pg_try_advisory_lock`) é a resposta natural para "só uma execução por usuário", e funciona
+  - mas ele mora numa CONEXÃO, e se a operação protegida for longa (segundos a minutos, tipicamente
+  porque chama uma API externa em loop) você acabou de **prender uma conexão do pool por todo esse
+  tempo**. Com um pool típico de 10-25, algumas dezenas de execuções simultâneas esgotam o pool e
+  **derrubam todos os endpoints para todos os usuários**. **Regra durável:** lock de sessão só para
+  trabalho CURTO e dentro do banco; para trabalho longo use uma **linha de lease** (tabela
+  `<coisa>_runs` com `user_id` PK + `started_at`), tomada por um **upsert condicional único** e
+  liberada por DELETE, sem segurar nada no meio:
+  `INSERT ... ON CONFLICT (user_id) DO UPDATE SET started_at=now() WHERE tabela.started_at < now() - <expiry> RETURNING user_id`
+  (nenhuma linha devolvida = alguém vivo tem o lease). Três propriedades que o lease precisa ter e que
+  valem checar em qualquer app: **(a) EXPIRY maior que o timeout do próprio request** (senão uma
+  execução viva tem o lease roubado) mas finito (senão um processo morto tranca a conta para sempre);
+  **(b) liberação num contexto NÃO cancelável** (`context.WithoutCancel`), porque o cliente desistir no
+  meio é o caso comum e um DELETE preso ao contexto cancelado nunca roda; **(c) recusar, não enfileirar**
+  - a segunda execução acordaria num estado que a primeira já mudou. **▶ Testar ao vivo:** rajada
+  concorrente em UM processo (`Promise.all`) e conte os recusados; depois **plante o lease à mão** e
+  prove a recusa determinística; depois **envelheça a linha** além do expiry e prove a retomada; por
+  fim confira que a tabela ficou **vazia** no final (lease vazado = conta travada). E lembre: um lock
+  novo NUNCA substitui a atomicidade fina que já existia (o lock por item continua sendo o que impede
+  a ação dupla) - ele só evita trabalho duplicado.
