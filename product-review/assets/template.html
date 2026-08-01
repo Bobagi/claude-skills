@@ -254,12 +254,12 @@ footer h3{font-family:"JBMono",monospace;font-size:10px;letter-spacing:.12em;tex
     <div class="kpi">
       <span class="lbl">Usuários reais</span>
       <span class="val">19</span>
-      <span class="sub">9 Cartomania · 5 Coin Hub<br>5 Todo · 1 ativo em 7 d</span>
+      <span class="sub">9 Cartomania · 5 Porkfolio<br>5 Todo · 1 ativo em 7 d</span>
     </div>
     <div class="kpi">
       <span class="lbl">Bases sem backup</span>
       <span class="val v-crit">3<span style="font-size:18px;color:var(--muted)"> de 4</span></span>
-      <span class="sub">só o Coin Hub tem rotina<br>e ela é local, no mesmo disco</span>
+      <span class="sub">só o Porkfolio tem rotina<br>e ela é local, no mesmo disco</span>
     </div>
   </div>
 </header>
@@ -281,7 +281,7 @@ footer h3{font-family:"JBMono",monospace;font-size:10px;letter-spacing:.12em;tex
 
     <div class="panel chart">
       <div class="ctitle">Rede acumulada por contêiner - top 5</div>
-      <div class="csub"><strong>Os dois earners (<span class="mono">repocket</span> e <span class="mono">tm</span>) foram removidos em 23/07.</strong> Com eles fora, o maior consumidor de banda passou a ser um produto de verdade - a API do Coin Hub - em vez de tráfego de estranhos.</div>
+      <div class="csub"><strong>Os dois earners (<span class="mono">repocket</span> e <span class="mono">tm</span>) foram removidos em 23/07.</strong> Com eles fora, o maior consumidor de banda passou a ser um produto de verdade - a API do Porkfolio - em vez de tráfego de estranhos.</div>
       <div class="hbars" id="netchart"></div>
     </div>
   </div>
@@ -290,7 +290,7 @@ footer h3{font-family:"JBMono",monospace;font-size:10px;letter-spacing:.12em;tex
     <strong>Leitura de PM:</strong> a máquina ainda gasta ~1,3 GB de RAM e 4,2% de CPU num servidor de jogo para amigos -
     o maior consumidor de RAM do box não é um produto. Mas o lado da banda foi resolvido: os <strong>dois earners
     saíram em 23/07</strong>, então o tráfego que antes era de estranhos (risco de reputação no IP compartilhado) agora
-    é do próprio Coin Hub. Não era problema de custo (o VPS está a 65% de disco e sobra RAM), mas o box ficou mais limpo.
+    é do próprio Porkfolio. Não era problema de custo (o VPS está a 65% de disco e sobra RAM), mas o box ficou mais limpo.
   </div>
 
   <div class="panel chart" style="margin-top:20px">
@@ -337,7 +337,7 @@ footer h3{font-family:"JBMono",monospace;font-size:10px;letter-spacing:.12em;tex
 
   <div class="grid2" style="margin-top:22px">
     <div class="note" style="margin:0">
-      <strong>O mais maduro é o Coin Hub.</strong> Tem 20 tabelas, credenciais de Binance, robôs de trading,
+      <strong>O mais maduro é o Porkfolio.</strong> Tem 20 tabelas, credenciais de Binance, robôs de trading,
       auditoria de exclusão de conta, aceite de termos versionado e 196 execuções de operação registradas.
       É o único produto do box que <strong>toca dinheiro real</strong> - e o único com rotina de backup.
       Também é o único com <strong>1 usuário ativo nos últimos 7 dias</strong>.
@@ -466,7 +466,7 @@ footer h3{font-family:"JBMono",monospace;font-size:10px;letter-spacing:.12em;tex
       <tbody>
         <tr>
           <td><span class="pname">Bases sem backup</span><span class="pmeta">cartomania · todo · umami</span></td>
-          <td>Só o Coin Hub tem rotina (diária, 04:23, 14 dias). As outras três <strong>nunca</strong> foram salvas.</td>
+          <td>Só o Porkfolio tem rotina (diária, 04:23, 14 dias). As outras três <strong>nunca</strong> foram salvas.</td>
           <td>Perda definitiva de 9 jogadores + 156 partidas, 5 usuários e todo o histórico de analytics.</td>
           <td><span class="chip c-crit">Crítico</span></td>
         </tr>
@@ -550,12 +550,12 @@ footer h3{font-family:"JBMono",monospace;font-size:10px;letter-spacing:.12em;tex
     <div class="rec" data-p="P0"><div class="rstripe"></div><div class="rbody">
       <div class="rtop"><span class="rp">P0</span><span class="rtitle">Criar backup de Cartomania, Todo e Umami - e tirar os dumps do disco</span></div>
       <p>
-        Três bancos em produção nunca foram salvos uma única vez. E o único backup que existe, o do Coin Hub,
+        Três bancos em produção nunca foram salvos uma única vez. E o único backup que existe, o do Porkfolio,
         mora no mesmo disco do banco que protege - o que não protege contra o cenário mais provável, que é perder
         a máquina inteira.
       </p>
       <p>
-        Posso generalizar o <span class="mono">/opt/CoinHub/scripts/db-backup.sh</span> para as quatro bases,
+        Posso generalizar o <span class="mono">/opt/Porkfolio/scripts/db-backup.sh</span> para as quatro bases,
         agendar no mesmo cron e adicionar destino externo. Preciso só que você diga <strong>para onde</strong>:
         Google Drive (você já tem MCP conectado), um bucket, ou outra máquina via SSH.
       </p>
@@ -610,7 +610,7 @@ footer h3{font-family:"JBMono",monospace;font-size:10px;letter-spacing:.12em;tex
     </div></div>
 
     <div class="rec" data-p="P1"><div class="rstripe"></div><div class="rbody">
-      <div class="rtop"><span class="rp">P1</span><span class="rtitle">Decidir o que o Coin Hub é: produto ou ferramenta pessoal</span></div>
+      <div class="rtop"><span class="rp">P1</span><span class="rtitle">Decidir o que o Porkfolio é: produto ou ferramenta pessoal</span></div>
       <p>
         É de longe o software mais sério do box - trading real, credenciais de Binance, auditoria, aceite de termos,
         exclusão de conta. Tem 5 usuários cadastrados, 1 ativo na última semana e 196 execuções de operação registradas.
@@ -813,7 +813,7 @@ $("#trafchart").innerHTML = TRAF.map(([name, h, b]) => {
 const SCORE = [
   ["Tic Tac Verse", "app Android · Play Store", "706 inst./30 d", "-", "-", "R$ 0,00", "crit",
    "Ads desligados por flag + AdMob suspenso até ~07/08. Único produto com distribuição real."],
-  ["Coin Hub", "coin.bobagi.space · trading", "5 cadastrados", "8.863", "58", "-", "warn",
+  ["Porkfolio", "porkfolio.bobagi.space · trading", "5 cadastrados", "8.863", "58", "-", "warn",
    "196 execuções de trading reais. 1 usuário ativo em 7 dias. Único com backup."],
   ["Cartomania", "cartomania.bobagi.space", "9 jogadores", "361", "72", "-", "warn",
    "156 partidas · cadastro novo em 23/07. Maior engajamento por usuário do portfólio."],
