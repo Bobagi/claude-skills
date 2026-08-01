@@ -183,6 +183,18 @@ click, drive them separately for now (interaction steps are a planned engine fea
 ---
 
 ## Learnings log (append-only; this is how the reviewer improves)
+- **2026-08-01 (via a web game) - a new rule that CAPS a collection at one item turns the list that
+  renders it into a duplicate.** When a backend invariant lands ("only one active X per user", "one
+  draft at a time", "a single default card"), the UI usually already has (a) a prominent surface for
+  the current item and (b) a generic LIST of that collection built when N could be many. After the
+  cap, the list can only ever hold the same single item the prominent surface names, so the screen
+  shows the same thing twice, often with two buttons doing the identical action - and the list adds
+  raw plumbing (an id/UUID) that the hero surface deliberately hides. Review rule: whenever a change
+  bounds cardinality, go find every list/table/counter over that collection and decide, per surface,
+  merge or drop; fold the list's genuinely useful metadata (status, last activity) into the item
+  surface so nothing is lost. Corollary for reviewing: capture the state where the collection is
+  NON-empty - the redundancy is invisible in the empty state, which is what a fresh test account
+  shows by default.
 - **2026-08-01 (via a canvas game app) - a bottom sheet capped by the FRAMEWORK, not by your own
   constraint.** A sheet whose content asks for `maxHeight: 0.78 * screen` can still render clipped
   because the host API imposes a smaller cap first (Flutter's `showModalBottomSheet` caps at 9/16 of
@@ -929,13 +941,13 @@ click, drive them separately for now (interaction steps are a planned engine fea
   items in a flex/grid row are misaligned by a CONSISTENT offset and only the first (or last) item is
   in the "right" place, suspect a **global class-name collision**, not a wrapping/height issue. A
   component that reuses a common utility class name (`.field`, `.card`, `.row`, `.col`, `.item`) silently
-  inherits the global design-system rule for that class — classically a vertical-stacking `margin-top`
+  inherits the global design-system rule for that class - classically a vertical-stacking `margin-top`
   with a `:first-child { margin-top: 0 }` reset, which pushes every item BUT the first down by one
   spacing unit. Diagnose by measuring each item's `getBoundingClientRect().top` (labels AND inputs) and
   grepping the global stylesheet for `.<class>` and `.<class>:first-child` / `label { margin }`. Fix with
   a higher-specificity scoped reset (e.g. `.wrapper label { margin: 0 }`) or a unique class name, then
   re-measure at several widths (the collision hides at the width where everything is one line). Lesson
-  for the reviewer itself: judging a per-item step from a screenshot alone is unreliable — a 1-spacing-unit
+  for the reviewer itself: judging a per-item step from a screenshot alone is unreliable - a 1-spacing-unit
   offset reads as intentional breathing room; always measure box tops when a row "looks slightly off".
 - **2026-07-30 (via an icon added to one tab of an existing text-only tab bar):** Putting an icon
   inside a control that until then held ONLY text (tab, button, chip, menu item) is a layout change,
