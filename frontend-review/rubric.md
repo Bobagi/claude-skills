@@ -950,3 +950,18 @@ click, drive them separately for now (interaction steps are a planned engine fea
   desktop**, nao so o mobile. Container queries (`container-type:inline-size`) sao a cura de raiz
   quando o projeto pode adota-las. Corolario de metodo: quando a mudanca e "mesmo componente, novo
   container", a passada de revisao que importa e a LARGA, invertendo o instinto mobile-first.
+- **2026-08-01 (via rename de marca - o wordmark bicolor escapa de TODA varredura textual):** num
+  rename de produto, a verificacao instintiva e `grep -ri "<nome antigo>"` no source e no bundle. Ela
+  **mente**, porque o logo textual costuma ser **partido em dois elementos** justamente para pintar as
+  metades de cores diferentes (`Coin<span>Hub</span>`, `<b>Air</b>bnb`, `Data<em>Dog</em>`) - a string
+  completa nao existe em lugar nenhum, entao o grep volta limpo enquanto o elemento MAIS VISIVEL da
+  pagina ainda mostra o nome velho, em todas as telas. Regra: apos qualquer rename, (1) grepe tambem
+  as metades e o padrao `>{sufixo}<`/`<span>`, (2) grepe a classe do logo (`.brand`, `.logo`,
+  `.wordmark`) em vez do texto, e (3) **confirme no screenshot do above-the-fold** - um shot da dobra
+  em um viewport ja teria pego isto em segundos. Corolario mais geral: **quando a mudanca e textual e
+  global, o pixel e a autoridade, nao o grep** - inverta a ordem habitual e olhe a imagem primeiro.
+  Segundo corolario, de risco: chaves de **estado persistido** (cookie de sessao, `localStorage` de
+  idioma/moeda/**consentimento de cookies**, chaves de advisory lock) NAO devem ser renomeadas junto -
+  renomear desloga usuarios, zera preferencias e **faz o banner de LGPD reaparecer derrubando o
+  consentimento ja dado**. Deixe-as com o nome antigo e DOCUMENTE o porque, senao a proxima sessao
+  "termina o rename" e quebra estado de producao.
