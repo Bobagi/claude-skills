@@ -546,3 +546,28 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   `Object.prototype.<key>` is undefined and the effective values are clamped. Also: extreme upstream
   numerics (e.g. a huge dividend yield) must degrade to bounded, formatted output — grep the rendered
   body for `NaN`/`Infinity` after seeding an absurd value.
+- **2026-08-01 (via um endpoint de venda em massa + um registro automático de incidentes):** duas lições
+  gerais, ambas encontradas por LER o contrato do parâmetro em vez de só procurar injeção.
+  **(a) "Filtro vazio = tudo" é seguro numa listagem e PERIGOSO numa ação destrutiva.** Normalizadores de
+  input costumam devolver string vazia para entrada inválida, e em toda listagem isso significa "sem
+  filtro", o que é inofensivo. Reusar o MESMO normalizador num endpoint de deletar/vender/cancelar em
+  massa transforma silenciosamente um pedido restrito ("só a moeda X") no pedido mais amplo possível
+  ("tudo"), sem erro e sem confirmação diferente - o usuário confirma uma coisa e o servidor faz outra.
+  **Regra durável:** em qualquer endpoint destrutivo, "escopo ausente" e "escopo presente mas ilegível"
+  são estados DIFERENTES; o segundo é 400, nunca um escopo maior. Só a ausência literal pode significar
+  "tudo". **▶ Testar ao vivo:** mande o parâmetro de escopo com um separador plausível (`A-B`, `A/B`),
+  um curinga (`*`) e metacaracteres; se a resposta for igual à de "sem escopo", é fail-open. Vale para
+  filtros de tenant/pasta/tag em delete em massa, não só para pares de trading.
+  **(b) Registro automático de erro é uma superfície de vazamento nova.** Assim que a app passa a gravar
+  a causa crua de uma falha (para o operador ver depois), ela criou um lugar onde a URL assinada, o header
+  de API key ou o corpo da requisição podem pousar em texto puro num banco lido por humanos e reenviado por
+  e-mail. **Regra durável:** a redação roda na CAMADA QUE GRAVA (serviço), nunca só no caminho de exibição,
+  e o teste tem que percorrer o caminho completo (serviço -> banco -> endpoint de leitura) com um segredo
+  sintético e provar que ele não está lá. Somado: o registro precisa **colapsar ocorrências por
+  fingerprint** (com os números - ids de ordem, quantidades - normalizados), senão um retry a cada 30s
+  vira uma linha nova por tentativa, uma referência nova para o mesmo problema, e um e-mail de alerta por
+  tentativa (auto-DoS do próprio canal de alerta). **▶ Testar ao vivo:** grave a MESMA falha duas vezes
+  com números diferentes no texto e prove 1 linha, referência estável e contador em 2. E se o índice único
+  do upsert for sobre uma **expressão** (ex.: `COALESCE(user_id,0), fingerprint`, para tratar NULL), dispare
+  o upsert contra o schema REAL: `ON CONFLICT` sobre expressão compila em qualquer mock e só falha em
+  produção.
