@@ -33,6 +33,7 @@ python3 $S reviews --limit 10
 python3 $S reviews-reply --review-id XYZ --text "Obrigado! Corrigido na v1.0.5."
 python3 $S listing                      # ficha da loja em todos os idiomas
 python3 $S listing-set --lang pt-BR --title "Tic Tac Verse: Jogo da Velha"
+python3 $S listing-set --lang pt-BR --video "https://www.youtube.com/watch?v=ID"  # '' limpa
 python3 $S details                      # contato da ficha (site do dev, e-mail)
 python3 $S details-set --website https://bobagi.space
 python3 $S images-list --lang pt-BR              # URLs das imagens atuais da ficha

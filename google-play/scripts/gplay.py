@@ -20,7 +20,7 @@ Uso:
   gplay.py reviews [--limit 10]
   gplay.py reviews-reply --review-id ID --text TXT
   gplay.py listing [--lang pt-BR]
-  gplay.py listing-set --lang pt-BR [--title T] [--short S] [--full ARQ]
+  gplay.py listing-set --lang pt-BR [--title T] [--short S] [--full ARQ] [--video URL]
 
 Trava de segurança: qualquer escrita no track `production` exige
 GPLAY_CONFIRM_PROD=yes no ambiente (setar só depois de o operador confirmar).
@@ -457,6 +457,22 @@ def cmd_listing(args):
         delete_edit(args.package, edit, token)
 
 
+def _looks_like_youtube_video(url: str) -> bool:
+    """URL de um vídeo único do YouTube, que é o que a ficha aceita."""
+    parts = urllib.parse.urlparse(url)
+    if parts.scheme not in ("http", "https"):
+        return False
+    host = parts.netloc.lower().removeprefix("www.").removeprefix("m.")
+    query = urllib.parse.parse_qs(parts.query)
+    if host in ("youtube.com", "music.youtube.com"):
+        if parts.path != "/watch" or "list" in query:
+            return False
+        return len(query.get("v", [])) == 1
+    if host == "youtu.be":
+        return bool(parts.path.strip("/")) and "list" not in query
+    return False
+
+
 def cmd_listing_set(args):
     token = access_token()
     edit = new_edit(args.package, token)
@@ -470,6 +486,17 @@ def cmd_listing_set(args):
     if args.full:
         with open(args.full) as fh:
             cur["fullDescription"] = fh.read().strip()
+    if args.video is not None:
+        # `--video ""` limpa o campo. O vídeo tem de ser uma URL de VÍDEO do
+        # YouTube (não playlist nem canal, sem parâmetros extras tipo timecode),
+        # público ou não listado (privado não aparece), sem restrição de idade,
+        # com monetização desligada e embed habilitado.
+        video = args.video.strip()
+        if video and not _looks_like_youtube_video(video):
+            die("--video precisa ser a URL de um vídeo do YouTube "
+                "(https://www.youtube.com/watch?v=ID ou https://youtu.be/ID), "
+                "sem playlist, canal ou parâmetros extras.")
+        cur["video"] = video
     api("PUT", f"/{args.package}/edits/{edit}/listings/{args.lang}", token, body=cur)
     commit_edit(args.package, edit, token)
     print(f"OK: listing [{args.lang}] atualizada.")
@@ -524,6 +551,8 @@ def main():
     ls.add_argument("--title")
     ls.add_argument("--short")
     ls.add_argument("--full", help="arquivo .txt com a descrição longa")
+    ls.add_argument("--video",
+                    help="URL do vídeo do YouTube da ficha ('' limpa o campo)")
 
     il = sub.add_parser("images-list")
     il.add_argument("--lang", required=True)
