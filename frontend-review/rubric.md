@@ -1037,3 +1037,19 @@ click, drive them separately for now (interaction steps are a planned engine fea
   `white-space: nowrap` e `user-select: all`. Vale para qualquer string que va parar num e-mail de
   suporte. **▶ Testar:** renderize no viewport mais estreito suportado e confirme que o codigo esta
   numa linha so.
+- **2026-08-01 (2ª rodada: confirmacao em varios passos para acao irreversivel):** tres checagens que
+  faltavam na rubric. **(a) NUNCA use dois `window.confirm()` seguidos como "confirmacao dupla".**
+  Depois do primeiro dialogo nativo o navegador oferece "impedir esta pagina de criar mais dialogos";
+  marcado, o SEGUNDO confirm e suprimido e respondido automaticamente, degradando a dupla checagem para
+  uma so, justamente na acao mais perigosa. Use um modal do proprio app, que o navegador nao pode
+  silenciar. **(b) Verifique QUAL botao recebe o foco no passo final:** o foco padrao tem que estar na
+  opcao SEGURA (cancelar/manter), nao na destrutiva; assim quem martela Enter avanca os passos e
+  **cancela**, em vez de executar. Meça com `document.activeElement`, nao pelo codigo, porque `autofocus`
+  em componente re-renderizado nem sempre pega. **(c) O botao de MAIOR consequencia nao pode ter o
+  contraste mais fraco.** E comum o gatilho ganhar um estilo caprichado e o botao final herdar a variante
+  `.danger` generica do design system, que costuma ser um vermelho claro (~3:1 com branco) que so passa
+  AA como "texto grande" - e botoes de dialogo costumam usar o tamanho pequeno. Meça os DOIS com
+  `getComputedStyle` e iguale o tratamento. Corolario geral: ao revisar fluxo destrutivo, **bloqueie o
+  endpoint na camada de rede** (`setRequestInterception` + abort) durante toda a review e **conte** os
+  requests bloqueados: e a prova de que a review nao disparou nada, e pega o caso em que um passo
+  executa a acao antes da hora.
