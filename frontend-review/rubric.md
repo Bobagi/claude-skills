@@ -1053,3 +1053,18 @@ click, drive them separately for now (interaction steps are a planned engine fea
   endpoint na camada de rede** (`setRequestInterception` + abort) durante toda a review e **conte** os
   requests bloqueados: e a prova de que a review nao disparou nada, e pega o caso em que um passo
   executa a acao antes da hora.
+- **2026-08-02 (um numero numa confirmacao destrutiva estava MENTINDO):** um dialogo dizia "isso vende
+  1 posicao" para quem tinha 35, porque a lista que alimentava a contagem tem **uma linha por
+  GRUPO** (um par/categoria/pasta), nao por item. `lista.length` respondia "quantos grupos", que para
+  um grupo so e sempre 1. **Regra durável:** todo numero que aparece numa confirmacao (quantos itens,
+  quanto dinheiro, quantos arquivos) tem que ser rastreado ate a fonte e a pergunta que ele responde
+  precisa ser dita em voz alta - "isto conta LINHAS DA VIEW ou ITENS DE VERDADE?". Views agregadas
+  (uma linha por par/categoria/dia) sao a armadilha classica, e o sintoma e o numero **1 grudado** no
+  caso de um grupo so, que passa despercebido porque parece plausivel. Se o backend nao expoe a
+  contagem real, ela **nao e derivavel** de somas/quantidades: peca o campo (`COUNT(*) FILTER (...)`),
+  nao invente. **▶ Testar:** rode a review com fixtures que tenham **N > 1 por grupo e N = 1 em outro
+  grupo** (nunca so 1 em tudo, que e o que esconde o bug) e confira o numero contra a fonte real.
+  Corolario de copy: em confirmacao destrutiva, "N itens" sozinho e pouco - diga tambem **quanto** (a
+  quantidade/valor) e **o que volta** (o resultado), que sao as perguntas que a pessoa esta realmente
+  se fazendo; e elimine `item(s)` / `posicao(oes)`: use frases singular/plural proprias por idioma
+  inseridas como sintagma nominal, senao a concordancia quebra em pt/es.
