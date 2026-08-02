@@ -45,6 +45,22 @@ no Ollama local rode UMA por vez - só há RAM para um modelo carregado).
 6. Groq: fatie qualquer coisa acima de ~6K tokens (TPM de 8K). Local: prefill é lento no M4 -
    prompts de até ~4-8K tokens rendem melhor.
 
+## Executor agêntico: Cline CLI (loop inteiro sem gastar token do Claude)
+
+Para uma tarefa DELIMITADA que envolva editar arquivos e rodar testes, delegue o loop inteiro
+ao Cline com modelo grátis. A allowlist só libera os providers já configurados (groq/ollama),
+de propósito; outras formas de invocar pedem confirmação do operador:
+
+```bash
+cline -P groq -m "openai/gpt-oss-120b" --worktree -t 300 "tarefa clara e fechada"
+cline -P ollama -m "qwen3.5:9b" --worktree -t 600 "tarefa pequena e offline"
+```
+
+Regras: em repositório git use SEMPRE `--worktree` (as edições ficam num worktree isolado em
+`~/.cline/worktrees/` para revisar o diff antes de integrar); sempre passe `-t` (timeout);
+fora de git, rode só em diretório descartável. O Cline roda com auto-approve (executa
+comandos sem perguntar), então nunca passe tarefa vaga nem aponte para código sensível.
+
 ## Saúde e manutenção
 
 - Ollama fora do ar? `curl -s localhost:11434/api/tags` → se falhar, `brew services start ollama`.
