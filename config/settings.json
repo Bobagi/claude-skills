@@ -3,18 +3,18 @@
     "defaultMode": "auto",
     "allow": [
       "Bash(ai.sh *)",
-      "Bash(bash /Users/gustavo/.claude/skills/ai-delegate/scripts/ai.sh *)",
       "Bash(ollama run *)",
       "Bash(ollama list*)",
       "Bash(ollama ps*)",
       "Bash(ollama show *)",
       "Bash(ollama pull *)",
-      "Bash(cline -P groq *)",
-      "Bash(cline -P ollama *)",
       "Bash(brew services start ollama)",
       "Bash(brew services restart ollama)",
       "Bash(brew services info ollama)",
       "Bash(curl -s localhost:11434/api/tags)"
+    ],
+    "ask": [
+      "Bash(cline *)"
     ]
   },
   "model": "opus[1m]",

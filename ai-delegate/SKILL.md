@@ -48,8 +48,9 @@ no Ollama local rode UMA por vez - só há RAM para um modelo carregado).
 ## Executor agêntico: Cline CLI (loop inteiro sem gastar token do Claude)
 
 Para uma tarefa DELIMITADA que envolva editar arquivos e rodar testes, delegue o loop inteiro
-ao Cline com modelo grátis. A allowlist só libera os providers já configurados (groq/ollama),
-de propósito; outras formas de invocar pedem confirmação do operador:
+ao Cline com modelo grátis. **Toda invocação do Cline pede UMA confirmação do operador, de
+propósito** (regra `ask` nas permissões): o texto da tarefa é instrução livre para um agente
+com auto-approve, então liberar sem confirmação seria execução arbitrária. Não tente contornar:
 
 ```bash
 cline -P groq -m "openai/gpt-oss-120b" --worktree -t 300 "tarefa clara e fechada"
