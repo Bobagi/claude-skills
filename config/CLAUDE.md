@@ -90,6 +90,15 @@ teste confiável que roda e pode falhar - priorize o caminho do dinheiro) e, em 
 - **`code-standards`** - audita **padrões de código e boas práticas** (consistência com o próprio repo,
   camadas, erros, código morto, i18n completa, mágicos, linter/formatter) e aplica correções seguras. Use
   em "está seguindo os padrões?"/"boas práticas". Complementa `/code-review` (bugs) e `/simplify`.
+- **`ai-delegate`** - **orquestra IAs gratuitas para economizar tokens do Claude**: delega tarefas
+  braçais delimitadas (boilerplate, testes de função existente, docstrings, i18n, commit msgs,
+  resumos) para Ollama local (qwen3.5:9b/4b, qwen2.5-coder:14b), Groq (gpt-oss-120b ~470 tok/s,
+  não treina; teto real 200K tokens/dia) e Gemini Flash (ctx 1M, **TREINA**: só código não
+  sensível). Fluxo: Claude escreve a spec → worker gera texto → Claude revisa e aplica (worker
+  NUNCA edita arquivo; modelos ≤14B quebram diffs). Inclui `scripts/ai.sh` (workers prontos) e o
+  **Cline CLI** (`cline -y`, headless) como executor agêntico com Groq/Ollama. Setup por máquina:
+  Ollama + modelos + keys em `~/.config/ai-workers/`. Use em "delega pra IA barata/local",
+  "economiza tokens", lotes de tarefas repetitivas.
 - **`vps`** - gerenciar o VPS bobagi.space via SSH.
 - **`resume`** - resumir um vídeo do YouTube a partir do link.
 - **`google-play`** - releases na Play Store via Play Developer API (service account): sobe

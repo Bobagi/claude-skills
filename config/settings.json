@@ -1,6 +1,14 @@
 {
   "permissions": {
-    "defaultMode": "auto"
+    "defaultMode": "auto",
+    "allow": [
+      "Bash(ai.sh *)",
+      "Bash(bash /Users/gustavo/.claude/skills/ai-delegate/scripts/ai.sh *)",
+      "Bash(ollama *)",
+      "Bash(cline *)",
+      "Bash(brew services *)",
+      "Bash(curl -s localhost:11434/api/tags)"
+    ]
   },
   "model": "opus[1m]",
   "hooks": {
