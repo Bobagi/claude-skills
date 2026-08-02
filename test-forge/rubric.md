@@ -48,6 +48,16 @@ Pule: getters/setters triviais, o que o compilador/framework já garante, UI pur
   (só 1 passou, saldo consistente) — em Go use goroutines + `-race`; em app rodando, N requests paralelos.
 
 ## Learnings log (append-only, geral)
+- **2026-08-02 (via app mobile - VERIFICAR ARTEFATO DE BUILD: cheque o TIMESTAMP antes de acreditar
+  nele).** Ao validar que uma mudanca entrou no binario (manifesto, flag, recurso), o arquivo de saida
+  pode ser de um build ANTIGO que ficou no diretorio: `build/.../app-release.aab` existia com data de
+  duas semanas atras, o build novo ainda estava rodando, e eu conclui "a mudanca NAO entrou" a partir do
+  artefato velho. O sintoma engana porque a checagem em si funciona: ela so olhou o arquivo errado.
+  **Regra: antes de inspecionar um artefato de build, compare o mtime dele com o inicio do build** (ou
+  apague o artefato antes de buildar). Vale para qualquer stack com diretorio de saida persistente
+  (dist/, target/, build/, out/) - e principalmente quando o build roda em background, porque ai o
+  arquivo antigo continua la o tempo todo. Corolario: um teste/comando de verificacao que le um caminho
+  fixo de saida deveria assertar a **frescura** do arquivo (mtime > T0), nao so o conteudo.
 - **2026-08-01 (via app de jogo - o teste que passa porque o CENARIO nao alcanca o guard):** Ao
   travar um guard do tipo "so conta quando a condicao C vale" (aqui: "vitoria so conta contra a
   maquina, nao no dois jogadores"), o cenario do teste tem de ser aquele em que **o resto todo
