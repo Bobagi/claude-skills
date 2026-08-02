@@ -1068,3 +1068,28 @@ click, drive them separately for now (interaction steps are a planned engine fea
   quantidade/valor) e **o que volta** (o resultado), que sao as perguntas que a pessoa esta realmente
   se fazendo; e elimine `item(s)` / `posicao(oes)`: use frases singular/plural proprias por idioma
   inseridas como sintagma nominal, senao a concordancia quebra em pt/es.
+- **2026-08-02 (via um site estático) - `overflowX:true` com `offCanvas` VAZIO aponta para um
+  elemento POSICIONADO e invisível, não para o layout.** O sinal de página mais larga que a viewport
+  costuma ser lido como "algum bloco estourou", mas quando a varredura de bordas não acha ninguém
+  além da margem direita, o culpado quase sempre é um filho `position:absolute` **dentro de um
+  scroller horizontal que não é posicionado**. Um absoluto se ancora no ancestral posicionado mais
+  próximo; se esse ancestral está FORA do `overflow-x:auto`, o scroller **não o recorta**, e o
+  elemento fica na coordenada x rolada (centenas de px) esticando a página inteira. O caso clássico
+  é o texto só para leitor de tela (`.sr-only`, que é absoluto por definição) colocado dentro de uma
+  célula de tabela larga com rolagem própria: some da tela, não aparece em `offCanvas` (tem 1px) e
+  ainda assim é o dono do overflow. **Regra:** todo `overflow-x:auto` que possa conter conteúdo
+  absoluto precisa de `position:relative`. **Como achar em 30s:** esconda `section` a `section`
+  medindo `document.documentElement.scrollWidth` - a seção que zera o excesso é a sua; dentro dela,
+  procure absolutos antes de procurar larguras. Corolário do mesmo caso: no mobile, uma trilha de
+  grid escrita como `1fr` é `minmax(AUTO,1fr)`, e o mínimo automático sobe até o **min-content** do
+  filho (o `min-width` da tabela dentro do scroller) - use sempre `minmax(0,1fr)` em contêiner que
+  empilha, e `min-width:0` no scroller.
+- **2026-08-02 (via um site atrás de CDN) - confirme que você está revisando O BUILD QUE ACABOU DE
+  SUBIR.** Uma primeira rodada mostrou a página inteira abaixo da dobra em opacidade baixa e parecia
+  um bug de CSS grave; era o CDN servindo o JS anterior (`cf-cache-status: HIT`, `age: 152`) porque o
+  vhost manda cachear js/css por horas. Revisar um build velho gera achado fantasma e, pior, some com
+  o achado real. **Antes de julgar qualquer screenshot de um alvo atrás de CDN/proxy:** compare o
+  arquivo servido com o da origem (`curl` na origem com `Host:` contra `curl` na URL pública) ou
+  cheque `cf-cache-status`/`age`. **Correção durável, não paliativa:** o deploy deve carimbar as URLs
+  dos assets com o **hash do conteúdo** (`/app.js?v=<sha>`), assim a URL muda quando o arquivo muda e
+  nunca quando não muda - purgar cache à mão não escala e some com a memória do próximo.
