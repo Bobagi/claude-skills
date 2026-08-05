@@ -1093,3 +1093,27 @@ click, drive them separately for now (interaction steps are a planned engine fea
   cheque `cf-cache-status`/`age`. **Correção durável, não paliativa:** o deploy deve carimbar as URLs
   dos assets com o **hash do conteúdo** (`/app.js?v=<sha>`), assim a URL muda quando o arquivo muda e
   nunca quando não muda - purgar cache à mão não escala e some com a memória do próximo.
+- **2026-08-05 (via um site de projeto) - "ficou com cara de IA" quase nunca se resolve com
+  mais capricho; resolve-se com PROCEDÊNCIA.** Um design pode estar bem executado (paleta
+  coerente, tipografia pareada, contraste ok) e ainda assim ser rejeitado pelo dono, porque o
+  problema não é qualidade, é **origem**: a paleta e as fontes foram inventadas para aquela
+  página e não existem em nenhum outro lugar do mundo dele. Regra ao construir qualquer
+  superfície nova para alguém que JÁ TEM produto no ar: **antes de escolher uma cor, vá ler os
+  tokens do que ele já publicou** (o `:root`/tema do site principal) e reuse-os literalmente,
+  incluindo a família tipográfica e a marca do topo. Distinção que vale: inventar identidade é
+  o trabalho quando não existe nenhuma; quando existe, inventar é apagar a dele. Corolário de
+  revisão: incluir no checklist "esta tela poderia ser de outra pessoa?" e, se puder, apontar
+  qual token do produto existente deveria estar ali.
+- **2026-08-05 (via um site de projeto) - um tema pedido pelo cliente para de parecer skin
+  quando ele pousa numa ESTRUTURA VERDADEIRA do conteúdo.** Pediram temática grega para um
+  produto que não tem nada de grego. O que salvou não foi colar colunas e louros: foi notar
+  que a lista de tarefas tinha **exatamente doze** itens e virá-la "os doze trabalhos",
+  numerada com letras gregas. O ornamento (a grega/meander) entrou como a **régua que separa
+  as seções**, ocupando o lugar de um filete que já era necessário, e o tema entrou na
+  tipografia (capitais inscricionais) em vez de entrar por imagem. Método: antes de aplicar um
+  tema, procure no conteúdo real uma contagem, uma ordem, uma sequência ou uma hierarquia que
+  já case com ele; use ornamento apenas onde a página já precisava de um elemento estrutural.
+  Se o tema não encontra ancoragem nenhuma no conteúdo, ele vai ler como fantasia por cima.
+  Alerta de execução: **ornamento geométrico repetido tem tamanho mínimo de legibilidade** - a
+  grega em unidade de 24px lia como pontilhado; só em 40px virou grega. Conferir padrão
+  repetido num recorte AMPLIADO, porque no screenshot inteiro ele passa por "uma linha".
