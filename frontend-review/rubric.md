@@ -1117,3 +1117,19 @@ click, drive them separately for now (interaction steps are a planned engine fea
   Alerta de execução: **ornamento geométrico repetido tem tamanho mínimo de legibilidade** - a
   grega em unidade de 24px lia como pontilhado; só em 40px virou grega. Conferir padrão
   repetido num recorte AMPLIADO, porque no screenshot inteiro ele passa por "uma linha".
+- **2026-08-06 (via um site estático com CSP estrita) - `style-src 'self'` bloqueia o ATRIBUTO
+  `style=`, não só o bloco `<style>`, e o sintoma é "mal desenhado", não "quebrado".** Um
+  gráfico cuja PROPORÇÃO vinha de `style="flex:26"` no HTML renderizou achatado: sem o
+  `flex-grow`, os elementos ficaram em `flex: 0 1 auto` e altura `0px`, então a peça apareceu
+  como se fosse um erro de altura/alinhamento. Não falta elemento, não há erro de layout, e o
+  instinto errado é ir mexer em `height` e `align-items`. Vale para qualquer coisa dirigida
+  por estilo inline: largura de barra, `--var` setada por elemento, `background-image` de
+  thumbnail, `transform` de posicionamento. **Como diagnosticar em segundos:** meça o elemento
+  VIVO (`getComputedStyle(el).flex` / `.height`) e compare com o que o HTML pede - um
+  `0 1 auto` num elemento que tem `style="flex:26"` só pode ser CSP. O browser também registra
+  a violação no console, então trate `consoleErrors` como pista de LAYOUT, não só de runtime.
+  **Correção certa:** mover os valores para o stylesheet (classe por variante, ou uma custom
+  property definida em regra); **não** adicionar `'unsafe-inline'` em `style-src` por causa de
+  um punhado de números fixos, porque isso troca uma proteção real por conveniência. Regra
+  preventiva ao construir sob CSP estrita: **zero atributo `style=` no HTML**, e conferir com
+  um grep antes de publicar.
