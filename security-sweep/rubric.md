@@ -593,3 +593,29 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   fim confira que a tabela ficou **vazia** no final (lease vazado = conta travada). E lembre: um lock
   novo NUNCA substitui a atomicidade fina que já existia (o lock por item continua sendo o que impede
   a ação dupla) - ele só evita trabalho duplicado.
+- **2026-08-08 (via um hub de dados de jogo) - dado de API/dataset de TERCEIRO é fonte de injeção
+  igual a input de usuário; e um construtor de URL "esquema+host fixos + `encodeURIComponent(dado)`"
+  é estruturalmente à prova de sequestro de esquema.** Uma feature virou strings de `location` vindas
+  de um dataset externo (WFCD) e de uma API pública (warframestat.us) em `<a href>` e em
+  `title`/`aria-label`. Ninguém "digitou" esses valores, mas eles são tão não confiáveis quanto um
+  campo de formulário: um dataset comprometido/poluído injeta `javascript:`/`<img onerror>` do mesmo
+  jeito. Regra: trate QUALQUER dado que você não gerou (API 3ª, arquivo importado, resposta de
+  worldstate) como hostil ao renderizar em href/atributo/HTML. **Padrão de fix que blinda o href por
+  construção:** montar como `PREFIXO_FIXO_HTTPS + encodeURIComponent(dado)` - o esquema e o host são
+  literais no código, então o atacante nunca controla o esquema (não há `javascript:` possível), e o
+  `encodeURIComponent` neutraliza `"`/`<`/`>`/`'` que quebrariam o atributo. **Como testar ao vivo o
+  caminho INTEIRO até o DOM** (não só a função): sirva uma resposta de API ENVENENADA (location com
+  `<img onerror>`, campo de URL com `javascript:`) e carregue os JS REAIS do cliente num browser
+  headless, ouvindo `dialog` (alert) e checando `window.__pwned`/`querySelector('img[onerror]')`; a
+  location tem que aparecer como `textContent` literal e o href malicioso tem que virar `null` na
+  allowlist de esquema (`safeHref`). Complementa a classe 10 (a defesa `setAttribute`/`textContent` +
+  allowlist de esquema no cliente vale para dado de 3º, não só para nome de usuário).
+- **2026-08-08 - endpoint novo batido em TODA página por um componente compartilhado (faixa/topbar):
+  confirme que cache+coalescência absorve a rajada, senão vira amplificação contra o upstream.** Um
+  widget global (relógios, ticker, status) que faz `fetch('/api/x')` no load multiplica a carga por
+  página vista. Se `/api/x` repassa para uma API pública sem cache, o IP do box vira um amplificador
+  (risco de rate-limit/ban upstream) - a mesma razão de ser da coalescência. Teste ao vivo: dispare
+  ~60 requests concorrentes ao endpoint e confirme 100% servido do cache (200, rápido, 0 de 5xx) e,
+  no código, que há `inflight`-map (1 fetch por chave sob concorrência) + TTL. Não é preciso
+  rate-limit no endpoint se ele é leitura barata cacheada; rate-limitar um endpoint que a própria
+  faixa poll-a em toda página pode inclusive quebrar usuário legítimo.
