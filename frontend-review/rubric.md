@@ -1133,3 +1133,18 @@ click, drive them separately for now (interaction steps are a planned engine fea
   um punhado de números fixos, porque isso troca uma proteção real por conveniência. Regra
   preventiva ao construir sob CSP estrita: **zero atributo `style=` no HTML**, e conferir com
   um grep antes de publicar.
+- **2026-08-08 (via um hub de dados de jogo) - `replaceChildren(null)` NÃO ignora o null: vira o
+  TEXTO "null" na página; e a faixa de chips "cheia" não avisa quando o novo chip nasce cortado.**
+  Dois aprendizados de uma rodada. (a) Codebases com um helper `el()` que filtra filhos nulos
+  criam o hábito de escrever `cond ? el(...) : null` - seguro DENTRO do helper, mas passado
+  DIRETO a `replaceChildren`/`append` o null é stringificado como "null" (a spec converte não-Node
+  em DOMString). O bug só aparece no estado de dado que zera o opcional, então capture também o
+  estado em que cada bloco condicional está VAZIO; grep rápido: `replaceChildren(` com argumento
+  ternário terminando em `: null`. (b) Ao ADICIONAR um item a uma linha/faixa que já existia
+  (chips, ticker, toolbar), meça `scrollWidth - clientWidth` do container ANTES e DEPOIS nos
+  breakpoints de desktop: uma faixa `overflow-x:auto` com scrollbar oculta engole o item novo
+  sem nenhum sinal visual (nem overflow de página, nem offCanvas - o corte fica DENTRO do
+  scroller), e no desktop não há swipe para descobrir o resto. Se o item novo é interativo,
+  confira também a ALTURA do alvo: numa faixa fina de texto (~20px), o primeiro elemento
+  clicável da faixa nasce abaixo do mínimo de 24px - `padding` vertical + `margin` negativa
+  dão área de toque sem mudar o layout.
