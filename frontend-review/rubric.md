@@ -1148,3 +1148,21 @@ click, drive them separately for now (interaction steps are a planned engine fea
   confira também a ALTURA do alvo: numa faixa fina de texto (~20px), o primeiro elemento
   clicável da faixa nasce abaixo do mínimo de 24px - `padding` vertical + `margin` negativa
   dão área de toque sem mudar o layout.
+- **2026-08-08 (consertar overflow horizontal sem criar outro):** tres licoes. **(a) Controles nativos
+  com mascara (`input[type=date]`, `time`, `color`, `number` com spinner) tem largura intrinseca que
+  NAO encolhe.** Uma linha com rotulo + dois deles vira um bloco rigido de ~330px que empurra a pagina
+  inteira no telefone, e o sintoma engana: a largura medida do bloco e IDENTICA em 320px e em 1280px.
+  Se ao medir um elemento a largura nao muda entre viewports, ele nao esta participando do layout
+  responsivo - e um bloco rigido, nao um bloco que "por acaso coube". **(b) Ligar reflow
+  (`flex-wrap`, `flex-grow`) em TODAS as larguras conserta a estreita e quebra a larga:** aqui o
+  `flex-wrap` sem media query fez o botao de limpar cair sozinho numa segunda linha no desktop, porque
+  o container passou a assentar numa largura onde ele nao cabia mais. Reflow de emergencia mora dentro
+  do `@media`, e depois de aplicar **re-meça a larga**, nao so a estreita. **(c) Para empilhar dois
+  controles com larguras IGUAIS, flex-wrap nao serve** (ele distribui pelo flex-basis e deixa o
+  separador orfao no fim da primeira linha, com os campos de tamanhos diferentes); um grid de duas
+  colunas (`1fr auto`) com o rotulo em `grid-column: 1 / -1` da larguras identicas e uma coluna
+  reservada para o botao acessorio. Ao esconder um separador visual ("-", "/", "ate") no empilhado,
+  confirme que cada campo ja tem `aria-label` proprio, senao o sentido de intervalo some para leitor
+  de tela. **▶ Metodo que fecha:** antes de atribuir QUALQUER overflow a sua mudanca, builde o commit
+  anterior e rode **a mesma sonda** - aqui, dois dos tres "achados" (header a 320px, rodape rigido a
+  601-767px, ritmo vertical desigual) eram identicos no baseline, e so a comparacao provou isso.
