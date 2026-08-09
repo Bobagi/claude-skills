@@ -1166,3 +1166,15 @@ click, drive them separately for now (interaction steps are a planned engine fea
   de tela. **▶ Metodo que fecha:** antes de atribuir QUALQUER overflow a sua mudanca, builde o commit
   anterior e rode **a mesma sonda** - aqui, dois dos tres "achados" (header a 320px, rodape rigido a
   601-767px, ritmo vertical desigual) eram identicos no baseline, e so a comparacao provou isso.
+
+- **2026-08-09 (via jogo canvas):** (a) **Lista rolável dentro de painel/modal precisa de
+  affordance nas DUAS pontas** - fade de borda + chevron que somem no extremo alcançado; o teste que
+  pega é perguntar "o último item visível parece o último item que existe?" quando o viewport corta
+  exatamente num limite de linha, o estado mais enganoso (o corte no MEIO de uma linha é o acaso
+  avisando; o corte limpo é silêncio total). Em engine canvas (Phaser), gradient de Graphics não
+  renderiza no renderer Canvas: o fade portável é pilha de retângulos com alpha decrescente.
+  (b) **WheelEvent sintético sem clientX/clientY não rola app canvas** - o hit-test da engine usa a
+  posição do pointer, e o default (0,0) cai fora do alvo; dispatch de mousemove + wheel com coords
+  centradas no elemento. Vale para qualquer sonda headless de scroll em canvas.
+  (c) **Captura de jogo/canvas: navegar com `networkidle` trava** (o loop de render mantém a página
+  "ocupada" ou simplesmente nunca há idle): usar `--wait-until load` + wait fixo.
