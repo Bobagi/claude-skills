@@ -244,6 +244,18 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
 ---
 
 ## Learnings log (append-only, geral)
+- **2026-08-10 (via um comparador web, coletor client-side) - "chave" embarcada no cliente NAO e
+  auth, e a defesa real e o resto.** Um endpoint de ingestao protegido por uma chave que viaja DENTRO
+  do artefato distribuido (extensao/app baixavel, bundle JS, APK) e efetivamente publico: qualquer um
+  baixa e extrai a chave. Nao a trate como segredo no relatorio. O que de fato limita o dano e: (a) o
+  alvo do POST precisa de um **id nao-enumeravel** (UUID) que o atacante nao conhece -> ele so afeta o
+  que ele mesmo criou; (b) todo campo que vira link/acao passa por **allowlist server-side** (host +
+  https), entao nao da para injetar `javascript:`/host arbitrario; (c) qualquer upload tem **cap +
+  poda + nunca e servido de volta**; (d) o dado e efemero, sem PII/dinheiro. Audite ESSAS quatro, nao
+  a chave. E registre como divida: se virar multiusuario, troca-se por chave por-instalacao no
+  handshake ou assinatura do payload por origem. **Corolario de metodo:** num SPA cujo 404 devolve o
+  index com 200, um teste de path-traversal/exposicao de arquivo da **200 enganoso** - confirme o
+  CONTEUDO (`grep 'SQLite format'`/um segredo do fonte), nunca conclua "vazou" so pelo status.
 - **2026-07-23 (via todo — o MÉTODO do teste de race pode mentir; + Express 4 e handlers async):**
   Três lições. **(1) `for i in $(seq N); do curl ... & done; wait` NÃO prova ausência de race.**
   Contra um `SELECT COUNT → INSERT` sabidamente vulnerável, 30 curls em background devolveram
