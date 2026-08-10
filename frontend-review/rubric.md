@@ -402,6 +402,23 @@ click, drive them separately for now (interaction steps are a planned engine fea
   (o usuario descreveu como "clique nao funciona direito"). Acao secundaria sobreposta a primaria =
   toque ambiguo; separe espacialmente ou remova a interatividade da linha.
 
+- **2026-08-10 (via um comparador web) - tres licoes que screenshots quase nao revelam.**
+  (1) **Um fallback SPA no 404 torna asset quebrado INVISIVEL:** quando toda rota desconhecida devolve
+  o index.html com 200, um `url()` de fonte/imagem com caminho errado "carrega" HTML sem erro de rede,
+  sem erro de console, e a pagina cai no font-fallback do sistema em silencio. Ao copiar um
+  `faces.css`/asset compartilhado entre projetos, os caminhos root-relative (`/fonts/...`) quebram se o
+  novo app monta static em outro prefixo. Check barato: `curl -o /dev/null -w '%{content_type}'` em CADA
+  asset critico e conferir que NAO veio text/html; e registrar o MIME de .woff2 quando o server e minimo.
+  (2) **Verifique o asset servido ATRAVES DA BORDA, nao so da origem:** com CDN/proxy na frente
+  (Cloudflare cacheia .js/.css/.zip por 4h por extensao), rebuild + recreate do container continua
+  servindo codigo velho (`cf-cache-status: HIT`) - o grep de "o asset contem minha mudanca" tem que rodar
+  na URL publica. Fix estrutural quando o HTML e renderizado pelo backend: carimbar as URLs de asset com
+  hash de conteudo no boot; a pagina (html nao cacheado) passa a apontar para URL nova a cada deploy.
+  (3) **Feedback de acao nasce COLADO no controle que o disparou:** uma mensagem de aviso appendada no
+  fim do `<main>` fica fora do fold no mobile exatamente quando mais importa; e um indicador de progresso
+  ("coletando...") nao pode afirmar atividade quando a pre-condicao (extensao/agente conectado) nao
+  existe - rotule o estado pela CAUSA ("aguardando coletor"), nao pela esperanca.
+
 > Add a dated, **general** lesson whenever a review surfaces a check worth keeping. Keep it
 > project-agnostic. Promote recurring lessons into the checklists above.
 
