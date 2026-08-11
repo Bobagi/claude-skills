@@ -183,6 +183,19 @@ click, drive them separately for now (interaction steps are a planned engine fea
 ---
 
 ## Learnings log (append-only; this is how the reviewer improves)
+- **2026-08-11 (via um site institucional) - dois componentes que renderizam "o mesmo rodapé/cabeçalho"
+  divergem nos EFEITOS COLATERAIS, não no visual.** Um layout compartilhado copiado em dois componentes
+  (uma home stand-alone + um `PageShell` para as sub-páginas) tende a ficar pixel-idêntico, porque a
+  divergência visual salta aos olhos na primeira olhada. O que apodrece em silêncio é o que cada cópia
+  escreve FORA da própria árvore: `document.documentElement.lang`, `data-theme`, `<title>`, meta tags,
+  chaves de `localStorage`, listeners de scroll. Caso real: a home escrevia `lang="pt"` e as sub-páginas
+  `lang="pt-BR"` - o mesmo site anunciando dois idiomas conforme a rota, invisível em qualquer screenshot.
+  Regra de review: ao revisar QUALQUER bloco duplicado entre componentes, não pare no diff do template e
+  do CSS - dê grep nos side effects (`documentElement`, `setAttribute`, `localStorage`, `document.title`)
+  de cada cópia e compare os VALORES, e depois meça o atributo no DOM ao vivo em cada rota, não só numa.
+  Corolário: um atributo de idioma tem que concordar com a formatação que a página realmente exibe
+  (se a data sai `dd/mm/aaaa`, o tag não pode ser um `pt` genérico).
+
 - **2026-08-01 (via a web game) - a new rule that CAPS a collection at one item turns the list that
   renders it into a duplicate.** When a backend invariant lands ("only one active X per user", "one
   draft at a time", "a single default card"), the UI usually already has (a) a prominent surface for
