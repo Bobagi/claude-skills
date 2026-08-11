@@ -1195,3 +1195,19 @@ click, drive them separately for now (interaction steps are a planned engine fea
   centradas no elemento. Vale para qualquer sonda headless de scroll em canvas.
   (c) **Captura de jogo/canvas: navegar com `networkidle` trava** (o loop de render mantém a página
   "ocupada" ou simplesmente nunca há idle): usar `--wait-until load` + wait fixo.
+
+- **2026-08-11 (via um portfolio SPA) - remover um CSS framework remove tambem o RESET dele; e o
+  grep de seletor que engana.** (a) **Ao retirar um framework de UI (Vuetify/Bootstrap/preflight do
+  Tailwind e afins), o base reset que ele injetava (body{margin:0}, box-sizing, background) sai
+  junto** - o browser volta ao default `body{margin:8px}` + fundo branco e o app "dark" ganha uma
+  moldura branca em TODA pagina, visivel em qualquer viewport. O defeito nasce no commit da remocao
+  e sobrevive semanas porque as reviews olham componentes, nao a moldura do documento. Check barato
+  pos-remocao (e em qualquer review): confirmar no CSS BUILDADO que existe um reset de `body` (grep
+  por `[^.\w-]body\{` deve achar margin/background), e provar por computed style
+  (`getComputedStyle(document.body).margin === '0px'`, `bodyRect.width === innerWidth`), nao so pelo
+  PNG - margem de body NAO dispara overflowX/scrollWidth, os sinais automaticos ficam limpos.
+  (b) **Armadilha de diagnostico: `grep -oE '(html|body)[^{]*\{'` casa o RABO de seletores de
+  classe** - `.bp .card .body{...}` "vira" `body{...}` no output e induz a corrigir um vazamento de
+  seletor que nao existe. Ancore o padrao a um nao-word (`[^.\w-]body\{`) ou cheque o contexto antes
+  de concluir; a distancia entre "o grep mostrou body{" e "existe uma regra bare body" derruba um
+  diagnostico inteiro.
