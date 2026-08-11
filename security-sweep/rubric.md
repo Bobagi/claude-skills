@@ -656,3 +656,30 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   `X-Real-IP` falso pela URL pública e lendo o `reg_ip` gravado (tem que ser o IP real do visitante, não o
   forjado). E some um **gate de "alvo velho"** (busca/recurso com mais de N min recusa ingestão, 410) p/
   fechar a janela de reuso de um id vazado.
+
+- **2026-08-11 (via um site de dados de jogo) — DADO DE WIKI/FONTE COMUNITÁRIA É INPUT DE USUÁRIO
+  ANÔNIMO, e o que falta nele quase nunca é escape: é TETO.** Quando uma app passa a ingerir um
+  catálogo mantido por terceiros (wiki editável, planilha pública, feed comunitário, repo de dados de
+  fã), o reflexo certo é auditar XSS/href/SQL — e nas apps que já renderizam por `textContent` +
+  `encodeURIComponent` **essas três passam de primeira**. O buraco real fica na **classe 5**: não há
+  teto de TAMANHO nem de QUANTIDADE no que entra. Exploit medido: uma edição com 20 mil ofertas do
+  mesmo item + um nome de 400 KB virou **uma linha de 2,8 MB no banco** e 20 mil nós de DOM numa
+  página pública — anônimo, sem executar nada. **Regra: todo ingest de terceiro precisa de cap de
+  comprimento por campo, cap de itens por chave e cap de entradas por lote, aplicados no INDEXADOR
+  (a fronteira onde o dado entra), não no render** — no render você só conserta uma superfície e
+  esquece as outras (SSR, JSON da API, sitemap, busca). Dois detalhes que valem: (a) para campo que
+  também é **chave de casamento**, **descarte** a entrada fora do teto em vez de truncar — chave
+  truncada não casa com nada e ainda mente na tela; (b) **calibre o teto medindo o dado real
+  primeiro** (aqui: máximo real 8 ofertas/48 chars ⇒ tetos 12/80) e afirme num teste que o índice
+  real continua com a MESMA contagem depois do cap, senão você troca um DoS por perda silenciosa de
+  conteúdo. Corolário de arquitetura que já passou no teste: quando a fonte externa devolve lixo ou
+  cai, o pipeline deve produzir **lote vazio** e o gravador deve **não reescrever a tabela** — assim
+  atacar a fonte de terceiro não apaga o dado bom (fail-safe), e isso é testável com um servidor
+  local que responde 500.
+- **2026-08-11 (método) — para provar XSS ao vivo sem publicar o payload, envenene uma CÓPIA.** Em
+  app pública sem login não há "conta descartável" para isolar o ataque, e injetar o payload no banco
+  de produção significa **servir XSS de verdade a quem acessar naquele segundo** (se a defesa falhar,
+  que é exatamente a hipótese sob teste). Padrão que resolve: `wal_checkpoint(TRUNCATE)` → copiar o
+  banco → subir uma 2ª instância da MESMA imagem numa porta local com a cópia montada → atacar ali →
+  derrubar e apagar. Você ganha o caminho REAL (mesmo código, mesmo SSR, mesmo CSP) com risco zero
+  para o usuário. Provar que a produção ficou intacta ao final faz parte do relatório.
