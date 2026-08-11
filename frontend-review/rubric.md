@@ -457,6 +457,23 @@ click, drive them separately for now (interaction steps are a planned engine fea
   estourar o ritmo do bloco no estreito). E cheque a a11y do loader: `role="img"`+`aria-label` no
   SVG/icone, container `aria-live="polite"`, e a animacao atras de `@media (prefers-reduced-motion)`.
 
+- **2026-08-11 (via um comparador web - ao "casar com um design system existente", INSPECIONE a marca
+  de perto contra a referencia, e confirme que o logo aparece NA PAGINA):** Uma rodada minha passou
+  por dois defeitos GROSSEIROS de header que a screenshot full-page mostrava mas eu nao escrutinei: (1)
+  a marca "B bobagi" era uma LETRA amarela solta (`<span>B</span> bobagi`) em vez do TILE arredondado
+  do design system (quadrado amarelo com "B" em cor on-yellow) - a versao solta lia como "Bbobagi",
+  claramente fora do padrao, e o dono pegou na hora; (2) o icone/mascote novo da marca (que o dono
+  PEDIU explicitamente) existia so no `<link rel=icon>` (aba do browser), **nunca renderizado na
+  pagina**. Licoes durables: **(a)** quando a tarefa e "deixar parecido com o site X / seguir o design
+  system", ABRA o componente real da referencia (o markup+CSS da `.brand`/`.mark` do site-mae) e
+  reproduza o COMPONENTE (tile+wordmark, tamanhos, radius, tokens `--on-yellow`), nao uma aproximacao
+  a olho; um wordmark/logo-tile e o primeiro lugar que um dono compara. **(b)** se o pedido inclui um
+  ICONE/logo/mascote, verifique que ele aparece num elemento visivel do DOM (`querySelector` de um
+  `<svg>`/`<img>` no header/hero), nao so no favicon - "coloquei o icone" via `rel=icon` NAO cumpre
+  "coloque o icone no site". **(c)** metodo: recorte a FAIXA DO HEADER (top ~140px) e leia-a isolada em
+  desktop E mobile - defeitos de marca somem no meio de uma screenshot full-page e passam batido. Um
+  rebrand nao esta revisado sem um close-up do header comparado lado a lado com a referencia.
+
 > Add a dated, **general** lesson whenever a review surfaces a check worth keeping. Keep it
 > project-agnostic. Promote recurring lessons into the checklists above.
 
