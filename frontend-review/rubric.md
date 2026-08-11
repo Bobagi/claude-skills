@@ -443,6 +443,19 @@ click, drive them separately for now (interaction steps are a planned engine fea
   de RODAPE (`.foot a`, `font-size` pequeno) nascem com ~17px de altura, abaixo do piso de 24px; fixe com
   `display:inline-block;min-height:24px` no seletor do rodape (pega o link legal novo e o "voltar" de
   brinde). Confirme pelo sinal `tinyTargets` antes/depois.
+- **2026-08-11 (via um comparador web - capturar um LOADER transiente que so existe sob pre-condicao
+  viva):** Para revisar/screenshotar um indicador de carregamento (spinner, skeleton, mascote
+  "farejando") que aparece so ENQUANTO uma acao assincrona roda e some no instante em que ela termina,
+  NAO basta disparar a acao e tirar o screenshot: se a acao completa rapido (ex.: resposta CACHEADA,
+  mock instantaneo, rota local), o loader **pisca e ja foi** antes do frame, e voce conclui falsamente
+  "o loader nao aparece / esta quebrado". Precisa das DUAS coisas: (a) satisfazer a pre-condicao REAL
+  que dispara o loader (ex.: a extensao/agente conectado, o estado de auth certo) e (b) garantir que a
+  acao **realmente demore** - use uma entrada FRESCA/nao-cacheada (query nova, id inedito, `force`) para
+  que o backend faca o trabalho e o loader permaneca visivel por segundos. Confirme no proprio DOM que o
+  elemento ainda esta `!hidden` no instante do screenshot (`$eval('#loader', e => !e.hidden)`), nao so
+  que ele apareceu em algum momento. Capture o loader em desktop E mobile (o mascote/spinner pode
+  estourar o ritmo do bloco no estreito). E cheque a a11y do loader: `role="img"`+`aria-label` no
+  SVG/icone, container `aria-live="polite"`, e a animacao atras de `@media (prefers-reduced-motion)`.
 
 > Add a dated, **general** lesson whenever a review surfaces a check worth keeping. Keep it
 > project-agnostic. Promote recurring lessons into the checklists above.
