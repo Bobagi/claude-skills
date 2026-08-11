@@ -201,3 +201,26 @@ Pule: getters/setters triviais, o que o compilador/framework já garante, UI pur
   the test green — the other still catches it. That's correct hardening, but to prove the test actually bites you
   must break BOTH guards at once and watch it go red (then restore). A "mutation survived" on one guard is not a
   weak test here; confirm by mutating the whole invariant.
+
+- **2026-08-11 (via warframe-farm-helper — o guard de "degrada bem" tem que envolver a PREPARAÇÃO, e o
+  teste tem que construir o ambiente degradado DE VERDADE):** Duas lições que se completam. **(1)** Escrevi
+  `try { row = stmt.get(name) } catch { row = null }` com o comentário "banco antigo, sem a tabela" — mas
+  quem estoura com tabela ausente é o **`db.prepare(...)`**, executado ANTES do laço, fora do try. O
+  comentário afirmava uma resiliência que o código não tinha, e a página inteira cairia com 500 num banco
+  sem a tabela. Vale para todo runtime com etapa de **compilação/preparação separada da execução**
+  (`prepare` de SQL, `compile` de regex/template, `Schema.parse`, `new Function`): o erro de *schema* nasce
+  na preparação, o erro de *dado* nasce na execução — um `try` só na execução não cobre o primeiro. **(2)**
+  O que expôs isso foi um teste que **montou um banco realmente sem a tabela** (`new Database(tmp)` + só o
+  `CREATE TABLE items`), em vez de simular passando `null` ou um mock que lança. Regra: teste de
+  "sobrevive ao ambiente X faltando" precisa **produzir o ambiente faltando**; mock que lança prova só que
+  você trata a exceção que você mesmo escolheu lançar, não que ela nasce onde você acha.
+- **2026-08-11 (via warframe-farm-helper — o assert que fixa o caminho de FALLBACK vira teste do bug):**
+  Um teste antigo afirmava `assert.match(item.url, /bratonPrime/)` e passava — mas passava porque o índice
+  de slug estava frio no processo de teste e a função caía na **URL legada** `/item.html?u=%2Fu%2FbratonPrime`,
+  que contém o uniqueName. Quando corrigi a função para montar o índice sozinha, a URL virou a bonita
+  (`/item/braton-prime`) e o teste ficou **vermelho por causa da melhoria**. O erro de método: o regex casava
+  um pedaço da **entrada** (o id que eu mesmo semeei), não a **forma da saída** — então ele passava nos dois
+  ramos e não dizia qual rodou. Regra geral: quando uma função tem caminho principal e fallback, asserte o
+  **valor exato do caminho que você espera** (igualdade, não `match` de substring da entrada); se os dois
+  ramos podem satisfazer o assert, o teste não distingue nada. Sintoma para procurar em suíte herdada:
+  `assert.match(saida, /<algo que veio da fixture>/)`.
