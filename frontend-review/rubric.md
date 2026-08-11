@@ -1288,3 +1288,21 @@ click, drive them separately for now (interaction steps are a planned engine fea
   seletor que nao existe. Ancore o padrao a um nao-word (`[^.\w-]body\{`) ou cheque o contexto antes
   de concluir; a distancia entre "o grep mostrou body{" e "existe uma regra bare body" derruba um
   diagnostico inteiro.
+
+- **2026-08-11 (via um site de dados de jogo) - UNIDADE AUSENTE num card de número é bug de
+  CONTEÚDO que nenhum sinal automático pega; e plural de unidade de tempo precisa da regra do
+  idioma, não de uma string só.** (a) Numa grade de cards de valor (preço, custo, duração), basta
+  UM card omitir a unidade para o leitor herdar a do vizinho: "225 **platina**" ao lado de
+  "15.000" faz o segundo ser lido como platina também. O defeito é invisível para overflow/contraste/
+  tap-target e sobrevive à review visual porque o card "parece certo" - o check que pega é **ler a
+  grade inteira em voz alta e perguntar "unidade de quê?" em cada célula**, e desconfiar sempre que
+  cards irmãos tiverem formatos diferentes (um com sufixo, outro sem). Vale também para o inverso:
+  reusar um rótulo de card (MAIÚSCULA, `letter-spacing`) dentro de uma frase inline traz a
+  capitalização junto e denuncia o reuso ("15.000 Créditos" no meio de uma linha). Tenha, no
+  dicionário, a forma **rótulo** e a forma **inline** de cada moeda/unidade. (b) Ao formatar
+  duração/contagem, `${n} ${t('unit.days')}` produz "1 dias" em qualquer língua latina e erra feio
+  em línguas com mais de duas formas (russo: 1 день / 2-4 дня / 5+ дней, com as exceções de 11-14).
+  Se o produto suporta idioma eslavo, a chave tem que ser **one/few/many** com a regra por idioma -
+  e o caso de teste que revela é o valor **1** (que quase nunca aparece nos dados de exemplo) e um
+  valor terminado em 2-4. Sintoma para grep numa review: template literal com número seguido de uma
+  única chave de unidade.
