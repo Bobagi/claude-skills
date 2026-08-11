@@ -73,6 +73,10 @@ Every finding must carry: **what** (the problem), **where** (route + viewport + 
   "ghost" button sitting over moving art). Judge it with the background IN MOTION, not from a frozen
   frame; verify by watching the animation and reading the copy over it.
 
+- [ ] **Antes de tratar um pixel-diff como regressão, meça o piso de ruído**: capture o mesmo build
+  duas vezes e diffe. Animação (emoji, badge flutuante, marquee, carrossel) produz diferença
+  não-zero por si só; só o que passa desse piso é mudança real.
+
 ### Imagery, icons, motion
 - [ ] Icons share a family/stroke weight and optical size; consistent corner radii across cards/buttons/inputs.
 - [ ] Shadows/borders consistent (one elevation system).
@@ -195,6 +199,24 @@ click, drive them separately for now (interaction steps are a planned engine fea
   de cada cópia e compare os VALORES, e depois meça o atributo no DOM ao vivo em cada rota, não só numa.
   Corolário: um atributo de idioma tem que concordar com a formatação que a página realmente exibe
   (se a data sai `dd/mm/aaaa`, o tag não pode ser um `pt` genérico).
+
+- **2026-08-11 (via um portfolio) - um pixel-diff sem RODADA DE CONTROLE não prova regressão, e
+  um token de acento tem DOIS papéis.** Duas lições de uma revisão de tema. (1) Ao validar que um
+  refactor de CSS não mexeu no tema que não era o alvo, o diff antes/depois acusou 0.78% de pixels
+  diferentes - parecia regressão. Capturar o MESMO build duas vezes deu 0.79% nas mesmas faixas:
+  era animação (emoji, badges flutuantes, marquee). **Regra: antes de chamar um diff visual de
+  regressão, tire duas capturas do mesmo build e subtraia esse piso.** Qualquer página com
+  `@keyframes`, vídeo, carrossel ou emoji animado tem um ruído de base não-zero; sem medir esse
+  piso você persegue bug inexistente ou, pior, aceita uma regressão real que ficou abaixo dele.
+  (2) **Um token de cor de acento quase sempre tem dois papéis: PREENCHIMENTO e TINTA**, e eles têm
+  requisitos opostos. Um amarelo/verde-limão/ciano vibrante funciona como fundo (com texto escuro
+  em cima) sobre QUALQUER tema, mas como texto/borda/anel de foco só funciona sobre fundo escuro -
+  amarelo #ffd21a sobre branco dá 1.45:1. Enquanto o produto tem um tema só, o mesmo token serve
+  aos dois usos e ninguém percebe; no dia em que entra um tema claro (ou um modo de acessibilidade),
+  metade dos usos desaparece. Regra ao revisar QUALQUER tema novo: classifique cada uso do acento
+  em fill vs ink (`background:` vs `color:`/`border-color:`/`outline:`), separe em dois tokens com o
+  token de tinta apontando para o de fill no tema original (mudança visual zero), e confira caso a
+  caso - um botão cujo fundo é a cor ESCURA legitimamente mantém o acento vibrante como texto.
 
 - **2026-08-01 (via a web game) - a new rule that CAPS a collection at one item turns the list that
   renders it into a duplicate.** When a backend invariant lands ("only one active X per user", "one
