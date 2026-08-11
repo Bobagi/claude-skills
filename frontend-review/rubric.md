@@ -418,6 +418,18 @@ click, drive them separately for now (interaction steps are a planned engine fea
   fim do `<main>` fica fora do fold no mobile exatamente quando mais importa; e um indicador de progresso
   ("coletando...") nao pode afirmar atividade quando a pre-condicao (extensao/agente conectado) nao
   existe - rotule o estado pela CAUSA ("aguardando coletor"), nao pela esperanca.
+- **2026-08-11 (via um comparador web - pagina de politica de privacidade exigida por app store):**
+  Ao adicionar a pagina legal que uma loja (Chrome Web Store, Play, App Store) exige antes de publicar
+  uma extensao/app, o check de "a politica bate com o que o site carrega" (2026-06-26) se ESTENDE ao
+  ARTEFATO distribuido, nao so ao site: a copy tem que descrever o que a EXTENSAO/APP realmente faz
+  (o que ela busca, quando age, que id/credencial guarda, o que NAO le), verificado contra o codigo do
+  coletor/cliente, porque e exatamente isso que o revisor da loja compara com as permissoes declaradas
+  no manifest. Uma politica que promete "nao le sua navegacao" com uma permissao `<all_urls>` no manifest
+  e uma reprovacao. Reuso barato de UI aqui e o certo: uma pagina legal nova deve REUSAR o componente de
+  painel/tokens existentes (nada de identidade nova) - o unico defeito recorrente e o tap target: links
+  de RODAPE (`.foot a`, `font-size` pequeno) nascem com ~17px de altura, abaixo do piso de 24px; fixe com
+  `display:inline-block;min-height:24px` no seletor do rodape (pega o link legal novo e o "voltar" de
+  brinde). Confirme pelo sinal `tinyTargets` antes/depois.
 
 > Add a dated, **general** lesson whenever a review surfaces a check worth keeping. Keep it
 > project-agnostic. Promote recurring lessons into the checklists above.
