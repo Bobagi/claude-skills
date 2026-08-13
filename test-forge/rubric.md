@@ -224,3 +224,19 @@ Pule: getters/setters triviais, o que o compilador/framework já garante, UI pur
   **valor exato do caminho que você espera** (igualdade, não `match` de substring da entrada); se os dois
   ramos podem satisfazer o assert, o teste não distingue nada. Sintoma para procurar em suíte herdada:
   `assert.match(saida, /<algo que veio da fixture>/)`.
+
+- **2026-08-13 (via um site de catálogo) - SONDA QUE VARRE A PRÓPRIA APP: separe "resposta de erro" de
+  "resposta vazia", senão o rate limit vira um laudo falso de produto quebrado.** Escrevi um script que
+  consultava a busca da app ~1.450 vezes em sequência para achar itens faltando; ele reportou **1.440
+  faltando (99%)**. Era o **rate limit da própria app** devolvendo `429 {"error":...}`, e o script fazia
+  `if (!d.results?.length) faltando.push(x)` - resposta de erro não tem `results`, então TODA requisição
+  barrada foi contada como "item não existe". O produto estava certo o tempo todo (o número real era 27,
+  1,9%). Três regras que saem disso: **(1)** toda sonda contra serviço próprio precisa de **pacing +
+  retry explícito no 429/503**, e deve **falhar alto** se o retry esgotar, em vez de degradar para um
+  resultado plausível; **(2)** trate **status != 2xx como INCONCLUSIVO**, nunca como negativo - a
+  diferença entre "não achei" e "não consegui perguntar" é a diferença entre um bug e nenhum bug; **(3)**
+  **desconfie de taxa de falha absurda**: quando uma varredura acusa ~100% de defeito, o suspeito número
+  um é o instrumento. O que me salvou foi checar **4 casos à mão** antes de reportar, e eles passaram -
+  regra barata e obrigatória: **antes de reportar um achado em massa, reproduza 3-5 casos individualmente
+  pelo caminho do usuário**. (Corolário para o rubric de teste: o mesmo vale para teste de integração que
+  bate em serviço com quota - um 429 não lido vira "feature ausente" verde/vermelho errado.)
