@@ -1,6 +1,5 @@
 {
   "permissions": {
-    "defaultMode": "auto",
     "allow": [
       "Bash(ai.sh *)",
       "Bash(ollama run *)",
@@ -15,7 +14,8 @@
     ],
     "ask": [
       "Bash(cline *)"
-    ]
+    ],
+    "defaultMode": "auto"
   },
   "model": "claude-fable-5[1m]",
   "hooks": {

@@ -109,6 +109,9 @@ teste confiável que roda e pode falhar - priorize o caminho do dinheiro) e, em 
   único `li.mjs`, escrita dry-run por padrão, só `--commit` salva; `audit` roda 15 checagens
   de visibilidade para recrutador). Use em "veja/altere/audite meu LinkedIn", "como aparecer
   mais em buscas de recrutador". Texto do perfil passa antes pela `ghostwriter`.
+- **`unity-mcp-skill`** - orquestra o Unity Editor via MCP for Unity (GameObjects, scripts,
+  cenas, testes, automação do editor). Use ao trabalhar em projeto Unity numa máquina com o
+  MCP for Unity conectado.
 - **`vps`** - gerenciar o VPS bobagi.space via SSH.
 - **`resume`** - resumir um vídeo do YouTube a partir do link.
 - **`google-play`** - releases na Play Store via Play Developer API (service account): sobe

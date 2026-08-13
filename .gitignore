@@ -6,7 +6,10 @@ package-lock.json
 *-out/
 frontend-review-out/
 
-# credenciais — NUNCA commitar (as skills google-play/admob leem de ~/.config/bobagi-google/)
+# CLAUDE.md da raiz e distribuido por maquina pelo sync-claude-md.ps1 (o versionado e config/CLAUDE.md)
+/CLAUDE.md
+
+# credenciais - NUNCA commitar (as skills google-play/admob leem de ~/.config/bobagi-google/)
 *service-account*.json
 admob-client.json
 admob-token.json
