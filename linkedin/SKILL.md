@@ -4,10 +4,10 @@ description: Lê e edita o perfil do LinkedIn do usuário via Playwright + Chrom
 allowed-tools: Bash, Read, Write, Edit
 ---
 
-# LinkedIn — leitura, edição e auditoria do perfil
+# LinkedIn · leitura, edição e auditoria do perfil
 
 Toda operação passa por **um CLI só**: `scripts/li.mjs`. Não escreva scripts Playwright
-avulsos — o que você precisa já está aqui, e o CLI carrega as armadilhas do LinkedIn
+avulsos: o que você precisa já está aqui, e o CLI carrega as armadilhas do LinkedIn
 (campos que apagam dados, listas virtualizadas, saves silenciosamente perdidos) que
 custaram muitas sessões para mapear.
 
@@ -67,22 +67,30 @@ node li.mjs set-site https://bobagi.space/
 ## Economia de tokens
 
 - Prefira `get <seção>` a `read`; prefira `audit` a ler o perfil inteiro e julgar no olho.
-- `read` grava tudo em `.out/profile.txt` e imprime só os tamanhos — leia o arquivo
+- `read` grava tudo em `.out/profile.txt` e imprime só os tamanhos; leia o arquivo
   **só se** precisar do conteúdo, e prefira `--sections` a puxar tudo.
 - Texto longo vai em arquivo (`--file`), nunca inline na linha de comando: o CLI
   preserva quebras de linha via `insertText`, e argumentos de shell não.
 - Os prints vão para `.out/`; abra com `Read` apenas o print da mudança em questão.
-- Não redirecione stdout para arquivo para depois lê-lo — a saída já é curta de propósito.
+- Não redirecione stdout para arquivo para depois lê-lo: a saída já é curta de propósito.
 
 ## Antes de editar
 
-Leia `references/best-practices.md` — o que realmente move visualização de recrutador,
+Leia `references/best-practices.md`: o que realmente move visualização de recrutador,
 e os limites de cada campo. Para escolher o alvo da edição, `audit` já diz o que está
 falhando e com que número.
 
 Se um comando falhar de um jeito novo, `references/dom-notes.md` tem o mapa do DOM e
 das armadilhas provadas; `references/capabilities.md` diz o que a skill **não** faz
 (e o que precisa ser feito à mão).
+
+## Texto do perfil (Sobre, headline, descrições)
+
+Antes de REDIGIR qualquer texto que vá para o perfil, carregue a skill `ghostwriter`
+(`~/.claude/skills/ghostwriter/voice.md`) e escreva dentro do perfil de voz de lá.
+Divisão de trabalho: o `audit` daqui cuida da visibilidade para recrutador; a voz
+(registro, humor, antipadrões de pitch) é da `ghostwriter`. Texto aprovado pelo
+usuário entra no corpus dela.
 
 ## Limites
 

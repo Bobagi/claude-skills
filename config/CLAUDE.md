@@ -99,6 +99,16 @@ teste confiável que roda e pode falhar - priorize o caminho do dinheiro) e, em 
   **Cline CLI** (`cline -y`, headless) como executor agêntico com Groq/Ollama. Setup por máquina:
   Ollama + modelos + keys em `~/.config/ai-workers/`. Use em "delega pra IA barata/local",
   "economiza tokens", lotes de tarefas repetitivas.
+- **`ghostwriter`** - **escreve qualquer texto em nome do Gustavo com a voz dele** (Sobre do
+  LinkedIn, bio de app de namoro, apresentação, post, recomendação), contra um `voice.md`
+  versionado (registro por contexto, marcadores de estilo, antipadrões, corpus de textos
+  aprovados) que cresce a cada uso. Use em "escreva/refaça minha descrição/bio", "não parece
+  eu", "está formal/vendedor demais", e SEMPRE antes de gerar texto que será publicado em nome
+  dele. Par da `linkedin` (uma escreve, a outra publica no perfil).
+- **`linkedin`** - lê, edita e audita o perfil do LinkedIn via CDP no Chrome do sistema (CLI
+  único `li.mjs`, escrita dry-run por padrão, só `--commit` salva; `audit` roda 15 checagens
+  de visibilidade para recrutador). Use em "veja/altere/audite meu LinkedIn", "como aparecer
+  mais em buscas de recrutador". Texto do perfil passa antes pela `ghostwriter`.
 - **`vps`** - gerenciar o VPS bobagi.space via SSH.
 - **`resume`** - resumir um vídeo do YouTube a partir do link.
 - **`google-play`** - releases na Play Store via Play Developer API (service account): sobe
