@@ -15,6 +15,9 @@ práticas universais vêm depois. Lida antes de auditar.
   handler se o resto usa repository; nada de regra de negócio no repository).
 - [ ] Estilo de erro consistente (erros tipados/sentinela vs strings; wrap com contexto; mesma forma de
   responder erro no HTTP).
+- [ ] Seletor por idioma/moeda/unidade tem ramo NEUTRO para valor desconhecido. `lang === 'x' ? a : b`
+  devolve `b` para todo o resto - ou seja, um idioma não previsto recebe o texto de OUTRO idioma, o
+  que é pior que não traduzir. Use mapa explícito e retorne a entrada crua quando não houver coluna.
 - [ ] Novos textos de UI vão pela camada de i18n, com **todas** as línguas preenchidas (nenhuma chave
   faltando num dicionário).
 - [ ] Tokens de design/config centralizados usados em vez de literais repetidos.

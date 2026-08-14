@@ -195,6 +195,30 @@ de dinheiro que você criar — construir sem ela é criar a fraude junto.**
   por cima); **toda chave existe em TODAS as línguas** (o `code-standards` audita chave faltando); mensagens
   de erro traduzíveis por **código** (o backend manda um `code` + params; o front renderiza `err.<code>`).
   Onde mostra país/idioma, **bandeira SVG local** (emoji quebra no Windows).
+- **★ Se algum idioma usa OUTRA ESCRITA (CJK, árabe, hebraico, tailandês, devanágari), i18n deixa de
+  ser dicionário e vira também tipografia e busca.** Checklist obrigatório antes de dizer que o
+  idioma está pronto:
+  - **Fonte:** a webfont da marca não tem os glifos. A pilha precisa de fallback de SISTEMA por
+    plataforma (webfont CJK tem megabytes); o fallback é por CARACTERE, então o latino continua na
+    fonte da marca. Confirme com `fc-list :lang=<x>` que a máquina de teste tem a escrita, senão o
+    headless mostra caixa vazia e você julga o que o usuário nunca verá.
+  - **`<html lang>` correto** (`zh-CN` vs `zh-TW` vs `ja`): mesma faixa Unicode, GLIFO diferente.
+    Lang errado não é detalhe de a11y, é texto com cara errada.
+  - **Métrica:** `letter-spacing` alto de rótulo espalha ideograma (cada um já é palavra), a
+    entrelinha do latino faz as linhas encostarem, 11px vira borrão e o peso 700 sintetizado
+    empastela os traços. Ajuste sob `html[lang^="<x>"]`, sem tocar nos outros idiomas.
+  - **Busca:** escrita sem espaço entre palavras (chinês/japonês/tailandês) quebra o tokenizador
+    padrão - o nome inteiro vira UM token e quem digita um pedaço não acha nada. Indexe o trecho e os
+    **bigramas** dele, e prove por teste que a tokenização das outras escritas não mudou.
+  - **RTL (árabe/hebraico):** `dir="rtl"`, e o layout precisa de propriedades lógicas
+    (`margin-inline-start`, não `margin-left`), senão espelha errado.
+  - **Camadas de texto:** rótulo de UI, nome de entidade, nome de LUGAR/unidade, prosa gerada e
+    conteúdo escrito à mão têm donos e coberturas diferentes. Liste-as separadamente: a que sempre
+    fica esquecida é a de LUGAR/UNIDADE, e é ela que faz a página parecer meio traduzida.
+  - **Detecção por país** (quando faz sentido abrir já no idioma da região): use o header de país do
+    CDN, num endpoint `no-store` (nunca embutido em HTML cacheável); ordem **escolha manual > país >
+    idioma do navegador > default**, e guarde a dedução numa CHAVE SEPARADA da escolha - senão o
+    reload entra em laço e o clique do usuário não vence o IP.
 - **🛡 Blinda com:** — (não é de segurança, mas é obrigatório em app sério).
 - **🔒 Trava com:** code-standards — nenhuma chave falta em nenhuma língua.
 
