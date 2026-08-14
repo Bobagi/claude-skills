@@ -1327,3 +1327,19 @@ click, drive them separately for now (interaction steps are a planned engine fea
   a versão traduzida. **(h) Ao revisar num servidor Linux, confira antes `fc-list :lang=<x>`**: sem
   fonte da escrita instalada o headless mostra caixas vazias ou cai numa fonte bitmap, e você
   julga acabamento de uma coisa que o usuário nunca vai ver (o layout ainda vale; o acabamento não).
+
+- **2026-08-14 (via um site multi-idioma, complemento da lição do mesmo dia) - antes de aceitar
+  "isso não tem tradução", PROVE com uma 2ª fonte; e a prova certa quase nunca é o dataset que você
+  já está usando.** Ao revisar a página no idioma novo, sobraram palavras na língua original e eu
+  concluí, olhando SÓ o dataset que alimenta o site, que "não existe tradução para isso". O dono
+  desconfiou. A checagem correta foi: **(1) medir por CATEGORIA, não no total** - o agregado dizia
+  "98% traduzido" e escondia que uma categoria inteira estava 98% NÃO traduzida; **(2) buscar uma
+  fonte independente que reflita o uso REAL** - aqui foi o marketplace onde os usuários daquele país
+  negociam, que expõe nome por locale e cruza pelo id do jogo. As duas fontes concordaram, então a
+  ausência era legítima (nome próprio) e não buraco. **Mas a mesma checagem revelou um buraco de
+  verdade que a leitura da tela não tinha achado**: outra camada (os nomes de LUGAR) estava 100% na
+  língua original porque a tabela de tradução só tinha a coluna do idioma antigo. **Checklist:** ao
+  julgar cobertura de tradução, (a) meça por categoria e ordene pela pior; (b) confirme "não tem
+  tradução" numa fonte de USO, não só na fonte de dados; (c) liste as CAMADAS de texto separadamente
+  (rótulo de UI, nome de entidade, nome de lugar, prosa gerada, conteúdo escrito à mão) - cada uma
+  costuma ter dono e cobertura diferentes, e a que ninguém lembra é a de LUGAR/UNIDADE.

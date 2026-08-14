@@ -240,3 +240,20 @@ Pule: getters/setters triviais, o que o compilador/framework já garante, UI pur
   regra barata e obrigatória: **antes de reportar um achado em massa, reproduza 3-5 casos individualmente
   pelo caminho do usuário**. (Corolário para o rubric de teste: o mesmo vale para teste de integração que
   bate em serviço com quota - um 429 não lido vira "feature ausente" verde/vermelho errado.)
+
+- **2026-08-14 (via um site multi-idioma) - i18n tem DOIS testes que pagam sozinhos, e um footgun de
+  fallback que só um teste pega.** **(1) Teste de PARIDADE de chaves entre idiomas.** Ao acrescentar
+  um idioma eu extraí as chaves do idioma base com um regex `'chave': 'valor'` e achei que tinha
+  traduzido tudo; o teste de paridade (que casa só a CHAVE, ignorando a forma do valor) acusou **8
+  chaves faltando** - eram justamente as de valor com aspas/multi-linha, que o meu regex não pegou.
+  Lição geral: **a extração que você usa para GERAR não serve para VERIFICAR** - o verificador tem
+  que casar um padrão mais frouxo e independente do gerador, senão os dois erram junto. **(2) O
+  footgun do fallback binário.** Uma função de tradução escrita como `const idx = lang === 'zh' ? 2 :
+  1` devolve a coluna do idioma 1 para TODOS os outros - ou seja, `f(s, 'en')` retornava português.
+  Não era alcançável pelos chamadores da época (todos guardados por um `if`), mas é uma bomba armada:
+  o dia em que alguém chamar sem o guard, sai texto do idioma errado no meio da página, e isso é PIOR
+  que não traduzir (o usuário lê uma língua que não escolheu e não entende de onde veio). Teste que
+  pega: **afirmar o comportamento para um idioma NÃO suportado** (`assert f(x,'en') === x`), não só
+  para os suportados. Correção: mapa explícito `{pt:1, zh:2}` com retorno cru quando não há coluna.
+  Regra durável: **em qualquer seletor por idioma/moeda/unidade, o ramo "nenhum dos conhecidos" tem
+  que ser NEUTRO (devolve a entrada), nunca "o primeiro da lista".**
