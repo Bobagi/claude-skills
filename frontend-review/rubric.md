@@ -1343,3 +1343,16 @@ click, drive them separately for now (interaction steps are a planned engine fea
   tradução" numa fonte de USO, não só na fonte de dados; (c) liste as CAMADAS de texto separadamente
   (rótulo de UI, nome de entidade, nome de lugar, prosa gerada, conteúdo escrito à mão) - cada uma
   costuma ter dono e cobertura diferentes, e a que ninguém lembra é a de LUGAR/UNIDADE.
+- **2026-08-14 (via um comparador web - revisar o POPUP/action de uma extensao de navegador):** O
+  motor de captura por grade de rotas NAO alcanca a UI de uma extensao (popup, options): ela mora em
+  `chrome-extension://<id>/popup.html`, e o `<id>` so existe com a extensao carregada. Para revisar:
+  suba um puppeteer com `--disable-extensions-except=<dir> --load-extension=<dir>`, pegue o `<id>` pelo
+  **target do service worker** (`browser.waitForTarget(t => t.type()==='service_worker')`, o host da URL
+  e o id), e navegue para `chrome-extension://<id>/popup.html` no **tamanho real do popup** (tipicamente
+  ~300px de largura; nao um viewport de pagina). Criterios especificos de popup: largura fixa pequena
+  sem overflow, hierarquia acao-primaria vs secundaria (o botao que faz o trabalho e o pesado; "so
+  abrir" e outline), tap targets >= 24px mesmo no espaco apertado, `autofocus` no campo, e - armadilha
+  de MV3 - o CSP de pagina de extensao **bloqueia script inline**: o JS TEM que ser arquivo externo
+  (`<script type="module" src>`), handler inline (`onclick=`) nao roda; confirme 0 erro de console (um
+  CSP violation aparece la). Estilo num `<style>`/atributo e permitido. Capture com a extensao carregada
+  de verdade, nunca so o HTML solto num file://, senao os `chrome.*` e o CSP real nao valem.
