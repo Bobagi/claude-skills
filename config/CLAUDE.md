@@ -32,6 +32,22 @@ travessão não vira ruído) e ignora binário. **Separador de título:** prefir
 CÓPIA do texto - trocar o fonte não basta, é preciso reprocessar o pipeline e conferir a página
 renderizada.
 
+## ★★ NÃO REBAIXE ESCOPO PARA "LIMITE CONHECIDO" (regra dura, aprendida na marra)
+
+Quando uma parte do pedido dá trabalho, a tentação é entregar o resto e listar aquilo como
+"limitação honesta" ou "projeto à parte". **Isso não é honestidade, é escopo cortado sem
+autorização** - e o Gustavo cobra, com razão ("obviamente é pra fazer, por que não fez antes?").
+
+- Se o pedido é "adicione o idioma X", **conteúdo escrito à mão (artigos, ajuda, FAQ) faz parte**.
+  Se é "faça o site funcionar", a página de erro faz parte. Se é "cadastre no Google", o sitemap
+  faz parte.
+- Rebaixar escopo só é legítimo quando algo é **tecnicamente impossível** (o dado não existe em
+  lugar nenhum) ou **decisão de produto do dono** - e aí você diz por que, com a medição na mão.
+- "É muito trabalho" e "é conteúdo, não código" **não são** motivos. Faça, e se for grande demais
+  para uma sessão, diga quanto falta e continue.
+- Antes de escrever "limite honesto" num relatório, releia o pedido original: se aquilo estava
+  dentro dele, apague a frase e vá fazer.
+
 ## ★ Política SKILL-FIRST (vale para todo comando, em todo projeto)
 
 **Antes de executar qualquer tarefa, procure ativamente uma skill ou plugin que ajude
