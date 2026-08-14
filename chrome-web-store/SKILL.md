@@ -65,6 +65,19 @@ python3 $S items                                    # apelidos configurados
   o Google expira o refresh token em **7 dias**. Publicar o app OAuth ("Em
   producao") torna permanente. Ver `SETUP.md`.
 
+## ★ Migracao de dominio de uma extensao (armadilha de ordem)
+
+O content script da extensao **instalada** so injeta nos hosts do `matches`
+gravado NELA. Entao **NAO troque o host canonico do site para o dominio novo
+antes que a versao que conhece esse host esteja INSTALADA na base** - a versao
+antiga simplesmente nao injeta no host novo e "o site nao reconhece a extensao"
+(sem conserto no servidor; esta dentro do artefato). Ordem certa:
+1. Publique a versao que lista **os dois hosts** em `matches`/`host_permissions`.
+2. Espere aprovar + os usuarios auto-atualizarem (Chrome atualiza em ~dias).
+3. So entao troque o canonico. Enquanto isso, se ja apontou pro dominio novo,
+   **301 as PAGINAS do dominio novo -> o antigo** (mantendo `/api/` DIRETO: um
+   301 num POST vira GET e quebra a API). Depois inverta o 301.
+
 ## Complementa
 
 `google-play` (apps na Play), `admob`/`google-ads` (receita/campanha),
