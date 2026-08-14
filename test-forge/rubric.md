@@ -257,3 +257,16 @@ Pule: getters/setters triviais, o que o compilador/framework já garante, UI pur
   para os suportados. Correção: mapa explícito `{pt:1, zh:2}` com retorno cru quando não há coluna.
   Regra durável: **em qualquer seletor por idioma/moeda/unidade, o ramo "nenhum dos conhecidos" tem
   que ser NEUTRO (devolve a entrada), nunca "o primeiro da lista".**
+
+- **2026-08-14 (via um site multi-idioma) - dois testes baratos que travam tradução: "sem literal na
+  view" e "termo oficial".** **(1)** Um cabeçalho de tabela escrito na mão no componente
+  (`text: 'Intact'`) aparecia em inglês nos 5 idiomas **mesmo existindo a chave no dicionário** - o
+  teste de paridade de chaves não pega isso, porque a chave existe e está traduzida; ninguém a usa.
+  Teste que pega: **grep no fonte da view proibindo o literal** (`assert !/text:\s*'Intact'/`) e
+  exigindo a chamada da chave. Vale para qualquer string que "deveria" vir do dicionário. **(2)** Ao
+  traduzir vocabulário de domínio (termos de um jogo, de uma norma, de um setor), o risco não é
+  esquecer: é usar um **sinônimo plausível** no lugar do termo que o produto nomeia oficialmente.
+  Trave com um teste que lista `[termo_certo, termo_errado]` e falha se o errado aparecer no código -
+  ele documenta a decisão e impede a regressão quando outra pessoa "corrigir" de volta. Bônus da
+  mesma família: afirmar que **caractere do idioma novo não vazou para os blocos dos outros idiomas**
+  (um replace global bem-intencionado troca os 5 de uma vez - foi o que eu fiz).

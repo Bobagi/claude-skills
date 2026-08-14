@@ -1356,3 +1356,27 @@ click, drive them separately for now (interaction steps are a planned engine fea
   (`<script type="module" src>`), handler inline (`onclick=`) nao roda; confirme 0 erro de console (um
   CSP violation aparece la). Estilo num `<style>`/atributo e permitido. Capture com a extensao carregada
   de verdade, nunca so o HTML solto num file://, senao os `chrome.*` e o CSP real nao valem.
+
+- **2026-08-14 (via um site multi-idioma, 3ª rodada do mesmo caso) - ★ AUDITORIA DE TRADUÇÃO SE FAZ
+  POR SCRIPT, NÃO PELO OLHO. Cole isto no console da página no idioma novo:**
+  ```js
+  const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  for (let n = w.nextNode(); n; n = w.nextNode())
+    if (/[A-Za-z]{2,}/.test(n.textContent)) console.log(n.textContent.trim());
+  ```
+  (troque a classe de caracteres pelo alfabeto de ORIGEM; some as ocorrências por palavra e ordene
+  por frequência). Eu revisei a mesma página por screenshot **duas vezes**, declarei "0 P0/P1", e o
+  dono ainda achou coisa em inglês nos prints. Na terceira rodada o script achou em 5 segundos tudo
+  que o olho perdeu: selo de tipo vindo cru do dataset, um cabeçalho de tabela **escrito na mão** no
+  código (aparecia em inglês nos 5 idiomas, mesmo com a chave existindo no dicionário), o tier de uma
+  entidade, nomes de peça, dois rótulos **concatenados direto na string** (`${x} · Steel Path`) e uma
+  abreviação de unidade. Por que o olho falha: numa tela cheia de escrita não-latina, as palavras
+  latinas parecem "nome próprio" e o cérebro as aceita. **Regras que saem disso:** (1) a saída do
+  script é uma lista de PALAVRAS - classifique cada uma em `nome próprio / marca / URL / BUG`, e o
+  que sobrar em BUG é a lista de trabalho; (2) o padrão mais escondido é **literal concatenado em
+  template string** (`${a} · Steel Path`), que nenhum grep por `text: '...'` acha - procure também
+  por texto solto dentro de crase; (3) rode o script DE NOVO depois de corrigir, e pare quando só
+  restar nome próprio/marca/URL; (4) **confirme a tradução dos termos de domínio contra a fonte
+  oficial, não de memória** - duas das minhas estavam erradas (usei um sinônimo plausível para um
+  termo que o produto nomeia oficialmente de outro jeito), e um teste que proíbe o termo errado no
+  código impede a volta.
