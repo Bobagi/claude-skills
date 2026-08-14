@@ -270,3 +270,15 @@ Pule: getters/setters triviais, o que o compilador/framework já garante, UI pur
   ele documenta a decisão e impede a regressão quando outra pessoa "corrigir" de volta. Bônus da
   mesma família: afirmar que **caractere do idioma novo não vazou para os blocos dos outros idiomas**
   (um replace global bem-intencionado troca os 5 de uma vez - foi o que eu fiz).
+
+- **2026-08-14 (via um site multi-idioma) - "pega a melhor linha do grupo" com ORDER BY + GROUP BY é
+  UNDEFINED, e o teste que pega é o de FALLBACK.** Para "devolva a tradução, ou o original quando não
+  houver", escrevi `SELECT ... FROM (SELECT * ... ORDER BY (lang=?) DESC) GROUP BY slug`. Parece
+  esperto e está errado: em SQL, a coluna "nua" num GROUP BY tem valor **não especificado** (o SQLite
+  costuma devolver a ÚLTIMA linha, não a primeira), então pedir `zh` devolvia `pt` - silenciosamente,
+  sem erro, com a query "funcionando". O correto é explicitar o fallback (`NOT EXISTS`) ou usar uma
+  função de janela. **O teste que pega isto tem que ter os TRÊS casos na mesma tabela:** (a) item com
+  tradução → sai traduzido; (b) item SEM tradução → sai no original e **continua na lista** (o erro
+  gêmeo é a tradução parcial *sumir* com o conteúdo); (c) idioma inexistente → tudo no original.
+  Só (a) passa por acidente em várias implementações erradas. Vale para qualquer "pick best row per
+  group": preço vigente, versão mais recente, endereço principal.

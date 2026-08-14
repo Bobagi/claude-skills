@@ -212,9 +212,25 @@ de dinheiro que você criar — construir sem ela é criar a fraude junto.**
     **bigramas** dele, e prove por teste que a tokenização das outras escritas não mudou.
   - **RTL (árabe/hebraico):** `dir="rtl"`, e o layout precisa de propriedades lógicas
     (`margin-inline-start`, não `margin-left`), senão espelha errado.
-  - **Camadas de texto:** rótulo de UI, nome de entidade, nome de LUGAR/unidade, prosa gerada e
-    conteúdo escrito à mão têm donos e coberturas diferentes. Liste-as separadamente: a que sempre
-    fica esquecida é a de LUGAR/UNIDADE, e é ela que faz a página parecer meio traduzida.
+  - **Camadas de texto:** rótulo de UI, nome de entidade, nome de LUGAR/unidade, prosa gerada,
+    **conteúdo escrito à mão** (artigos/ajuda/FAQ) e **texto vindo de API externa** têm donos e
+    coberturas diferentes. Liste-as separadamente: as que sempre ficam esquecidas são LUGAR/UNIDADE
+    e CONTEÚDO, e são elas que fazem a página parecer meio traduzida.
+  - **Conteúdo escrito à mão FAZ PARTE do idioma novo.** Não trate "traduzir os artigos" como
+    projeto à parte: numa página no idioma B, um bloco no idioma A é pior que inglês - o leitor não
+    tem como nem adivinhar o que é. Arquitetura que funciona: arquivo-fonte no idioma de origem
+    (`content/<tipo>/*.md`) + tradução em subpasta com o **mesmo nome de arquivo**
+    (`content/<tipo>/<lang>/*.md`), tabela com chave **(slug, lang)** e **fallback para a origem**
+    quando não há tradução (tradução parcial nunca pode ESCONDER conteúdo). Metadado de
+    roteamento/matching fica só no original; a tradução contribui com título e corpo.
+  - **★ Texto vindo de API externa em um idioma só: procure o mesmo conteúdo no DATASET do produto.**
+    Foi a fonte que eu esqueci de validar. A API de estado do jogo devolvia os desafios só em inglês,
+    mas o dataset oficial os traduzia nos 5 idiomas - e o casamento não era pelo texto (que muda e
+    às vezes vem como placeholder), e sim pelo **ID interno** contido no id da API. Regra: quando uma
+    API devolve texto não traduzido, pergunte "esse mesmo objeto existe no catálogo/dataset com id?"
+    antes de aceitar o inglês. E se o texto traduzido vier com **placeholder do produto** (`|COUNT|`),
+    preencha com o valor extraído do texto original; se não der para preencher, devolva o ORIGINAL
+    completo - placeholder cru na tela é pior que não traduzir.
   - **Detecção por país** (quando faz sentido abrir já no idioma da região): use o header de país do
     CDN, num endpoint `no-store` (nunca embutido em HTML cacheável); ordem **escolha manual > país >
     idioma do navegador > default**, e guarde a dedução numa CHAVE SEPARADA da escolha - senão o
