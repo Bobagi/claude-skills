@@ -1380,3 +1380,11 @@ click, drive them separately for now (interaction steps are a planned engine fea
   oficial, não de memória** - duas das minhas estavam erradas (usei um sinônimo plausível para um
   termo que o produto nomeia oficialmente de outro jeito), e um teste que proíbe o termo errado no
   código impede a volta.
+- **2026-08-14 (via um comparador web - tornar um BADGE/PILL/CHIP clicavel: o tap target e a caixa do
+  `<a>`, nao a do pill):** Ao transformar um chip/badge/pill de status em link (ex.: o chip
+  "nao instalado" que passa a linkar a loja da extensao), o sinal `tinyTargets` mede a caixa do
+  **`<a>` interno**, nao a do pill que o envolve. Dar `min-height:24px` so ao `.chip`/pill NAO
+  resolve - o link fica ~16-19px (a altura da linha de texto) dentro de um pill de 24px. Fix: o
+  **proprio `<a>`** precisa de `display:inline-flex; align-items:center; min-height:24px` para
+  preencher; de o pill uns 2px a mais (`min-height:26px`) para o link caber com folga. Verifique
+  re-medindo o `tinyTargets` depois - o instinto de "aumentei o container, ta resolvido" e falso.
