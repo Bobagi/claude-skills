@@ -125,3 +125,15 @@ esforço aparente, e alérgico a texto que "se acha".
 - 2026-08-13 · Sugestão dele de piada vinda pela metade ("...eu tento") vale mais que
   a piada pronta do rascunho: quando ele propõe uma linha, adotar a dele e construir
   callback em cima.
+- 2026-08-14 · Registro para **issue/PR em repo público** (resposta técnica a um
+  desconhecido que pediu algo): natural, sem piada plantada, mas com a mesma
+  honestidade do resto. O que faz soar como ele nesse contexto: (a) admitir o
+  próprio deslize em uma linha e seguir ("...which were the part I almost left for
+  later and shouldn't have"), sem pedir desculpa em bloco; (b) contar a parte difícil
+  com o detalhe técnico concreto em vez de adjetivo ("o tokenizador padrão virava o
+  nome inteiro em um token só"), que é o mesmo padrão do "se cair às 2h da manhã";
+  (c) explicar a decisão discutível ANTES de alguém reclamar, dizendo como foi
+  verificada, e abrir para correção ("se não bate com a comunidade, me diz e eu
+  mudo"); (d) listar o que continua faltando, com o motivo. Números entram como
+  informação (39 artigos), nunca como troféu. Fecho: convite curto no lugar de CTA,
+  e uma linha na língua da pessoa quando ela não fala português.
