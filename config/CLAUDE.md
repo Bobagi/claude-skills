@@ -117,6 +117,13 @@ teste confiável que roda e pode falhar - priorize o caminho do dinheiro) e, em 
 - **`google-play`** - releases na Play Store via Play Developer API (service account): sobe
   AAB, tracks, promoção, rollout, reviews, listing. Produção exige confirmação explícita do
   operador. Credenciais em `~/.config/bobagi-google/` (setup único: `google-play/SETUP.md`).
+- **`chrome-web-store`** - publica extensões do Chrome na Chrome Web Store via API oficial
+  (upload de pacote .zip + publish/enviar pra revisão), como a `google-play` faz com apps. OAuth
+  próprio do dono (client "Aplicativo da Web" + refresh token escopo `chromewebstore`), credenciais
+  em `~/.config/bobagi-google/` (`cws-client.json`/`cws-token.json`/`cws-items.json`; setup único:
+  `chrome-web-store/SETUP.md`). Limites: não edita descrição longa/screenshots da ficha e a
+  publicação passa por revisão do Google; NÃO listar lojas/marcas de 3os na descrição (keyword spam).
+  Extensão padrão - Farolivro. Use em "sobe/publica/atualiza a extensão", "reenvia após rejeição".
 - **`admob`** - relatórios AdMob via API (receita, eCPM, impressões por dia/ad unit/país) +
   inventário. OAuth do dono da conta (setup único: `admob/SETUP.md`); escrita de inventário
   é restrita pelo Google (fallback manual).
