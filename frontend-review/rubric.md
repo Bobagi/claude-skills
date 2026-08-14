@@ -1306,3 +1306,24 @@ click, drive them separately for now (interaction steps are a planned engine fea
   e o caso de teste que revela é o valor **1** (que quase nunca aparece nos dados de exemplo) e um
   valor terminado em 2-4. Sintoma para grep numa review: template literal com número seguido de uma
   única chave de unidade.
+
+- **2026-08-14 (via um site multi-idioma) - IDIOMA NOVO COM OUTRA ESCRITA (CJK, árabe, devanágari)
+  não é "trocar as strings": é revisar TIPOGRAFIA, e o defeito que sobra é PÁGINA MEIO TRADUZIDA.**
+  Checklist que passou a valer sempre que entrar uma escrita não-latina: **(a) `letter-spacing` da
+  identidade vira lixo** - rótulo com 0.15-0.25em é elegante em caixa alta latina e em CJK espalha
+  ideogramas que já são palavras inteiras (override para ~0.04em); **(b) entrelinha** - o ideograma
+  preenche a caixa toda, sem ascendente/descendente, então a entrelinha do latino faz as linhas
+  encostarem (1.7-1.9); **(c) piso de tamanho** - 11px é legível em latino e vira borrão num glifo de
+  20+ traços (mínimo ~13px); **(d) peso** - fonte CJK de sistema costuma não ter 700 real e o
+  navegador SINTETIZA o negrito, empastelando os traços (teto 600); **(e) `lang` correto no `<html>`**
+  - `zh-CN` vs `ja` mudam o GLIFO desenhado (mesma faixa Unicode, formas diferentes), então lang errado
+  não é detalhe de a11y, é texto com cara errada; **(f) a webfont própria não tem os glifos** - a
+  pilha precisa do fallback de SISTEMA por plataforma (webfont CJK tem megabytes), e o fallback é por
+  CARACTERE, então latino continua na fonte da marca. **(g) O achado que só a review pega:** com o
+  layout inteiro certo, o que fica errado é **meia tradução** - nome do item traduzido e a lista de
+  ingredientes, o selo de tipo e as unidades ainda no idioma original, **muitas vezes com a tradução
+  disponível no próprio dado**, só não usada. Método: leia a tela inteira como se não soubesse o
+  idioma de origem e marque TODA palavra que ficou nele; depois cheque, uma a uma, se o dado já tem
+  a versão traduzida. **(h) Ao revisar num servidor Linux, confira antes `fc-list :lang=<x>`**: sem
+  fonte da escrita instalada o headless mostra caixas vazias ou cai numa fonte bitmap, e você
+  julga acabamento de uma coisa que o usuário nunca vai ver (o layout ainda vale; o acabamento não).
