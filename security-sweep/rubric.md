@@ -657,29 +657,49 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   forjado). E some um **gate de "alvo velho"** (busca/recurso com mais de N min recusa ingestão, 410) p/
   fechar a janela de reuso de um id vazado.
 
-- **2026-08-11 (via um site de dados de jogo) — DADO DE WIKI/FONTE COMUNITÁRIA É INPUT DE USUÁRIO
+- **2026-08-11 (via um site de dados de jogo) - DADO DE WIKI/FONTE COMUNITÁRIA É INPUT DE USUÁRIO
   ANÔNIMO, e o que falta nele quase nunca é escape: é TETO.** Quando uma app passa a ingerir um
   catálogo mantido por terceiros (wiki editável, planilha pública, feed comunitário, repo de dados de
-  fã), o reflexo certo é auditar XSS/href/SQL — e nas apps que já renderizam por `textContent` +
+  fã), o reflexo certo é auditar XSS/href/SQL - e nas apps que já renderizam por `textContent` +
   `encodeURIComponent` **essas três passam de primeira**. O buraco real fica na **classe 5**: não há
   teto de TAMANHO nem de QUANTIDADE no que entra. Exploit medido: uma edição com 20 mil ofertas do
   mesmo item + um nome de 400 KB virou **uma linha de 2,8 MB no banco** e 20 mil nós de DOM numa
-  página pública — anônimo, sem executar nada. **Regra: todo ingest de terceiro precisa de cap de
+  página pública - anônimo, sem executar nada. **Regra: todo ingest de terceiro precisa de cap de
   comprimento por campo, cap de itens por chave e cap de entradas por lote, aplicados no INDEXADOR
-  (a fronteira onde o dado entra), não no render** — no render você só conserta uma superfície e
+  (a fronteira onde o dado entra), não no render** - no render você só conserta uma superfície e
   esquece as outras (SSR, JSON da API, sitemap, busca). Dois detalhes que valem: (a) para campo que
-  também é **chave de casamento**, **descarte** a entrada fora do teto em vez de truncar — chave
+  também é **chave de casamento**, **descarte** a entrada fora do teto em vez de truncar - chave
   truncada não casa com nada e ainda mente na tela; (b) **calibre o teto medindo o dado real
   primeiro** (aqui: máximo real 8 ofertas/48 chars ⇒ tetos 12/80) e afirme num teste que o índice
   real continua com a MESMA contagem depois do cap, senão você troca um DoS por perda silenciosa de
   conteúdo. Corolário de arquitetura que já passou no teste: quando a fonte externa devolve lixo ou
-  cai, o pipeline deve produzir **lote vazio** e o gravador deve **não reescrever a tabela** — assim
+  cai, o pipeline deve produzir **lote vazio** e o gravador deve **não reescrever a tabela** - assim
   atacar a fonte de terceiro não apaga o dado bom (fail-safe), e isso é testável com um servidor
   local que responde 500.
-- **2026-08-11 (método) — para provar XSS ao vivo sem publicar o payload, envenene uma CÓPIA.** Em
+- **2026-08-11 (método) - para provar XSS ao vivo sem publicar o payload, envenene uma CÓPIA.** Em
   app pública sem login não há "conta descartável" para isolar o ataque, e injetar o payload no banco
   de produção significa **servir XSS de verdade a quem acessar naquele segundo** (se a defesa falhar,
   que é exatamente a hipótese sob teste). Padrão que resolve: `wal_checkpoint(TRUNCATE)` → copiar o
   banco → subir uma 2ª instância da MESMA imagem numa porta local com a cópia montada → atacar ali →
   derrubar e apagar. Você ganha o caminho REAL (mesmo código, mesmo SSR, mesmo CSP) com risco zero
   para o usuário. Provar que a produção ficou intacta ao final faz parte do relatório.
+- **2026-08-14 (via um comparador web - popup/action de extensao que abre deep-link + migracao de host
+  no CORS e na allowlist de mensagem):** Quando uma extensao MV3 ganha um popup (`action`) que ABRE o
+  site com uma query do usuario, e o site auto-dispara a busca por um parametro (`/?q=`), a superficie
+  nova nao e sessao/dinheiro - e (a) **open-redirect/host-injection** na montagem da URL e (b) **XSS
+  refletido** pelo parametro. Padrao que blinda os dois (mesma ideia do href-por-construcao de
+  2026-08-08): monte a URL como **HOST_LITERAL_DO_PRODUTO + '/?q=' + encodeURIComponent(query)** - o
+  esquema e o host nunca vem do input, entao `javascript:`/`//evil`/`https://evil` caem todos no
+  VALOR do parametro, e o site so poe o valor em `input.value` (nao em HTML) + renderiza via
+  `textContent`. **Teste ao vivo o caminho inteiro**: carregue `/?q=<img onerror>`,
+  `<script>window.__pwned=1</script>`, `//evil`, `javascript:` num Chrome real, ouvindo `dialog` e
+  checando `window.__pwned`/`querySelector('[onerror],[onload]')`/reflexao crua no innerHTML E que
+  `location.host` nunca mudou. **Migracao de dominio** (add um host novo ao produto) tem DOIS pontos a
+  re-testar juntos: (1) o **CORS** - o `allow_origin_regex` do Starlette usa `fullmatch`, entao
+  `https://(a|b)\.dominio\.com` com pontos ESCAPADOS barra o sufixo `a.dominio.com.evil.com`; prove com
+  `curl -X OPTIONS -H "Origin: <sufixo-malicioso>"` que NAO volta `Access-Control-Allow-Origin`; (2) a
+  **allowlist de pagina** que o service worker usa pra aceitar `postMessage`/`sendMessage` de coleta -
+  use `url.startsWith(host + '/')` (a barra e a fronteira; sem ela `host.evil.com/` passa). Extraia
+  as duas (montar-url e allowlist) para um modulo PURO e trave com unit + mutation (tirar o
+  `encodeURIComponent` e tirar o `+ '/'` tem que ficar vermelho). Manter os DOIS hosts (antigo+novo)
+  na allowlist durante a migracao e legitimo e nao afrouxa nada, porque cada um e checado com fronteira.
