@@ -728,3 +728,21 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   561KB; o corte cego de 150KB pegou so o shell da SPA) - a amostra fica inutil pra diagnosticar. A
   amostragem util busca os MARCADORES dos dados (`application/ld+json`, `permalink`, `__PRELOADED`)
   e envia o inicio + essas regioes com o offset real, dentro do mesmo cap.
+- **2026-08-15 (adendo, mesmo comparador) - decodificar estado de SPA de 3o serializado com
+  refs NAO-JSON, e endurecer o parser no HOST de origem.** Sites grandes (ex.: Mercado Livre
+  `search-nordic`) embutem o estado da pagina num script como `fn("0:{...}")` onde o JSON tem
+  tokens que NAO sao JSON valido: refs numericas (`@123`), refs de letra unica (`u`),
+  `NaN`/`undefined`. Reimplementar o desserializador e fragil e desnecessario: os campos que
+  interessam (titulo/preco/url) sao literais INLINE, entao **neutralize os tokens nao-JSON para
+  `null` (so em posicao de VALOR - apos `:` `,` `[`; string comeca com `"` e nunca e tocada;
+  preserve `true/false/null`) e `JSON.parse`**. A regex de neutralizacao tem que ser LINEAR
+  (`@\d+` e `[A-Za-z_$][\w$]*`) - nada de backtracking. Segurança: (a) o teto de tamanho de
+  script + nos + profundidade do walk continua sendo a defesa de DoS (o `JSON.parse` de um estado
+  de 300KB e barato, mas o walk recursivo precisa de cap); (b) **endureça o parser na ORIGEM: ele
+  so deve emitir URL cujo HOST seja o da propria loja** (regex de host fixo) - assim uma url
+  envenenada no estado de 3o (`javascript:`, `www.evil.com`, sufixo `loja.com.br.evil.com`) morre
+  no parser, ANTES do allowlist do backend (dupla defesa; o parser "so emite dado limpo"). Prove
+  ao vivo semeando url hostil no estado e conferindo que so host-da-loja sai. E **use os dados
+  reais so como fixture PII-safe**: paginas de loja LOGADA carregam nickname/e-mail do usuario -
+  nao commite o arquivo real; gere uma fixture sintetica que reproduz o FORMATO (com os tokens de
+  ref) e valide o parser contra o arquivo real so em memoria.
