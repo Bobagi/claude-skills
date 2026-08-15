@@ -49,6 +49,16 @@ python3 $S items                                    # apelidos configurados
    `host_permissions` pode demorar mais). Quem ja tem a versao antiga
    auto-atualiza quando aprovar.
 
+> **★ Uma versao por vez em revisao.** Enquanto uma versao esta EM REVISAO (pending
+> review / ready to publish), a loja **recusa** um upload novo com
+> `uploadState: FAILURE` + `ITEM_NOT_UPDATABLE` ("cannot be updated now because it is
+> in pending review, ready to publish, or deleted status"). Nao da pra enfileirar
+> releases: **espere a versao atual aprovar** para subir a proxima. Planeje agrupar
+> mudancas num unico bump em vez de publicar N vezes seguidas. O Chrome **auto-atualiza
+> a extensao instalada sozinho** em ~horas apos a aprovacao; um botao in-app que chame
+> `chrome.runtime.requestUpdateCheck()` so ADIANTA isso para "agora" (nao substitui a
+> revisao nem publica nada).
+
 ## Limites (honesto, deixe claro ao operador)
 
 - A API sobe **pacote + publica**. NAO edita a **descricao longa da ficha**,
