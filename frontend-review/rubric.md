@@ -1398,3 +1398,12 @@ click, drive them separately for now (interaction steps are a planned engine fea
   (`vertical-align:bottom` para alinhar as linhas de baixo) e/ou encurte o rótulo, deixando a
   explicação para a prosa ao redor. Teste toda tabela nova no viewport mais estreito olhando o
   CABEÇALHO, não só as células.
+
+- **2026-08-15 (via um comparador - botao pequeno que HERDA o tamanho de um "chip" informativo):**
+  ao adicionar um CONTROLE (botao/link clicavel) ao lado de um elemento so-informativo (chip de
+  status, badge, pill) e reusar a mesma classe/altura por consistencia visual, cuidado: o chip pode
+  ter 24-26px de altura (ok, ninguem clica), mas um botao real precisa de alvo de toque >=44px no
+  mobile. A solucao que preserva o visual: manter a altura do chip no DESKTOP (onde ficam lado a
+  lado e o alinhamento importa) e so BUMPAR o botao no mobile via media query (onde o header quebra e
+  o botao cai em linha propria, entao um alvo maior nao desalinha nada). Checar: todo novo `<button>`/
+  `<a>` clicavel que copia o estilo de um chip/badge tem `min-height>=40px` no viewport de telefone.
