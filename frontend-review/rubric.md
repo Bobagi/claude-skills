@@ -1388,3 +1388,13 @@ click, drive them separately for now (interaction steps are a planned engine fea
   **proprio `<a>`** precisa de `display:inline-flex; align-items:center; min-height:24px` para
   preencher; de o pill uns 2px a mais (`min-height:26px`) para o link caber com folga. Verifique
   re-medindo o `tinyTargets` depois - o instinto de "aumentei o container, ta resolvido" e falso.
+- **2026-08-15 (via um site de guias) - `white-space:nowrap` em `th` quebra primeiro no CABEÇALHO,
+  e o scroller esconde o corte:** ao estilizar tabela gerada de markdown (sem wrapper possível,
+  padrão `table{display:block;overflow-x:auto}`), o rótulo de cabeçalho é quase sempre mais longo
+  que o dado da coluna ("Meta de pontos" vs "50") - com `nowrap` no `th`, a última coluna sai do
+  campo de visão no viewport estreito lendo cortada no meio da palavra, SEM sinal de overflow de
+  página (o scroll é in-container, `overflowX:false`, zero offCanvas). Regra: quando o DADO já cabe
+  no mobile, o cabeçalho não pode ser o motivo do scroll - deixe o `th` quebrar linha
+  (`vertical-align:bottom` para alinhar as linhas de baixo) e/ou encurte o rótulo, deixando a
+  explicação para a prosa ao redor. Teste toda tabela nova no viewport mais estreito olhando o
+  CABEÇALHO, não só as células.
