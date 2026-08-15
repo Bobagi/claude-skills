@@ -703,3 +703,28 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   as duas (montar-url e allowlist) para um modulo PURO e trave com unit + mutation (tirar o
   `encodeURIComponent` e tirar o `+ '/'` tem que ficar vermelho). Manter os DOIS hosts (antigo+novo)
   na allowlist durante a migracao e legitimo e nao afrouxa nada, porque cada um e checado com fronteira.
+- **2026-08-15 (via um comparador de precos - extrair de JSON EMBUTIDO no HTML de 3o, e nao
+  confundir a BIBLIOTECA de captcha com um bloqueio):** Quando uma app deixa de raspar `<a href>`
+  e passa a extrair de um **JSON dentro do HTML de terceiro** (JSON-LD schema.org `ItemList`,
+  estado de hidratacao de SPA em `<script>window.__X__=...`), a superficie de XSS/href/SQL e a
+  mesma de sempre - se o front ja renderiza por `textContent` e o backend ja tem allowlist de host
+  server-side, XSS (`title` com `<script>`), href (`javascript:`) e host-injection
+  (`evil.com`, sufixo `.evil.com`, userinfo `bom@mau`) **passam de primeira** (provado ao vivo:
+  ingerir a listagem hostil devolve so o URL legitimo, os 4 hostis caem no `url_allowed`). O
+  vetor NOVO e **classe 5 (DoS)**: um `<script>` de MB parseado por `JSON.parse` + a recursao no
+  objeto resultante. Teto obrigatorio no PARSER: comprimento de script, numero de scripts,
+  **profundidade de recursao**, contagem de nos visitados, e cap de itens - senao um JSON de
+  10 mil elementos ou aninhado 2000 niveis trava o navegador do usuario (nao ha login pra
+  rate-limitar). Extraia o parser para um modulo PURO (roda no offscreen, no content script e em
+  `node --test`) e trave os tetos com mutation check. **Duas armadilhas especificas:** (a) a
+  deteccao de "bloqueado/captcha" **nao pode casar a BIBLIOTECA** de reCAPTCHA/hCaptcha - grandes
+  sites (ML) carregam `gstatic.com/recaptcha` em TODA pagina legitima; casar `recaptcha` marcava
+  busca boa de "bloqueado". Case so a assinatura da pagina de DESAFIO real (`suspicious-traffic`,
+  `shieldsquare`, `cf_chl_`, `/errors/validateCaptcha`, `captcha-delivery.com`). (b) **pagina de
+  loja LOGADA carrega o e-mail do proprio usuario** num script de conta; se a app salva amostra de
+  HTML pra calibrar parser (classe 13), redija e-mail na CAMADA QUE GRAVA e prove com um e-mail
+  sintetico que ele nao esta no arquivo em disco. **Licao de metodo (sample truncado):** um coletor
+  que salva "os primeiros N KB" da pagina pode cortar ANTES da regiao de dados (a pagina do ML tinha
+  561KB; o corte cego de 150KB pegou so o shell da SPA) - a amostra fica inutil pra diagnosticar. A
+  amostragem util busca os MARCADORES dos dados (`application/ld+json`, `permalink`, `__PRELOADED`)
+  e envia o inicio + essas regioes com o offset real, dentro do mesmo cap.
