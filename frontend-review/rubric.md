@@ -1407,3 +1407,13 @@ click, drive them separately for now (interaction steps are a planned engine fea
   lado e o alinhamento importa) e so BUMPAR o botao no mobile via media query (onde o header quebra e
   o botao cai em linha propria, entao um alvo maior nao desalinha nada). Checar: todo novo `<button>`/
   `<a>` clicavel que copia o estilo de um chip/badge tem `min-height>=40px` no viewport de telefone.
+
+- **2026-08-16 (via um comparador de precos) - um CONECTOR decorativo (trilha, seta, linha
+  pontilhada que "leva" a um alvo) precisa terminar NO alvo em todos os viewports.** Um elemento cujo
+  significado e apontar/conduzir (trilha de cheiro ate a busca, seta ate o CTA) com `max-width` fixa
+  menor que o container fluido termina "no ar" no viewport largo e vira rabisco aleatorio - o
+  proposito do elemento se perde exatamente na tela onde ele mais aparece. Regra: se o elemento
+  conecta A a B, verifique no viewport MAIS LARGO que a ponta encosta (ou aponta claramente) em B;
+  conectores devem ter largura relativa ao mesmo container do alvo, nao um px fixo. Corolario ja
+  conhecido mas reconfirmado: anel de foco e TINTA, nao preenchimento - um acento quente (ambar)
+  como outline sobre fundo claro some (~1.6:1); use a cor estrutural escura do tema.
