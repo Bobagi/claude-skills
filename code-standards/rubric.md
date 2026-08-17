@@ -57,3 +57,13 @@ Testes → `test-forge`. UI/UX → `frontend-review`.
   quanto um **segundo sistema de migrations** (SQL aplicado por psql no boot) que torna um `runMigrations()`
   JS **morto**. Footgun recorrente: script `"test": "docker compose down -v && …"` — o `-v` **apaga o
   volume do banco**; rodar `npm test` destrói dados. Sinalize e neutralize (placeholder não-destrutivo).
+- **2026-08-17 (via mobile-app, card 42251):** Quando o padrão local **conflita** com uma regra firme do
+  dono do repo, não escolha um dos dois: procure o **terceiro caminho**, que é outro padrão local
+  equivalente já presente no mesmo arquivo. Caso concreto: a função vizinha (escrita pelo tech lead em
+  2024) tratava o `catch` com um comentário explicativo, mas nos repos da Unifique não se deixa
+  comentário em código. Trocar por um `catch` vazio quebraria `no-empty`; a saída foi o
+  `console.log('[error <fn>]', error)` que **o próprio arquivo já usa** em três outros catches: zero
+  comentário, zero desvio. Antes de julgar um comentário herdado como padrão, rode `git log -S` nele:
+  saber **quem** escreveu (tech lead vs eu mesmo numa sessão passada) muda se ele é convenção ou dívida.
+  Cheque também `prettier --check` além do eslint: o `printWidth` do repo (160 aqui) é padrão objetivo que
+  o eslint não cobre.
