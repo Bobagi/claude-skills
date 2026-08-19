@@ -1417,3 +1417,29 @@ click, drive them separately for now (interaction steps are a planned engine fea
   conectores devem ter largura relativa ao mesmo container do alvo, nao um px fixo. Corolario ja
   conhecido mas reconfirmado: anel de foco e TINTA, nao preenchimento - um acento quente (ambar)
   como outline sobre fundo claro some (~1.6:1); use a cor estrutural escura do tema.
+
+- **2026-08-19 (via Fenix, aba de validacao de identidade - 14 divergencias de design achadas por
+  humano DEPOIS de eu ter "alinhado ao handoff"):** eu tinha validado comparando print do app com
+  print do Figma, a olho. O revisor sentou com o handoff frame a frame e achou 14 itens. As causas
+  raiz, todas reutilizaveis:
+  1. **A escala do design system nao e a do framework.** `tailwind.config` do projeto redefinia
+     `spacing` (1=8px, 2=16px, 3=24px) e `borderRadius` (xs 2 / sm 8 / DEFAULT 16 / lg 24). Resultado:
+     um indicador `h-4 w-4` que eu li como 16px renderizava **32px**, e `rounded-md` (6px, default do
+     Tailwind) nao pertencia a escala do projeto. Checar a config ANTES de escrever ou julgar classe.
+  2. **Token de cor pode inverter entre temas.** `neutral-100` era `#ffffff` no claro e `#000000` no
+     escuro: o card da lista virava preto puro no dark mode. Sempre ler o valor do token nos DOIS
+     temas; nome de token nao e cor.
+  3. **Elemento de 1px dentro de flex some por `flex-shrink`.** Um `Divider` de `h-[1px]` como filho
+     direto de `flex flex-col` ficou com **0,0625px** quando o conteudo passou a exceder a altura, e
+     nao pintava nada. So aparecia em um estado especifico (com banner). Medir `getBoundingClientRect`
+     no navegador, nao confiar no DOM existir.
+  4. **`truncate` sem `min-w-0` no pai flex nao corta nada:** o container cresce e gera scroll
+     horizontal. Testar com o pior caso real (nome de arquivo de 95 caracteres), nao com o feliz.
+  5. **Nao replicar a mesma lista de formatos aceitos em pickers diferentes:** o handoff pedia
+     PDF/PNG/JPG no documento e so PNG/JPG na foto de rosto; copiar a lista deixou aceitar PDF como
+     selfie.
+  6. **Prop de componente do DS muda semantica:** `autoSize` virava `w-min`, e era isso que deixava
+     os botoes "espremidos" em vez de metade da coluna.
+  Regra pratica que fecha o buraco: depois de aplicar, **medir no navegador** (largura, padding,
+  radius, cor computada) e comparar com o numero do inspector do handoff, em vez de olhar as duas
+  imagens lado a lado. E conferir o **dark mode** de toda tela tocada, sempre.

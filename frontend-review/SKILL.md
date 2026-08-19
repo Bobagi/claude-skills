@@ -27,6 +27,26 @@ costuma ser a URL alvo (ou um caminho de projeto / "este projeto").
 4. **Rotas** — liste as telas que importam (home, login, dashboard, conta, modais, estados vazios).
    Em SPA com hash router, use rotas tipo `#/account`.
 
+## Pilar 0 — Ler o design system ANTES de julgar (obrigatório quando existe handoff)
+
+Sem esta etapa o review vira comparação a olho, e comparação a olho deixa passar divergência que o
+revisor humano acha em minutos. Faça nesta ordem, antes de abrir qualquer screenshot:
+
+1. **Abra a config de tema do projeto** (`tailwind.config.*`, tokens do DS, CSS de variáveis) e anote
+   as escalas REAIS. Elas costumam não ser as do framework: um design system pode redefinir
+   `spacing` (1 = 8px, 2 = 16px, 3 = 24px) e `borderRadius` (xs 2 / sm 8 / DEFAULT 16 / lg 24). Nesse
+   projeto, `h-4 w-4` é 32px, não 16px, e `rounded-md` não existe na escala, é resto do default do
+   framework vazando.
+2. **Leia os tokens de cor nos DOIS temas.** Token pode inverter: `neutral-100` valia `#ffffff` no
+   claro e `#000000` no escuro. Escolher pelo nome, ou pelo hex do handoff, produz buraco preto no
+   tema oposto. Regra: todo token de fundo/borda que você aplicar precisa ser conferido nos dois
+   temas antes de virar código.
+3. **Leia o código dos componentes do DS que for usar.** Props mudam semântica: um `autoSize` virou
+   `w-min` e explicava um botão "espremido" que parecia bug de layout.
+4. **Peça o handoff exportado** se não houver acesso ao Figma (o operador exporta o zip do arquivo).
+   Prints de terceiros em baixa resolução levam a conclusão errada: um card lido como
+   `rg_frente_verso.pdf` era na verdade `rg_frente.pdf e verso.pdf`, o que muda a regra de negócio.
+
 ## Pilar 1 — Visual (screenshots + crítica)
 Use o motor `scripts/capture.mjs` (Puppeteer headless; resolve Chrome e `puppeteer-core` sozinho via
 caches conhecidos — veja "Setup" abaixo). Capture cada rota em vários viewports.
