@@ -754,3 +754,14 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   worker que lê aquilo pode multiplicar/comparar com lixo). Dispare a matriz inteira num campo novo:
   overflow, string, `null`, `NaN` literal, `0`, negativo, e fora-de-faixa - e confira o valor ARMAZENADO,
   não só o status. O default seguro é: decoder rejeita malformado (400), service clampa o resto por faixa.
+- **2026-08-20 (via um app financeiro) - um NOVO caminho de gasto automatico se blinda REUSANDO o
+  caminho de compra ja comprovado, nao reimplementando.** Ao adicionar um gatilho novo que gasta
+  dinheiro sozinho (ex.: "compra na queda" alem do DCA diario), a forma segura e chamar a MESMA funcao
+  de execucao de ordem que ja passa por todas as travas (teto por ordem, minimo notional, recusa de
+  producao sem opt-in de live-trading, log idempotente) e so trocar o TIPO da operacao. Auditar: (1) o
+  novo gatilho e idempotente por janela (guarda por tipo+dia, fail-closed na leitura da guarda para
+  nunca dobrar); (2) respeita o teto por robo/usuario (fail-closed em erro de leitura de alocacao); (3)
+  fail-closed no proprio gatilho quando o dado que dispara vem de fora (nao comprar com vela ilegivel);
+  (4) o dado que decide (simbolo) vem do banco, nao do request; (5) desligado por default (opt-in).
+  E-mail disparado por evento de robo: dedup por episodio (marcador worker-owned que o update do
+  usuario nao toca), senao um worker de 30s manda N e-mails; template escapa tudo e nao vaza segredo.
