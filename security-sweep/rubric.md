@@ -746,3 +746,11 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   reais so como fixture PII-safe**: paginas de loja LOGADA carregam nickname/e-mail do usuario -
   nao commite o arquivo real; gere uma fixture sintetica que reproduz o FORMATO (com os tokens de
   ref) e valide o parser contra o arquivo real so em memoria.
+- **2026-08-20 (via um app financeiro) - campo numérico novo num payload existente herda o decoder, mas
+  NÃO herda os clamps: teste os dois separadamente.** Ao adicionar um campo float/int a um endpoint que
+  já existe, o decoder JSON da linguagem já rejeita overflow (`1e309`→Inf) e tipo errado (`"20"`) com
+  400 de graça - fácil concluir "está protegido". Mas `null`/`0`/negativo/fora-de-faixa passam o decoder
+  e chegam ao service: sem clamp explícito por faixa, viram `Infinity`/`NaN`/valor absurdo no banco (e o
+  worker que lê aquilo pode multiplicar/comparar com lixo). Dispare a matriz inteira num campo novo:
+  overflow, string, `null`, `NaN` literal, `0`, negativo, e fora-de-faixa - e confira o valor ARMAZENADO,
+  não só o status. O default seguro é: decoder rejeita malformado (400), service clampa o resto por faixa.
