@@ -1450,3 +1450,13 @@ click, drive them separately for now (interaction steps are a planned engine fea
   daria agora (idealmente reproduzindo o incidente que motivou a feature). Um espelho que diverge do
   servidor e pior que nao ter preview - a pessoa confia no que le. Par obrigatorio: tripwire de deriva
   ligando as duas fontes + um caso ao vivo na review visual.
+- **2026-08-20 (via um app financeiro) - um `label { margin }` global resetado SÓ dentro de `.field` é
+  footgun de margem.** Design systems costumam dar margem vertical ao `<label>` (label de formulario
+  empilhado) e neutralizar so dentro do wrapper `.field`. Resultado: TODO `<label>` de controle INLINE
+  fora de `.field` (toggle switch, dropdown-picker de "exibir em X", linha de filtro, seletor de
+  pagina) herda essa margem (ex.: 16px topo + 8px base) e empurra barras de ferramentas/toggles para
+  fora do ritmo - silenciosamente, porque cada um vive num flex container que mascara parte do efeito.
+  Quando o usuario reclamar que "as margens estao erradas em varios lugares", faca grep de `<label`
+  SEM `for=`/sem `.field`, e confira se cada classe de controle inline (`.switch`, `.pos-filter`,
+  `.display-pick`, `.pager-size`...) reseta `margin: 0`. Fix: `margin: 0` nessas classes; o layout (o
+  flex container) e quem deve possuir o espacamento, nao a margem herdada do label.
