@@ -187,6 +187,20 @@ click, drive them separately for now (interaction steps are a planned engine fea
 ---
 
 ## Learnings log (append-only; this is how the reviewer improves)
+- **2026-08-20 (via um site-brinquedo 3D) - `display` em classe mata o atributo `hidden`.** Qualquer
+  elemento alternado via atributo `hidden` que TAMBÉM recebe `display:` numa classe (`.x{display:grid}`)
+  fica visível para sempre: a regra do autor vence o default do UA (`[hidden]{display:none}`). Um
+  overlay de fallback nesse estado cobre o app inteiro E engole os cliques, com o DOM jurando
+  `el.hidden === true`. Check novo: para todo seletor com `display:` cujo elemento usa `hidden`,
+  exigir o par `.x[hidden]{display:none}`; e no review comparar `el.hidden` avaliado no DOM contra o
+  screenshot - divergência entre os dois é exatamente este bug.
+- **2026-08-20 (idem) - capturar página WebGL em headless exige flags e outra condição de load.**
+  Chromium headless sem GPU não cria contexto WebGL (a página cai no fallback e o review avalia a
+  tela errada); lançar com `--enable-unsafe-swiftshader --use-gl=angle --use-angle=swiftshader` para
+  ver a cena real. Página com rAF contínuo + beacon de analytics nunca atinge `networkidle2` (timeout
+  de navegação) - usar `domcontentloaded` + espera fixa. Atrás de Cloudflare, headless leva challenge:
+  capturar pela origem (`/etc/hosts` → 127.0.0.1; o cert LE real valida). E física baseada em `dt`
+  clampado roda em câmera lenta a ~10fps de software - julgar duração de animação só em GPU real.
 - **2026-08-11 (via um site institucional) - dois componentes que renderizam "o mesmo rodapé/cabeçalho"
   divergem nos EFEITOS COLATERAIS, não no visual.** Um layout compartilhado copiado em dois componentes
   (uma home stand-alone + um `PageShell` para as sub-páginas) tende a ficar pixel-idêntico, porque a
