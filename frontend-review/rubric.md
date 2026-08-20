@@ -1443,3 +1443,10 @@ click, drive them separately for now (interaction steps are a planned engine fea
   Regra pratica que fecha o buraco: depois de aplicar, **medir no navegador** (largura, padding,
   radius, cor computada) e comparar com o numero do inspector do handoff, em vez de olhar as duas
   imagens lado a lado. E conferir o **dark mode** de toda tela tocada, sempre.
+- **2026-08-20 (via um app financeiro) - preview no cliente de uma DECISAO do servidor se valida com
+  dado VIVO, nao so com fixture.** Quando a UI espelha logica que roda no backend (ex.: "o robo vai
+  pular a compra de hoje porque houve alta de X%"), o review nao termina no pixel: carregue a tela com
+  dado real de mercado/producao e confira que a frase do preview descreve o mesmo veredito que o servidor
+  daria agora (idealmente reproduzindo o incidente que motivou a feature). Um espelho que diverge do
+  servidor e pior que nao ter preview - a pessoa confia no que le. Par obrigatorio: tripwire de deriva
+  ligando as duas fontes + um caso ao vivo na review visual.
