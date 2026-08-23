@@ -598,6 +598,16 @@ click, drive them separately for now (interaction steps are a planned engine fea
   drawer, toast ou barra fixa. Antes de declarar que um overlay não apareceu, olhe o fold shot; e ao
   revisar overlays, capture fold + fullPage (o segundo só para o conteúdo por trás).
 
+- **2026-08-23f (via um painel financeiro) - diálogo de ação EM MASSA precisa POSSUIR os controles de
+  escopo, não herdá-los invisíveis de outra superfície.** Uma primeira versão herdava o escopo (par,
+  origem) dos filtros da TABELA atrás do diálogo: funcional, mas o usuário não via nem podia mudar
+  "para quem" a ação valia sem fechar, mexer no filtro e reabrir - reclamação imediata do dono. Regra:
+  o diálogo que dispara uma ação em lote mostra selects/inputs PRÓPRIOS para cada dimensão do escopo,
+  com a contagem de itens afetados atualizando ao vivo (ideal: o dry-run do servidor devolve o
+  breakdown por opção, ex.: contagem por par, e o seletor exibe "OPÇÃO (n)"); estado de filtros de
+  fora vira no máximo pré-preenchimento visível e editável. Check ao revisar qualquer "aplicar a
+  todos": dá para responder "todos QUEM?" e mudar a resposta SEM sair do diálogo?
+
 > Add a dated, **general** lesson whenever a review surfaces a check worth keeping. Keep it
 > project-agnostic. Promote recurring lessons into the checklists above.
 
