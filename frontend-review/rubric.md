@@ -590,6 +590,14 @@ click, drive them separately for now (interaction steps are a planned engine fea
   apagado), resete-o ao default; (3) cuidado com estilo `:disabled` desenhado para "ocupado" (cursor
   progress) sendo reusado para "bloqueado" - são semânticas diferentes (not-allowed + dica do porquê).
 
+- **2026-08-23e (via um painel financeiro) - modal/overlay `position:fixed` some no screenshot
+  fullPage: julgue-o no shot de FOLD.** No fullPage o puppeteer estica a viewport para a altura da
+  página e o overlay fixo rende uma única vez ancorado no topo do documento - se a página é longa, o
+  crop da região "onde o modal deveria estar" mostra conteúdo normal e induz o falso diagnóstico "o
+  modal não abriu". O `__fold.png` (viewport real) é a evidência correta para qualquer dialog,
+  drawer, toast ou barra fixa. Antes de declarar que um overlay não apareceu, olhe o fold shot; e ao
+  revisar overlays, capture fold + fullPage (o segundo só para o conteúdo por trás).
+
 > Add a dated, **general** lesson whenever a review surfaces a check worth keeping. Keep it
 > project-agnostic. Promote recurring lessons into the checklists above.
 
