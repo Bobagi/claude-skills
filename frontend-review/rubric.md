@@ -524,6 +524,20 @@ click, drive them separately for now (interaction steps are a planned engine fea
   nova-vs-antiga sobre a mesma fonte vira achado, não ruído. Corolário: o fix canônico é transformar
   o helper em binding reativo (`$:` arrow) em vez de duplicar a leitura em cada consumidor.
 
+- **2026-08-23b (via um painel financeiro) - keyed `{#each}`/`v-for :key`/React `key` com ATRIBUTO
+  DE EXIBIÇÃO em vez de identidade quebra só quando os dados mudam de forma.** Uma lista keyed por um
+  campo "que parecia único" (o ativo "BTC" de uma carteira, quando a linha real é por PAR de
+  negociação) funciona por meses até a primeira carga de dados em que o atributo se repete (um
+  import criou BTC em dois pares) - aí o framework corrompe a reconciliação em produção SEM erro
+  (itens fantasma/duplicados, seleção destacando o "gêmeo"; em dev o Svelte lança, mas ninguém roda
+  dev com aquele dado). Checks: (1) para todo each keyed, pergunte "essa chave é a IDENTIDADE da
+  linha no modelo de dados (id, símbolo composto), ou um rótulo que PODE repetir?"; (2) rótulo
+  ambíguo é bug próprio: dois itens visualmente idênticos ("BTC" e "BTC") que são coisas diferentes
+  precisam de desambiguação no label (ex.: "BTC/USDT"), especialmente quando o rótulo alimenta um
+  texto de AÇÃO destrutiva ("vender todos os X" que só vende um dos dois); (3) o harness de review
+  deve incluir o estado de dados que DUPLICA o atributo (a rubric de "seed the worst case" vale para
+  cardinalidade, não só quantidade).
+
 > Add a dated, **general** lesson whenever a review surfaces a check worth keeping. Keep it
 > project-agnostic. Promote recurring lessons into the checklists above.
 
