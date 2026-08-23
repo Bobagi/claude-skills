@@ -538,6 +538,16 @@ click, drive them separately for now (interaction steps are a planned engine fea
   deve incluir o estado de dados que DUPLICA o atributo (a rubric de "seed the worst case" vale para
   cardinalidade, não só quantidade).
 
+- **2026-08-23c (via um painel financeiro) - print de "regressão" logo após deploy de SPA: primeiro
+  pergunte QUE BUNDLE produziu a tela.** Uma SPA não recarrega sozinha; a aba que o usuário deixou
+  aberta continua rodando o código de ANTES do deploy, e o report dele ("você não corrigiu, piorou")
+  descreve fielmente o bug antigo. O próprio print responde: procure strings/rótulos que só existem
+  numa das versões (o fix mudava o texto das pills; o print mostrava o texto velho = aba velha).
+  Triagem antes de reabrir investigação: (1) fingerprint do print contra as strings do bundle novo;
+  (2) conferir que a borda/HTML serve o hash novo; (3) pedir hard-reload e novo print. Sem isso você
+  "conserta" código que já está certo ou desfaz um fix bom. Corolário: responda com o pedido de
+  reload JUNTO da correção de qualquer feedback legítimo restante, nunca só "recarregue aí".
+
 > Add a dated, **general** lesson whenever a review surfaces a check worth keeping. Keep it
 > project-agnostic. Promote recurring lessons into the checklists above.
 
