@@ -53,6 +53,14 @@ Every finding must carry: **what** (the problem), **where** (route + viewport + 
 - [ ] Nothing overlaps after reflow; sticky headers don't cover content.
 - [ ] Type and spacing scale down sensibly - desktop spacing shouldn't look huge on mobile, or mobile spacing cramped on desktop.
 - [ ] Images/media keep aspect ratio; no stretch/squash; avatars stay circular.
+- [ ] **Arte com TEXTO EMBUTIDO (diagrama, infográfico, print anotado) foi desenhada na largura do
+  CELULAR.** `max-width:100%` resolve o overflow e esconde o problema real: a imagem encolhe e o texto
+  DENTRO dela encolhe junto. Meça: `escala = largura renderizada no viewport mais estreito ÷ largura
+  intrínseca da arte`, depois `font-size da arte × escala`. Uma figura de 720px com corpo de 12px cai
+  para ~5,5px num telefone de 390 (container ~328) - ilegível, P0. Desenhe a arte na largura do
+  container do celular (empilhada na vertical, texto ~12px), e deixe que no desktop ela apareça no
+  tamanho natural, centralizada: aí o texto da figura fica do tamanho da prosa nos dois lados. Confira
+  renderizando o arquivo na largura REAL do container, não só no tamanho de autoria.
 
 ### Typography
 - [ ] Clear hierarchy (size/weight/color distinguish H1 > H2 > body > caption).
@@ -151,6 +159,12 @@ Every finding must carry: **what** (the problem), **where** (route + viewport + 
 - [ ] Conditional rendering covers loading/empty/error, not just data-present.
 - [ ] Strings are in the i18n layer, not hardcoded (when the project is localized) - check **every** language dict has the key.
 - [ ] Images have width/height or aspect-ratio to avoid CLS; lazy-load below the fold.
+- [ ] **Asset de nome estável atrás de CDN precisa de cache-busting para ser EDITÁVEL.** Trocar o
+  conteúdo de `/img/x.svg` não troca o que o leitor vê enquanto a borda tiver a cópia antiga (confira
+  com `cf-cache-status` / `age` / `max-age` num HEAD pela URL pública). Cite com `?v=` ou hash desde a
+  primeira publicação - descobrir isso só na hora da correção custa uma janela de horas mostrando a
+  versão errada. Corolário para o teste que valida "a imagem existe no disco": ele tem que tirar a
+  query antes de olhar o sistema de arquivos.
 
 ## Pillar 3 - UX / a11y / consistency
 
@@ -167,6 +181,11 @@ Every finding must carry: **what** (the problem), **where** (route + viewport + 
 - [ ] Forms: labels, helpful errors tied to fields, no destructive action without confirm/undo.
 - [ ] Consistency: the same concept looks/behaves the same everywhere (sub-tab placement, button styles, card widths, table patterns).
 - [ ] Internationalization renders correctly per locale (flags/text), no untranslated fallbacks leaking.
+- [ ] **Texto dentro de imagem é conteúdo traduzível.** Numa página localizada, um diagrama, gráfico
+  ou print anotado com o texto cravado num idioma aparece no idioma ERRADO em todas as outras versões,
+  e nenhum linter de i18n acusa (a string não está no dicionário, está no pixel). Ou gere um arquivo
+  por idioma a partir de um script com tabela de textos, ou tire o texto da arte e ponha em legenda.
+  Vale também para o `alt`: ele tem que estar no idioma da página, não no do autor.
 - [ ] Reduced-motion respected; no essential info conveyed only by animation.
 
 ## Reading the automated signals (`manifest.json`)
@@ -187,6 +206,18 @@ click, drive them separately for now (interaction steps are a planned engine fea
 ---
 
 ## Learnings log (append-only; this is how the reviewer improves)
+- **2026-08-23 (via um artigo/guia ilustrado) - figura com texto embutido é conteúdo, não decoração:
+  ela tem largura de celular e tem idioma.** Duas falhas na mesma arte. (1) Desenhei os diagramas em
+  720px pensando na coluna do desktop; no telefone o container tem ~328px e `max-width:100%` reduz a
+  imagem inteira, então o corpo de 12px virou 5,5px - o layout passa em todos os sinais automáticos
+  (`overflowX:false`, `offCanvas:0`) e mesmo assim a figura está ilegível, porque nenhum sinal mede
+  texto DENTRO de imagem. Regra nova: medir `escala × font-size da arte` no viewport mais estreito e
+  desenhar mobile-first, empilhado. (2) A página tinha tradução, a arte não: o leitor do outro idioma
+  recebeu 4 diagramas na língua errada, e nenhuma checagem de i18n pega isso (a string mora no pixel).
+  Regra nova: arte com texto = um arquivo por idioma, gerado por script com tabela de textos. Corolário
+  de processo: se a arte é gerada, o GERADOR vai para o repo do projeto, senão a próxima correção vira
+  redesenho à mão; e a altura do canvas se deriva do conteúdo, porque constante mágica corta a borda
+  de baixo quando o texto cresce.
 - **2026-08-20 (via um site-brinquedo 3D) - `display` em classe mata o atributo `hidden`.** Qualquer
   elemento alternado via atributo `hidden` que TAMBÉM recebe `display:` numa classe (`.x{display:grid}`)
   fica visível para sempre: a regra do autor vence o default do UA (`[hidden]{display:none}`). Um
