@@ -510,6 +510,20 @@ click, drive them separately for now (interaction steps are a planned engine fea
   desktop E mobile - defeitos de marca somem no meio de uma screenshot full-page e passam batido. Um
   rebrand nao esta revisado sem um close-up do header comparado lado a lado com a referencia.
 
+- **2026-08-23 (via um painel financeiro) - duas superfícies alimentadas pela MESMA fonte assíncrona
+  são um detector de bug de reatividade uma da outra.** Ao adicionar uma superfície derivada nova
+  (coluna, badge, card) ao lado de uma existente que consome o mesmo dado assíncrono (mapa de
+  cotações, resultado de fetch), compare as duas NO MESMO frame do screenshot: se a nova mostra o
+  dado e a antiga mostra o estado vazio/"sem cotação", isso não é flakiness - é bug de rastreamento
+  de dependências (em frameworks que rastreiam deps textualmente, como Svelte, um helper `function`
+  hoisted esconde a leitura do estado e o bloco consumidor nunca re-executa quando o dado chega; a
+  superfície nova "funciona" porque referencia o estado pelo nome). Produção mascara isso porque
+  outros eventos (polls, cliques, props reatribuídas) re-disparam o render por acidente; um harness
+  de fixtures com dados chegando em ordem controlada expõe. Regra: o harness de review deve manter o
+  padrão real de chegada assíncrona (não pré-popular tudo síncrono), e toda divergência
+  nova-vs-antiga sobre a mesma fonte vira achado, não ruído. Corolário: o fix canônico é transformar
+  o helper em binding reativo (`$:` arrow) em vez de duplicar a leitura em cada consumidor.
+
 > Add a dated, **general** lesson whenever a review surfaces a check worth keeping. Keep it
 > project-agnostic. Promote recurring lessons into the checklists above.
 
