@@ -548,6 +548,17 @@ click, drive them separately for now (interaction steps are a planned engine fea
   "conserta" código que já está certo ou desfaz um fix bom. Corolário: responda com o pedido de
   reload JUNTO da correção de qualquer feedback legítimo restante, nunca só "recarregue aí".
 
+- **2026-08-23d (via um painel financeiro) - toggle de ESCOPO DE VISÃO vs ação destrutiva que age no
+  TOTAL.** Quando a UI ganha um filtro de visualização ("mostrar/ocultar dados importados", "só ativos",
+  "excluir arquivados"), todo número recalculado passa a descrever um SUBCONJUNTO - mas os endpoints de
+  ação (vender tudo, apagar, exportar) continuam agindo no conjunto COMPLETO. Um botão destrutivo
+  encabeçado por um número filtrado promete X e executa Y. Checks: (1) para cada toggle de escopo, liste
+  as ações disparáveis daquela tela e pergunte "o servidor respeita o filtro?"; se não, desabilite o
+  botão COM tooltip explicando (renderizado esmaecido - escondê-lo lê como a feature sumindo); (2) o
+  estado do filtro não pode sobreviver escondido: se a condição que exibe o toggle desaparece (dado
+  apagado), resete-o ao default; (3) cuidado com estilo `:disabled` desenhado para "ocupado" (cursor
+  progress) sendo reusado para "bloqueado" - são semânticas diferentes (not-allowed + dica do porquê).
+
 > Add a dated, **general** lesson whenever a review surfaces a check worth keeping. Keep it
 > project-agnostic. Promote recurring lessons into the checklists above.
 
