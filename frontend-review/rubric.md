@@ -608,6 +608,17 @@ click, drive them separately for now (interaction steps are a planned engine fea
   fora vira no máximo pré-preenchimento visível e editável. Check ao revisar qualquer "aplicar a
   todos": dá para responder "todos QUEM?" e mudar a resposta SEM sair do diálogo?
 
+- **2026-08-25 (via um painel financeiro) - ajuda de mecanismo com 2+ variáveis exige exemplo
+  NUMÉRICO encadeado e preview com os valores do usuário.** Um parágrafo em prosa explicando um
+  mecanismo paramétrico (trailing stop: "arma em X, segue o pico, vende no recuo de Y%") confundiu
+  até o dono do produto - ele leu "armar" como "vender". O que fixa: (1) intro que NEGA o
+  mal-entendido mais provável ("NÃO vende no preço de armar"); (2) fases numeradas curtas; (3) um
+  exemplo com números concretos percorrendo a linha do tempo (700k arma -> pico 900k -> vende 720k;
+  pior caso 560k); (4) melhor de tudo, um PREVIEW no editor que recalcula com os valores que a
+  pessoa digitou, na moeda dela ("com esses valores: arma em X, pior venda Y, pico A vende ~B").
+  Check ao revisar qualquer form paramétrico de dinheiro: dá para prever o resultado numérico da
+  configuração SEM sair da tela? Se a resposta exige fazer conta de cabeça, falta o preview.
+
 > Add a dated, **general** lesson whenever a review surfaces a check worth keeping. Keep it
 > project-agnostic. Promote recurring lessons into the checklists above.
 
