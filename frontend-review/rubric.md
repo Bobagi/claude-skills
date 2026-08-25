@@ -172,6 +172,13 @@ Every finding must carry: **what** (the problem), **where** (route + viewport + 
 - [ ] Every control has an accessible name (the `unnamed`/`unlabeledInputs` signals); inputs have associated labels.
 - [ ] Keyboard: everything reachable and operable; visible focus ring; logical tab order; Esc closes modals; focus trapped in modals.
 - [ ] Images informative→`alt`, decorative→empty alt/`aria-hidden` (the `alt` signal).
+- [ ] **Legenda de imagem que você não produziu sai da FONTE, não do seu olho.** Ao reusar print,
+  mapa ou diagrama de terceiro, leia a legenda/contexto da origem antes de escrever a sua: uma
+  leitura visual plausível vira erro factual na sua página (caso real: marcadores coloridos num mapa
+  lidos como "aqui nasce o item", quando a fonte dizia que a área colorida marcava a MAIOR DISTÂNCIA
+  até o alvo - conselho invertido). Cheque também se a imagem mostra o mesmo ESTADO que o texto
+  descreve (foto diurna num guia que só vale à noite, UI de versão antiga, modo diferente); se não
+  mostrar, ou troque a imagem ou avise na legenda. E registre a procedência no próprio artigo.
 - [ ] **Don't put `tabindex="0"` on a non-interactive element** (a scroll container, a plain `<div>`
   text region). It fails the lint (`a11y-no-noninteractive-tabindex`) and adds a confusing tab stop -
   the content is already in the accessibility tree for screen readers, and the real controls
@@ -206,6 +213,18 @@ click, drive them separately for now (interaction steps are a planned engine fea
 ---
 
 ## Learnings log (append-only; this is how the reviewer improves)
+- **2026-08-25 (via um artigo que passou a usar prints de terceiro) - a imagem passa em todos os
+  sinais e mesmo assim mente.** Trouxe prints de uma wiki para ilustrar um guia. Layout impecável
+  (`overflowX:false`, `offCanvas:0`, `missingAlt:0`, sem erro de console) e ainda assim duas legendas
+  estavam erradas, porque eu as escrevi OLHANDO a imagem em vez de ler o que a fonte dizia sobre ela:
+  a área colorida de um mapa, que eu li como "é aqui que nasce", significava na origem "estes são os
+  mais LONGES do alvo" - conselho invertido; e chamei de "ícone do adaptador" uma arte que era o item
+  já instalado. Nenhum pilar visual pega isso. Checks novos: (a) legenda de imagem de terceiro sai da
+  legenda/contexto da FONTE; (b) confira se a imagem mostra o mesmo ESTADO do texto (dia x noite,
+  versão da UI, modo de jogo) e avise na legenda quando não mostrar; (c) declare a procedência no
+  artigo. Corolário técnico que deu certo e vale repetir: reservir a imagem do próprio domínio (em vez
+  de hotlink) mantém a CSP `img-src 'self'` fechada e o peso sob controle; alpha sobrevive na conversão
+  para webp, então arte recortada assenta em tema escuro sem retângulo branco.
 - **2026-08-23 (via um artigo/guia ilustrado) - figura com texto embutido é conteúdo, não decoração:
   ela tem largura de celular e tem idioma.** Duas falhas na mesma arte. (1) Desenhei os diagramas em
   720px pensando na coluna do desktop; no telefone o container tem ~328px e `max-width:100%` reduz a
