@@ -619,6 +619,19 @@ click, drive them separately for now (interaction steps are a planned engine fea
   Check ao revisar qualquer form paramétrico de dinheiro: dá para prever o resultado numérico da
   configuração SEM sair da tela? Se a resposta exige fazer conta de cabeça, falta o preview.
 
+- **2026-08-25b (via um painel financeiro) - o screenshot mostrou o defeito e o revisor não viu:
+  cheque a INTENÇÃO declarada de cada bloco, não só sinais automáticos.** Um cabeçalho desenhado como
+  "título à esquerda, botão à direita" renderizou com o botão CAÍDO para baixo do título (herança de
+  um `.card-header{flex-direction:column}` global não re-declarada no scoped) e a revisão aprovou "0
+  P0/P1/P2": overflow ok, console ok, conteúdo ok - mas ninguém comparou o que APARECEU com o que o
+  CSS recém-escrito PRETENDIA. O dono pegou de primeira. Regras: (1) ao revisar UI que você mesmo
+  acabou de escrever, liste as intenções de layout (o que fica ao lado de quê, o que alinha à
+  direita) e confira UMA A UMA no screenshot - autor relendo o próprio trabalho vê a intenção, não o
+  pixel; (2) todo `display:flex` scoped sobre uma classe que o design system também define precisa
+  re-declarar `flex-direction` explicitamente (o global pode ser column); (3) número derivado
+  (percentual, moeda) em texto novo: conferir o separador decimal no locale do dono (toFixed gera
+  ponto; use toLocaleString).
+
 > Add a dated, **general** lesson whenever a review surfaces a check worth keeping. Keep it
 > project-agnostic. Promote recurring lessons into the checklists above.
 
