@@ -176,6 +176,15 @@ def micros(v: dict) -> float:
     return int(v.get("microsValue", 0)) / 1e6
 
 
+def numeric(v: dict) -> float:
+    """Metrica da AdMob API: dinheiro vem em microsValue, taxas em doubleValue."""
+    if "microsValue" in v:
+        return int(v["microsValue"]) / 1e6
+    if "doubleValue" in v:
+        return float(v["doubleValue"])
+    return float(v.get("integerValue", 0))
+
+
 def cmd_report(args):
     token = access_token()
     pub = publisher_id(token)
@@ -212,7 +221,7 @@ def cmd_report(args):
         mv = row.get("metricValues", {})
         earn = micros(mv.get("ESTIMATED_EARNINGS", {}))
         impr = int(mv.get("IMPRESSIONS", {}).get("integerValue", 0))
-        rpm = micros(mv.get("IMPRESSION_RPM", {}))
+        rpm = numeric(mv.get("IMPRESSION_RPM", {}))
         clicks = int(mv.get("CLICKS", {}).get("integerValue", 0))
         total_earn += earn
         total_impr += impr
@@ -221,7 +230,8 @@ def cmd_report(args):
     if printed == 0:
         print("(sem dados no período — normal com pouco tráfego ou app recém-publicado)")
     else:
-        print(f"{'TOTAL':<28} {total_earn:>12.4f} {int(total_impr):>11d}")
+        total_rpm = (total_earn / total_impr * 1000) if total_impr else 0.0
+        print(f"{'TOTAL':<28} {total_earn:>12.4f} {int(total_impr):>11d} {total_rpm:>9.2f}")
 
 
 def cmd_create_adunit(args):
