@@ -1615,3 +1615,11 @@ click, drive them separately for now (interaction steps are a planned engine fea
   SEM `for=`/sem `.field`, e confira se cada classe de controle inline (`.switch`, `.pos-filter`,
   `.display-pick`, `.pager-size`...) reseta `margin: 0`. Fix: `margin: 0` nessas classes; o layout (o
   flex container) e quem deve possuir o espacamento, nao a margem herdada do label.
+- **2026-08-27 (via app mobile - SEM SCREENSHOT AINDA DÁ PARA AUDITAR: overflow como asserção).** Em box
+  headless (sem browser/emulador), não desista da verificação de front: renderize o componente em viewports
+  fixos dentro do test runner e falhe em qualquer exceção de layout. Pegou 85px de estouro numa linha de
+  botões que estava em produção. E monte a matriz **idioma x tela**: o público real do produto costuma
+  falar um idioma de string mais longa que o inglês em que a UI foi desenhada. Corolário de a11y que veio
+  junto: distância mínima entre um alvo de toque perigoso (abrir anúncio, excluir) e o botão primário deve
+  ser **asserção sobre retângulos**, não avaliação visual.
+

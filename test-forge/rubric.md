@@ -282,3 +282,18 @@ Pule: getters/setters triviais, o que o compilador/framework já garante, UI pur
   gêmeo é a tradução parcial *sumir* com o conteúdo); (c) idioma inexistente → tudo no original.
   Só (a) passa por acidente em várias implementações erradas. Vale para qualquer "pick best row per
   group": preço vigente, versão mais recente, endereço principal.
+- **2026-08-27 (via app Flutter - OVERFLOW DE LAYOUT É TESTE EXECUTÁVEL, E A MATRIZ É IDIOMA x TELA).**
+  Quando não dá para rodar emulador/browser (box headless), a verificação de front vira teste de widget:
+  renderize num **viewport fixo** e afirme que nenhuma exceção de layout foi lançada
+  (`expect(tester.takeException(), isNull)` no Flutter; equivalentes existem em RN/web via clientWidth >
+  scrollWidth). Isso pegou um estouro de 85px que **screenshot nenhum tinha reportado** porque ninguém
+  abriu o app naquele tamanho. Duas regras que ficam: (a) **teste a matriz IDIOMA x TELA, não só tela** -
+  o idioma do público real (hindi, alemão, finlandês) tem string mais longa que o inglês do dev, e é lá
+  que quebra; (b) **folga entre alvos de toque é asserção, não olhômetro** - comparar `getRect()` de dois
+  widgets trava a distância mínima contra regressão.
+- **2026-08-27 (via app Flutter - RODE O TESTE CONTRA O CÓDIGO ANTIGO PARA SABER O QUE É SEU).** Um teste
+  novo que falha na primeira execução pode estar acusando um bug **pré-existente**, não a sua mudança. Antes
+  de "consertar o que eu quebrei", renderize/execute o alvo SEM a sua alteração: no caso, o overflow existia
+  antes da feature. Isso muda a conversa com o dono (bug antigo achado de brinde ≠ regressão introduzida) e
+  evita tanto se culpar à toa quanto deixar o defeito antigo passar batido.
+

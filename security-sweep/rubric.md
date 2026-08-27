@@ -163,6 +163,26 @@ lock), **é vulnerável**: N requests concorrentes leem o mesmo estado velho e t
 - **Fix:** transações atômicas; máquina de estados explícita; validar sinais/limites; verificar assinatura
   do webhook.
 
+## 14b. Política do provedor de anúncio (app cliente monetizado)
+Em app **cliente sem servidor** (mobile/desktop/extensão), o ativo mais valioso pode não ser o dado do
+usuário: é a **conta no provedor** (AdMob/AdSense/loja). Um banimento por política zera a receita de vez,
+e reincidência costuma ser permanente. Audite as regras do provedor como classe de segurança.
+- [ ] Anúncio premiado é **opt-in**: só abre por toque explícito, nunca sozinho nem no caminho de uma ação.
+- [ ] A **recompensa é declarada antes** de abrir ("assista e ganhe X"), e é paga por **assistir**, nunca
+  por clicar (crédito só no callback de recompensa do SDK, jamais no de clique/fechamento).
+- [ ] **Sem ad stacking / encadeamento:** não oferecer anúncio logo depois de outro. Para saber se o
+  anterior REALMENTE apareceu, a função que exibe precisa **devolver bool** - "mandei exibir" não é
+  "exibiu" (sem anúncio carregado ela é no-op silenciosa).
+- [ ] **Clique acidental:** o convite não pode imitar nem encostar no botão primário. Cor/forma distintas
+  e folga mínima - **trave com teste** comparando os retângulos (`getRect`), não no olho.
+- [ ] Consentimento (UMP/GDPR) roda antes de qualquer requisição de anúncio; formato novo herda o mesmo
+  fluxo, não abre caminho paralelo.
+- [ ] Build de debug/dev serve ad unit de **teste**; o id real é gated por modo de release.
+- **▶ Testar:** sem emulador/loja não dá para atacar por rede - o equivalente é exercitar cada invariante
+  com teste que dispara o cenário (fechar o anúncio antes do fim, toque duplo) e **validar por mutação**.
+- **Fix:** gate de opt-in, crédito só no callback de recompensa, supressão pós-intersticial, separação
+  física do botão primário.
+
 ## 15. Infra / headers / TLS / superfície exposta
 - [ ] TLS 1.2/1.3 só; HSTS; `Permissions-Policy` negando o que não se usa; `X-Content-Type-Options`,
   `X-Frame-Options`/frame-ancestors. Portas de DB/admin **não** públicas (bind 127.0.0.1 + túnel/proxy).
@@ -765,3 +785,17 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   (4) o dado que decide (simbolo) vem do banco, nao do request; (5) desligado por default (opt-in).
   E-mail disparado por evento de robo: dedup por episodio (marcador worker-owned que o update do
   usuario nao toca), senao um worker de 30s manda N e-mails; template escapa tudo e nao vaza segredo.
+- **2026-08-27 (via app mobile Flutter - CHECK-THEN-ACT EM EVENT LOOP SINGLE-THREADED: atômico só até o
+  primeiro `await`).** A classe 1 assume concorrência real (N requests). Em runtime de event loop único
+  (Dart, JS, Python asyncio) a regra é diferente e vale saber: ler o guard e escrever a flag é **atômico
+  se não houver ponto de suspensão entre os dois** - nenhum outro código roda no meio. A janela reabre no
+  instante em que entra um `await`/`yield`. **Regra prática: escreva a flag de "em andamento" ANTES do
+  primeiro `await`, nunca depois** - e cuidado com chamada assíncrona não-aguardada, que NÃO suspende
+  (não abre janela) mas parece que sim. Corolário para auditar: procure `await` entre a checagem e a
+  escrita; se houver, é TOCTOU mesmo sem threads.
+- **2026-08-27 (via app cliente monetizado - O ATIVO PODE SER A CONTA, NÃO O DADO).** Ao auditar app sem
+  backend, metade da rubric não tem superfície e é tentador declarar "nada a fazer". Errado: reformule a
+  pergunta para "o que, se der errado, custa dinheiro/acesso ao dono?". Em app com anúncio é a conta no
+  provedor; em app de loja é a publicação; em extensão é o item na store. Auditar as regras do
+  terceiro vira classe legítima de segurança (ver 14b).
+
