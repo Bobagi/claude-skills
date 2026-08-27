@@ -29,7 +29,7 @@ esforço aparente, e alérgico a texto que "se acha".
 |---|---|---|
 | Texto publicado profissional (Sobre do LinkedIn, currículo, ficha de loja) | Informal-polido | Forma completa: "em uma" (não "numa"), "para" (não "pra"), "para o" (não "pro"), "cerca de" (não "uns"). O humor fica; a grafia sobe um degrau. |
 | Semi-informal (recomendação no LinkedIn, README pessoal, post) | Natural | "pra" liberado, piada solta, pode zoar com carinho. |
-| Totalmente informal (bio de app de namoro, chat) | Como ele fala | "pra", "tô", "rolê"; no máximo 1 emoji por texto. |
+| Totalmente informal (bio de app de namoro, chat) | Como ele fala | "pra", "tô", "rolê", "q" no lugar de "que", "kk" como riso; no máximo 1 emoji por texto. |
 
 ## Marcadores de estilo (o que faz parecer ele)
 
@@ -110,6 +110,25 @@ esforço aparente, e alérgico a texto que "se acha".
 > Se você prefere plano tranquilo a lugar lotado, me chama e vem descobrir se em
 > conversa eu rendo mesmo.
 
+### Chat técnico com colega de time · Teams (enviada por ele 2026-08-26, registro totalmente informal)
+
+Contexto: um colega de time perguntou se ele ia criar rota nova pra buscar o usuário
+com as permissões ou usar duas chamadas. As duas opções estavam erradas, a rota já
+devolvia tudo junto, e quem tinha feito essa rota era o próprio colega que perguntou.
+Nomes de serviço e de tipo trocados por genéricos, o repo é público.
+
+> Nenhuma das duas kk. O GET <rota de detalhe> já devolve as permissões junto, o
+> <TipoDetalhe> estende as permissions e o usecase busca o member e as permissões na
+> mesma request. Já tá assim na develop do <serviço> q vc mesmo fez.
+>
+> Então é uma chamada só, e é essa que eu uso nas duas telas, no perfil pra montar os
+> chips e na de editar permissões pra marcar os toggles.
+>
+> E o GET <rota de listagem> não traz permissões, que foi o motivo da coluna Permissões
+> ter ficado de fora. Se a gente quiser essa coluna depois, eu acho melhor incluir as
+> permissões no <TipoListagem> do que bater uma vez por linha, mas aí seria um card a
+> parte, imagino.
+
 ## Learnings log
 
 - 2026-08-13 · Ele pede alternativas de abertura e escolhe por comparação; oferecer
@@ -137,3 +156,29 @@ esforço aparente, e alérgico a texto que "se acha".
   mudo"); (d) listar o que continua faltando, com o motivo. Números entram como
   informação (39 artigos), nunca como troféu. Fecho: convite curto no lugar de CTA,
   e uma linha na língua da pessoa quando ela não fala português.
+- 2026-08-26 · Registro para **chat técnico com colega de time** (Teams, pergunta de
+  arquitetura), calibrado comparando o rascunho da skill com o que ele mandou de fato.
+  O que ele MANTEVE do rascunho: responder na primeira linha antes de explicar
+  ("Nenhuma das duas"), nome concreto do tipo e da rota, frases emendadas por vírgula.
+  O que ele MUDOU, e é o que faltava no perfil:
+  - **"kk" no fim da primeira linha** quando a resposta contraria as duas opções que a
+    pessoa ofereceu. Serve pra tirar o peso do "vocês dois estão errados". Riso em
+    chat é marca dele, e vem cedo, não no fecho.
+  - **Abreviação de chat**: "q" no lugar de "que". Em chat ele digita como digita.
+  - **Dar o crédito da autoria pro outro quando é dele** ("na develop do <serviço>
+    q vc mesmo fez"). Ancora o fato e ao mesmo tempo tira o tom de quem está ensinando.
+    Se o histórico mostra que a pessoa fez, dizer isso na cara.
+  - **Precisão no fato, folga na gramática**: ele corrigiu "develop" para "develop do
+    <serviço>" (ambiguidade de ambiente, ele não deixa passar), e ao mesmo tempo
+    escreveu "o <TipoDetalhe> estende as permissions", que é tecnicamente torto. Rigor é
+    com nome de ambiente, repo, rota e número; não com concordância técnica.
+  - **Corta a frase que anuncia o formato da resposta.** O rascunho tinha "O N+1 mesmo
+    tá na listagem, não no detalhe,"; ele apagou e começou direto no fato ("E o GET
+    <rota> não traz permissões"). Ele não narra a estrutura do que vai dizer.
+  - **Corta linha que só diz o que ele NÃO faz** ("a rota de listar permissões eu nem
+    toco"): se não usa, não precisa dizer.
+  - **Hedge no fecho quando o assunto é território do outro**: "mas aí seria um card a
+    parte, imagino" no lugar de "aí é mexer no contrato, card separado".
+    Condicional mais "imagino" propõe; presente do indicativo decreta. Em decisão que
+    não é só dele, ele propõe.
+  - **Linha em branco entre parágrafos**, mesmo em mensagem de três parágrafos curtos.
