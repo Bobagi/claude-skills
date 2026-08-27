@@ -233,16 +233,54 @@ def cmd_bundles(args):
         print(f"versionCode={b['versionCode']} sha256={b.get('sha256', '?')}")
 
 
+# Idiomas que recebem a nota quando o texto e um so. Um app com ficha em mais
+# idiomas deve usar --notes-file com JSON por idioma (ver abaixo).
+DEFAULT_NOTE_LANGS = ("pt-BR", "en-US", "es-ES")
+
+
 def _release_notes(args):
+    """Notas da versao, por idioma.
+
+    `--notes-file` aceita DUAS formas:
+      * JSON `{"pt-BR": "...", "en-US": "..."}` - uma nota por idioma, que e o
+        certo quando a ficha tem varios idiomas;
+      * texto puro - replicado em DEFAULT_NOTE_LANGS, como antes.
+
+    O modo texto puro manda o MESMO texto para tres locales, ou seja, entrega
+    nota em portugues para quem le ingles. Serve para rascunho; para release de
+    verdade use o JSON.
+    """
     text = args.notes
     if args.notes_file:
         with open(args.notes_file) as fh:
-            text = fh.read().strip()
+            raw = fh.read().strip()
+        try:
+            parsed = json.loads(raw)
+        except ValueError:
+            parsed = None
+        if isinstance(parsed, dict):
+            notes = [
+                {"language": lang, "text": str(body).strip()}
+                for lang, body in parsed.items()
+                if str(body).strip()
+            ]
+            if not notes:
+                return None
+            for note in notes:
+                if len(note["text"]) > 500:
+                    raise SystemExit(
+                        f"ERRO: nota de {note['language']} tem "
+                        f"{len(note['text'])} chars; a Play corta em 500."
+                    )
+            return notes
+        text = raw
     if not text:
         return None
-    return [
-        {"language": lang, "text": text} for lang in ("pt-BR", "en-US", "es-ES")
-    ]
+    if len(text) > 500:
+        raise SystemExit(
+            f"ERRO: a nota tem {len(text)} chars; a Play corta em 500."
+        )
+    return [{"language": lang, "text": text} for lang in DEFAULT_NOTE_LANGS]
 
 
 def cmd_upload(args):
