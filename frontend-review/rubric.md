@@ -213,6 +213,22 @@ click, drive them separately for now (interaction steps are a planned engine fea
 ---
 
 ## Learnings log (append-only; this is how the reviewer improves)
+- **2026-08-30 (via uma chip nova numa linha de lista existente) - review de "um elemento só" tem
+  checklist própria, menor que a de página inteira, e pular ela é fácil demais quando a mudança
+  parece pequena demais pra merecer processo.** Pedido era revisar só uma `<span>` nova (badge)
+  inserida numa `<li class="row">` que já existia, repetida dezenas de vezes na página. Dois checks
+  bastaram e cobriram o que importava: (a) **calcular o contraste de verdade do PAR de tokens
+  usado** (cor do texto novo × background real do container, não comparar "visualmente parece
+  legível" na tela) - devolveu 7.4:1, acima do necessário, mas só o cálculo confirma, a leitura a
+  olho de um cyan sobre navy-escuro engana tanto pra mais quanto pra menos; (b) **capturar
+  especificamente o viewport mais estreito suportado**, porque é ali que um badge inline dentro de
+  um flex-row historicamente ou empurra scroll horizontal ou sobrepõe o texto vizinho - aqui o
+  `flex-wrap` já existente resolveu (o badge caiu pra uma nova linha, sem cortar), mas isso só se
+  confirma vendo o screenshot da tela pequena, os `signals` automáticos (`overflowX:false`) sozinhos
+  não provam que o WRAP ficou bonito, só que não vazou da viewport. Regra pra review de elemento
+  único: não pular pro Pilar 3 (a11y/consistência) achando que "é pouca coisa" - rodar os DOIS
+  checks acima (contraste calculado + screenshot do viewport mínimo) é o mínimo que substitui uma
+  varredura completa quando o escopo é deliberadamente pequeno.
 - **2026-08-25 (via um artigo que passou a usar prints de terceiro) - a imagem passa em todos os
   sinais e mesmo assim mente.** Trouxe prints de uma wiki para ilustrar um guia. Layout impecável
   (`overflowX:false`, `offCanvas:0`, `missingAlt:0`, sem erro de console) e ainda assim duas legendas
