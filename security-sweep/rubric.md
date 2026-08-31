@@ -799,3 +799,16 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   provedor; em app de loja é a publicação; em extensão é o item na store. Auditar as regras do
   terceiro vira classe legítima de segurança (ver 14b).
 
+- **2026-08-31 (via feature de permissionamento num BFF - "O GUARD É SÓ DE UI" NÃO É ACHADO POR SI
+  SÓ; PROVE A FRONTEIRA REAL).** Numa app BFF (Next.js/SSR que encaminha o JWT da sessão para um backend
+  que valida), o gate de UI (esconder botão, layout que renderiza "sem permissão") é defense-in-depth. É
+  tentador reportar "o guard é só de front, logo é vulnerável" - mas isso é hipótese, não achado. A
+  pergunta certa é: **o backend que recebe a chamada reimpõe a autorização?** Só dá para saber
+  DISPARANDO a rota com um token que não deveria passar. Teste mínimo e decisivo: pegue um usuário
+  **sem a permissão** (não só de outro dono) e bata direto na rota de mutação, pulando o front. Se
+  vier 403 na origem, o guard de UI é cosmético no bom sentido; se vier 200, aí sim é P0. E faça as
+  duas dimensões do IDOR separadas: **cruzar o escopo (outro plano/tenant)** costuma dar 404 mesmo COM
+  a permissão certa, enquanto **agir sem a permissão no escopo próprio** dá 403 - são checagens
+  diferentes e ambas precisam de um request cada. Corolário de teste: para logar como o usuário certo
+  no ambiente de teste, trocar a senha no banco de nonprod é mais confiável que adivinhar credencial;
+  gere o token pelo endpoint de auth e ataque a rota do backend direto, sem passar pela UI.
