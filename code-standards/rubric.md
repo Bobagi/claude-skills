@@ -67,3 +67,15 @@ Testes → `test-forge`. UI/UX → `frontend-review`.
   saber **quem** escreveu (tech lead vs eu mesmo numa sessão passada) muda se ele é convenção ou dívida.
   Cheque também `prettier --check` além do eslint: o `printWidth` do repo (160 aqui) é padrão objetivo que
   o eslint não cobre.
+- **2026-09-01 (via Concierge, card 15270 - APAGAR COMENTÁRIO É DIFF CIRÚRGICO, NÃO VARREDURA):**
+  Quando a regra do dono é "sem comentário no código" e a branch mexeu em arquivo compartilhado, um
+  `grep` de comentários **não** serve como lista de remoção: metade deles é de um colega e já está
+  mergeada no `develop`. O procedimento correto é, para cada linha de comentário do arquivo atual,
+  perguntar se ela existe em `git show origin/develop:<arquivo>`; só o que **não** existe lá é da sua
+  branch. Duas armadilhas confirmadas: (1) remover por trecho de texto quebra bloco multi-linha e deixa
+  `/**` e `*/` órfãos, ou pior, deixa a frase do meio virar CSS/JS solto - depois de remover, varra o
+  diff por fragmento órfão; (2) uma linha que o `diff` mostra como sua pode ser do colega com **só o
+  traço trocado** (a regra de em dash obriga a editar comentário alheio) - essas devem ficar, com o
+  traço já corrigido, porque apagá-las é churn no código de outro card. E o `printWidth` do prettier
+  pode estar sujo no próprio `develop`: confira o baseline com `git archive origin/develop | prettier
+  --check` antes de "arrumar formatação", senão você reformata o repo inteiro dentro do seu PR.
