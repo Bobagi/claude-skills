@@ -60,6 +60,7 @@ ou `bash <repo>/sync.sh`. Depois, **reinicie o Claude** (um `claude` novo) para 
 | `cloudflare` | `/cloudflare` | Gerencia o DNS da zona `bobagi.space` no Cloudflare via API (`scripts/cf-dns.sh`): cria/altera/remove subdomínios (A/CNAME, proxied/DNS-only) e registros **TXT** (`txt`/`txt-del`, usados pela verificação do Search Console). DNS é SÓ no Cloudflare (Hostinger morto desde 2026-07-06). Credenciais fora do repo (`/root/.config/cloudflare/` no VPS, chmod 600); de outra máquina, executa via skill `vps` (SSH). |
 | `google-search-console` | `/gsc` | **Cadastra e monitora sites no Google sem abrir o navegador**: verifica a posse sozinha (token DNS + TXT criado pela skill `cloudflare`), adiciona a propriedade, submete sitemap e lê desempenho de busca (cliques, impressões, CTR, posição, top queries/páginas). Reusa a service account do `google-play` - sem consent screen, sem senha do operador. Setup único em `google-search-console/SETUP.md`. |
 | `product-review` | `/product-review` | **Atua como Product Manager do portfolio inteiro do VPS.** Coleta dados reais de todos os produtos (tráfego do nginx separando humano/robô/ataque, usuários nos bancos, receita do Google Ads/AdMob, SEO do Search Console, tráfego/estrelas do GitHub, consumo e saúde do box), analisa o que tem valor / consome / é usado, e gera ou atualiza um **Artifact único** (republicado no mesmo link) com diagnóstico e recomendações priorizadas P0/P1/P2. Roda no VPS (docker + bancos + skills google + gh); assets versionados em `product-review/assets/` (coletor, analisador de log, builder de fontes, template HTML). Doc operacional em `/opt/pm-dashboard/README.md`. Use em "revisão de produto"/"como estão os projetos"/"atualize o dashboard de produto". |
+| `game-overlay` | `/game-overlay` | **Instala e configura em qualquer PC Windows o overlay de monitoramento para jogos** (HWiNFO lê os sensores + RTSS/RivaTuner desenha no jogo; CapFrameX para teste/benchmark; Intel PresentMon opcional). Um CLI (`scripts/overlay.ps1 tudo`, um UAC) baixa, instala fora do Program Files, configura, **descobre os sensores da máquina pela memória compartilhada e casa o layout padrão do PC** (FPS, 1% Low, frametime com gráfico, CPU/GPU Busy, blocos de CPU, GPU, RAM, discos, consumo estimado), registra a tarefa agendada elevada (RTSS antes do HWiNFO) e verifica lendo o OSD real (+ teste com vkcube e screenshot). Layout, armadilhas e modelo de LEIAME em `game-overlay/reference/`. Use em "instale o RivaTuner e o HWiNFO", "overlay de FPS nos jogos", "replicar o overlay do PC no notebook", "sumiu o FPS do overlay". |
 
 ### Plugins (marketplace `claude-plugins-official` = `anthropics/claude-plugins-official`)
 | Plugin | Para que serve |
@@ -153,6 +154,10 @@ claude-skills/
 │   ├── rubric.md               #   checklist/expertise versionada que cresce
 │   └── scripts/capture.mjs     #   screenshots multi-viewport (Puppeteer headless)
 ├── resume/SKILL.md             # skill: resumo de vídeo do YouTube
+├── game-overlay/               # skill: overlay de jogos (HWiNFO + RTSS) em qualquer PC Windows
+│   ├── SKILL.md
+│   ├── reference/              #   layout.md (por que de cada linha), armadilhas.md, LEIAME-modelo.md
+│   └── scripts/                #   overlay.ps1 (CLI), lib.ps1, layout-padrao.json, iniciar-monitoramento.ps1, runner.ps1, captura.ps1
 ├── product-review/             # skill: PM do portfolio (coleta + analisa + publica Artifact)
 │   ├── SKILL.md
 │   └── assets/                 #   collect.sh, analyze_logs.py, build.py, template.html, fonts/*.woff2

@@ -1,0 +1,57 @@
+{
+  "versao": 1,
+  "descricao": "Layout padrao do overlay (o mesmo do PC de referencia). Cada linha casa UMA leitura do HWiNFO pelo rotulo ORIGINAL em ingles (szLabelOrig da memoria compartilhada, que nao muda com o idioma da interface), dentro de um seletor de grupo. idHint e o indice da leitura visto em maquinas ja configuradas e serve so para desempate. Marcadores {cpuNome} {gpuNome} {ramGB} {ramMB} {vramMB} {cpuLimiteW} {gpuLimiteW} vem do hardware detectado; se um marcador de unidade nao tiver valor, a unidade fica a padrao do HWiNFO.",
+  "grupos": {
+    "rtss":       { "nome": ["^RTSS"], "id": ["F00F5000"] },
+    "presentmon": { "nome": ["^PresentMon"], "id": ["F0000FF0"] },
+    "cpu":        { "nome": ["^CPU \\[#\\d+\\]", "^CPU:", "^CPU "], "id": ["F0000300", "F0000400", "F0002A00"] },
+    "gpu":        { "nome": ["^d?GPU \\[#\\d+\\]", "^GPU:", "^iGPU \\[#\\d+\\]"], "id": ["E0002000"] },
+    "sistema":    { "nome": ["^System:", "^Sistema:"], "id": ["F0000301"] },
+    "memtimings": { "nome": ["^Memory Timings", "^Tempos da mem"], "id": ["F0000301"] },
+    "drive":      { "nome": ["^Drive:", "^Unidade:", "^Disco:"], "id": ["F0000101"] }
+  },
+  "linhas": [
+    { "linha": 1,  "chave": "fps",       "label": "FPS",        "grupo": "rtss",       "tipo": 8, "idHint": 0,  "leitura": ["^Framerate$"] },
+    { "linha": 2,  "chave": "fpsMedio",  "label": "FPS medio",  "grupo": "presentmon", "tipo": 8, "idHint": 0,  "leitura": ["^Framerate Presented \\(avg\\)", "^Framerate Presented.*avg", "^Framerate.*\\(avg\\)", "^Framerate Presented$"] },
+    { "linha": 3,  "chave": "low1",      "label": "1% Low",     "grupo": "presentmon", "tipo": 8, "idHint": 4,  "leitura": ["(?i)^Framerate Presented \\(1% low\\)", "(?i)^Framerate Presented.*1% low", "(?i)^Framerate.*1% low", "(?i)1% low"] },
+    { "linha": 4,  "chave": "frametime", "label": "Frametime",  "grupo": "rtss",       "tipo": 8, "idHint": 3,  "leitura": ["^Frame ?[Tt]ime$"],
+      "grafico": { "RtssGraphShow": 1, "RtssGraphWidth": 60, "RtssGraphHeight": 44, "RtssGraphMargin": 2, "RtssGraphMinY": "0.000000", "RtssGraphMaxY": "40.000000" } },
+    { "linha": 6,  "chave": "cpuBusy",   "label": "CPU Busy",   "grupo": "presentmon", "tipo": 8, "idHint": 40, "leitura": ["^CPU Busy \\(avg\\)$", "^CPU Busy"] },
+    { "linha": 7,  "chave": "gpuBusy",   "label": "GPU Busy",   "grupo": "presentmon", "tipo": 8, "idHint": 30, "leitura": ["^GPU Busy \\(avg\\)$", "^GPU Busy"] },
+    { "linha": 9,  "chave": "cpuUso",    "label": "{cpuNome}",  "grupo": "cpu", "tipo": 7, "idHint": 29,  "leitura": ["^Total CPU Usage$", "^Total CPU Utility$"] },
+    { "linha": 10, "chave": "cpuThread", "label": "Thread max", "grupo": "cpu", "tipo": 7, "idHint": 28,  "leitura": ["^Max CPU/Thread Usage$", "^Max CPU/Thread Usage", "^Max CPU Usage"] },
+    { "linha": 11, "chave": "cpuClock",  "label": "Clock",      "grupo": "cpu", "tipo": 6, "idHint": 52,  "leitura": ["^Average Effective Clock$", "^Core Effective Clocks$", "^Core Clocks$", "^Core 0 Clock$"] },
+    { "linha": 12, "chave": "cpuTemp",   "label": "Temp",       "grupo": "cpu", "tipo": 1, "idHint": 510, "leitura": ["^CPU Package$", "^CPU \\(Tctl/Tdie\\)$", "^CPU Die \\(average\\)$", "^CPU Package Temperature$", "^CPU$", "^Core Temperatures$", "^Core Max$"] },
+    { "linha": 13, "chave": "cpuWatts",  "label": "Watts",      "grupo": "cpu", "tipo": 5, "idHint": 0,   "leitura": ["^CPU Package Power$", "^CPU Package Power \\(SMU\\)$", "^CPU PPT$", "^Package Power$"], "unidade": "W / {cpuLimiteW} W" },
+    { "linha": 15, "chave": "gpuUso",    "label": "{gpuNome}",  "grupo": "gpu", "tipo": 7, "idHint": 0,   "leitura": ["^GPU Core Load$", "^GPU Utilization$", "^GPU Core Utilization$", "^GPU Usage$", "^GPU D3D Usage$"] },
+    { "linha": 16, "chave": "gpuClock",  "label": "Clock",      "grupo": "gpu", "tipo": 6, "idHint": 0,   "leitura": ["^GPU Clock$", "^GPU Core Clock$", "^GPU Effective Clock$"] },
+    { "linha": 17, "chave": "gpuWatts",  "label": "Watts",      "grupo": "gpu", "tipo": 5, "idHint": 0,   "leitura": ["^GPU Power$", "^GPU Power \\(Total\\)$", "^GPU Board Power$", "^GPU ASIC Power$", "^GPU Chip Power \\(VDDCR_GFX\\)$", "^GPU Chip Power$"], "unidade": "W / {gpuLimiteW} W" },
+    { "linha": 18, "chave": "gpuTemp",   "label": "Temp",       "grupo": "gpu", "tipo": 1, "idHint": 0,   "leitura": ["^GPU Temperature$", "^GPU Hot Spot Temperature$"] },
+    { "linha": 19, "chave": "vram",      "label": "VRAM",       "grupo": "gpu", "tipo": 8, "idHint": 252, "leitura": ["^GPU Memory Allocated$", "^GPU D3D Memory Dedicated$", "^GPU Memory Usage$", "^GPU Memory Used$", "^GPU Memory Dedicated$"], "unidade": "MB / {vramMB} MB" },
+    { "linha": 20, "chave": "vramClock", "label": "VRAM clock", "grupo": "gpu", "tipo": 6, "idHint": 4,   "leitura": ["^GPU Memory Clock$", "^GPU Memory Effective Clock$"] },
+    { "linha": 22, "chave": "ramUsada",  "label": "RAM {ramGB} GB", "grupo": "sistema", "tipo": 8, "idHint": 3, "leitura": ["^Physical Memory Used$"], "unidade": "MB / {ramMB} MB" },
+    { "linha": 23, "chave": "ramUso",    "label": "Uso",        "grupo": "sistema",    "tipo": 8, "idHint": 5, "leitura": ["^Physical Memory Load$"] },
+    { "linha": 24, "chave": "ramFreq",   "label": "Freq",       "grupo": "memtimings", "tipo": 6, "idHint": 0, "leitura": ["^Memory Clock$"], "valueMult": "2.000000" },
+    { "linha": 26, "chave": "discos",    "label": "Disco {letra} {tipo}", "grupo": "drive", "tipo": 7, "idHint": 2, "leitura": ["^Total Activity$", "^Drive Activity$"], "porDisco": true }
+  ],
+  "pcTotal": {
+    "descricao": "Sensor customizado com formula. Referencia leituras PELA ETIQUETA EXIBIDA, entre aspas; por isso as leituras auxiliares ganham apelidos ASCII unicos e ficam fora do OSD (RtssInclude=0). O parser avalia da esquerda para a direita SEM precedencia: a divisao pela eficiencia fica no fim de proposito. So e criado quando todos os apelidos obrigatorios existem na maquina.",
+    "linhaAposDiscos": 2,
+    "label": "PC total",
+    "unidade": "W est.",
+    "grupoCustom": "Energia",
+    "grupoId": "F000CCCC",
+    "nome": "PC total est.",
+    "cpu": [
+      { "apelidos": { "CPUCores": ["^IA Cores Power$"], "CPUSysAgent": ["^System Agent Power$"], "CPUResto": ["^Rest-of-Chip Power$"] } },
+      { "apelidos": { "CPUCores": ["^CPU Core Power \\(SVI[23] TFN\\)$", "^Core Power$", "^CPU Core Power$"], "CPUSoC": ["^CPU SoC Power \\(SVI[23] TFN\\)$", "^SoC Power$", "^CPU SoC Power$"] } }
+    ],
+    "gpu": [
+      { "apelidos": { "GPU8pin": ["^GPU 8-pin #1 Input Power$"], "GPUPCIe": ["^GPU PCIe \\+12V Input Power$"], "GPU8pin2": ["^GPU 8-pin #2 Input Power$"], "GPU8pin3": ["^GPU 8-pin #3 Input Power$"] }, "opcionais": ["GPU8pin2", "GPU8pin3"] },
+      { "apelidos": { "GPU16pin": ["^GPU 16-pin HVPWR Input Power$", "^GPU 12VHPWR Input Power$"], "GPUPCIe": ["^GPU PCIe \\+12V Input Power$"] } },
+      { "apelidos": { "GPUTotal": ["^GPU Power \\(Total\\)$", "^GPU Board Power$"] } }
+    ],
+    "desktop":  { "constante": 45, "eficiencia": 0.87 },
+    "notebook": { "constante": 15, "eficiencia": 0.90 }
+  }
+}

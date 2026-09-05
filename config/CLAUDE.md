@@ -171,6 +171,15 @@ teste confiável que roda e pode falhar - priorize o caminho do dinheiro) e, em 
   trabalho e doc operacional em `/opt/pm-dashboard/`. Um cron de sistema já deixa o `metrics-<data>.txt`
   fresco (segundas), mas quem publica o Artifact é o Claude numa sessão. Use em "revisão de produto",
   "como estão os projetos", "relatório de PM", "atualize o dashboard de produto".
+- **`game-overlay`** - **instala e configura em qualquer PC Windows o overlay de monitoramento para
+  jogos** (HWiNFO lê os sensores + RTSS/RivaTuner desenha no jogo; CapFrameX para teste; Intel
+  PresentMon opcional). `scripts/overlay.ps1 tudo` (um UAC) baixa, instala fora do Program Files,
+  configura, descobre os sensores da máquina pela memória compartilhada e **casa o layout padrão do
+  PC** (FPS, 1% Low, frametime com gráfico, CPU/GPU Busy, blocos de CPU, GPU, RAM, discos, consumo
+  estimado), registra a tarefa agendada elevada (RTSS antes do HWiNFO, sempre) e verifica lendo o
+  OSD real do RTSS (+ vkcube e screenshot). Layout, armadilhas e modelo de LEIAME em
+  `game-overlay/reference/`. Use em "instale o RivaTuner/RTSS e o HWiNFO", "overlay de FPS/uso de
+  CPU e GPU nos jogos", "replicar o overlay do PC no notebook", "sumiu o FPS do overlay".
 
 > **Limite transversal Google (Play/AdMob/Ads):** o que a API oficial não cobre (pagamentos,
 > data safety, criar ad unit/mediação, consent screen) é feito PELO OPERADOR guiado passo a
