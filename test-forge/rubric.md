@@ -48,6 +48,18 @@ Pule: getters/setters triviais, o que o compilador/framework já garante, UI pur
   (só 1 passou, saldo consistente) — em Go use goroutines + `-race`; em app rodando, N requests paralelos.
 
 ## Learnings log (append-only, geral)
+- **2026-09-07 (via um mural de feedback público) - as regras da CAMADA HTTP não moram no service e o
+  unit do service não as cobre: suba o router REAL numa porta efêmera.** Honeypot que responde
+  `{ok:true}` FALSO sem gravar, gate de `Content-Type: application/json` (text/plain cross-site não
+  pode gravar), e o mapeamento de erro de corpo (`entity.parse.failed`→400, `entity.too.large`→413,
+  nunca 500) são todos middleware/rota - um unit test do módulo de negócio fica verde com tudo isso
+  quebrado. Padrão barato em Express: `const app = express(); app.use('/api', routerReal);
+  app.listen(0)` num `test.before`, e `fetch` de verdade contra `server.address().port`; asserte o
+  EFEITO no banco (contagem de linhas), não só o status - "honeypot devolve 200" passa mesmo se ele
+  estiver gravando. Bordas exatas de teto (MSG_MAX aceita, MSG_MAX+1 recusa) entram no mesmo arquivo.
+  Reconfirmada a lição 2026-07-23 do Docker: suíte que roda DENTRO da imagem (`COPY . .`) não vê o
+  arquivo de teste novo até o rebuild - o sintoma é "Could not find test/x.test.js" (ou pior, um verde
+  do conjunto antigo parecendo que o novo passou: confira o `# tests` esperado, não só o `pass`).
 - **2026-08-02 (via app mobile - VERIFICAR ARTEFATO DE BUILD: cheque o TIMESTAMP antes de acreditar
   nele).** Ao validar que uma mudanca entrou no binario (manifesto, flag, recurso), o arquivo de saida
   pode ser de um build ANTIGO que ficou no diretorio: `build/.../app-release.aab` existia com data de
