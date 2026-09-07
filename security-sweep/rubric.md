@@ -812,3 +812,24 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   diferentes e ambas precisam de um request cada. Corolário de teste: para logar como o usuário certo
   no ambiente de teste, trocar a senha no banco de nonprod é mais confiável que adivinhar credencial;
   gere o token pelo endpoint de auth e ataque a rota do backend direto, sem passar pela UI.
+- **2026-09-07 (via um mural público de feedback sem auth) - `trust proxy` EM CONTAINER: 'loopback'
+  não é o peer real, e o rate limit por IP vira balde GLOBAL em silêncio.** Numa app Node/Express
+  atrás de nginx MAS rodando em Docker, o peer que a app vê não é 127.0.0.1: é o **gateway da bridge**
+  (172.x.0.1). `app.set('trust proxy', 'loopback')` então NÃO confia no hop e o Express **descarta o
+  X-Forwarded-For do nginx** - `req.ip` vira o gateway para TODOS os visitantes. Duas consequências
+  que um review estático não vê: (a) qualquer teto "por IP" (posts/dia, token-bucket de busca) vira
+  teto GLOBAL - em feature de escrita pública isso é DoS trivial da feature (5 posts de um atacante
+  silenciam o mundo); (b) qualquer auditoria/ip_hash grava o mesmo valor para todo mundo. **▶ Testar
+  ao vivo (a prova que fecha):** faça UM request pela borda pública e UM local direto e compare o
+  identificador derivado do IP que a app armazenou (ip_hash/audit) - iguais = quebrado. Fix:
+  `trust proxy: ['loopback', 'uniquelocal']` (cobre o gateway da bridge); re-prove que os hashes
+  divergem E que XFF forjado não fura (mande `XFF: "10.x, <ip-real>"` - o rightmost público tem que
+  mandar, porque o nginx sempre appenda `$remote_addr`). Padrões que passaram de primeira num mural
+  anônimo e valem re-validar em qualquer feature de escrita pública sem login: honeypot que responde
+  `{ok:true}` FALSO sem gravar (bot não aprende); teto por IP + teto GLOBAL diário (botnet varia IP)
+  + dedupe de mensagem idêntica/dia; exigir `Content-Type: application/json` mata o CSRF-spam
+  distribuído (text/plain cross-site → body não parseado → 400; JSON cross-site → preflight nega);
+  IP cru nunca no banco (sha256 com salt local gerado no 1º uso); moderação por CLI dentro do
+  container em vez de endpoint web de admin (superfície zero); e em better-sqlite3 o check-then-act
+  dos tetos é atômico por ser SÍNCRONO no event loop (sem await entre COUNT e INSERT - corolário da
+  lição 2026-08-27), provado com Promise.all de 20 distintos → exatamente teto×201.

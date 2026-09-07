@@ -182,3 +182,14 @@ Nomes de serviço e de tipo trocados por genéricos, o repo é público.
     Condicional mais "imagino" propõe; presente do indicativo decreta. Em decisão que
     não é só dele, ele propõe.
   - **Linha em branco entre parágrafos**, mesmo em mensagem de três parágrafos curtos.
+- 2026-08-31 · Contexto novo: **nota de versao da Play Store** (changelog curto, 6 a 7
+  idiomas). Calibrado como "ficha de loja" na tabela de registro: informal-polido,
+  grafia completa ("para", "em vez de"), sem contracao oral. Duas decisoes que valem
+  para a proxima: (a) **voz impessoal, nao primeira pessoa** ("Correcao na contagem de
+  partidas", nao "corrigi" nem "corrigimos"): quem fala ali e o app, e "nos" soa a time
+  que nao existe; (b) **nao maquiar mudanca que da mais anuncio ao jogador**. A v1.10.1
+  conserta um contador que fazia o intersticial quase nunca aparecer, ou seja, o efeito
+  pratico e mais anuncio; a nota diz "estava bagunçando o intervalo dos anuncios" em vez
+  de esconder atras de "melhorias de desempenho". Fato seco, sem spin, que e o mesmo
+  padrao do "listar o que continua faltando, com o motivo" do log de 2026-08-14.
+  Ainda **nao validado pela reacao dele**: entrou em producao sem revisao linha a linha.
