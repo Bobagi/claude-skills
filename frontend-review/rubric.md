@@ -213,6 +213,22 @@ click, drive them separately for now (interaction steps are a planned engine fea
 ---
 
 ## Learnings log (append-only; this is how the reviewer improves)
+- **2026-09-07 (via um site multi-página que ganhou o 5º item de menu) - nav com `overflow-x:auto` e
+  scrollbar OCULTA é uma bomba de tempo: o item N+1 nasce invisível.** Um header cujo nav rola
+  horizontalmente com `scrollbar-width:none` "funciona" enquanto os itens cabem por sorte; no dia em que
+  entra um item novo, ele fica cortado FORA da vista em todos os viewports, sem affordance nenhuma - a
+  feature nova nasce sem descoberta, e nenhum sinal automático acusa (`overflowX:false`, porque o scroll
+  é interno). Regra: ao ADICIONAR um item a qualquer barra/nav existente, meça `scrollWidth vs
+  clientWidth` do container em 390/768/1100/1440 ANTES de dar por pronto; se o container é um scroller
+  de scrollbar oculta, prefira convertê-lo em `flex-wrap:wrap` (item quebra pra baixo, sempre visível).
+  Três armadilhas de flex que apareceram juntas no fix: (a) o breakpoint do header em linha única tem
+  que considerar o **max-width do `.wrap`**, não a viewport (a linha só cabe quando o CONTAINER dá, e o
+  container para de crescer no max-width); (b) num pai `nowrap`, um filho que PODE quebrar internamente
+  (nav com wrap) também ENCOLHE no algoritmo flex e quebra sozinho mesmo "cabendo" - trave-o com
+  `flex: 0 0 auto` e deixe o vizinho elástico (a busca, com `min-width`) absorver o aperto; (c) depois
+  de cada ajuste, re-meça com o probe - o PNG de um viewport só não prova os outros. Bônus de i18n:
+  contador "{n} itens" precisa da variante singular (chave própria `*.countOne` nos N idiomas) e o
+  contador guarda o número em variável - nunca faça parse do próprio texto renderizado pra incrementar.
 - **2026-08-30 (via uma chip nova numa linha de lista existente) - review de "um elemento só" tem
   checklist própria, menor que a de página inteira, e pular ela é fácil demais quando a mudança
   parece pequena demais pra merecer processo.** Pedido era revisar só uma `<span>` nova (badge)
