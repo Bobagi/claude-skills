@@ -213,6 +213,19 @@ click, drive them separately for now (interaction steps are a planned engine fea
 ---
 
 ## Learnings log (append-only; this is how the reviewer improves)
+- **2026-09-12 (via um dropdown de autocomplete de busca) - `min-width:auto` num filho flex de texto
+  força o CONTAINER a estourar largura, mesmo sem nenhum `min-width`/`width` fixo na regra suspeita.**
+  Um item de sugestão (`display:flex`, ícone + nome + rótulo secundário com `margin-left:auto`) não
+  tinha `min-width:0` no span do nome; por padrão um flex item nunca encolhe abaixo do seu conteúdo
+  min-content, então um nome longo (com acento/hífen) empurrava a largura do `.sg` além do dropdown
+  pai, e como o dropdown já tinha `overflow-y:auto` sem `overflow-x` explícito, o navegador expunha uma
+  barra de rolagem horizontal feia dentro do popup. Sintoma relatado pelo usuário: "o dropdown não usa
+  o espaço direito, aparece uma barra de deslizar horizontal". Correção: `min-width:0` +
+  `overflow:hidden;text-overflow:ellipsis;white-space:nowrap` no filho de texto principal, `flex:none`
+  + `max-width` no rótulo secundário, e `overflow-x:hidden` defensivo no próprio dropdown. Regra geral:
+  **todo filho de texto dentro de uma flex row precisa de `min-width:0` para poder truncar** - a causa
+  raiz de "container mais largo que devia" quase nunca é o container, é o filho que se recusa a
+  encolher.
 - **2026-09-07 (via um site multi-página que ganhou o 5º item de menu) - nav com `overflow-x:auto` e
   scrollbar OCULTA é uma bomba de tempo: o item N+1 nasce invisível.** Um header cujo nav rola
   horizontalmente com `scrollbar-width:none` "funciona" enquanto os itens cabem por sorte; no dia em que
