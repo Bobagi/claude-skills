@@ -549,7 +549,15 @@ function Get-GithubUltimoAsset([string]$Repo, [string]$Padrao) {
 function Register-TarefaMonitoramento($c) {
   $ps = Join-Path $env:WINDIR 'System32\WindowsPowerShell\v1.0\powershell.exe'
   $usuario = "$env:USERDOMAIN\$env:USERNAME"
-  $act = New-ScheduledTaskAction -Execute $ps -Argument ('-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "{0}"' -f $c.Launcher)
+  $argPs = '-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "{0}"' -f $c.Launcher
+  # -WindowStyle Hidden sozinho pisca a janela azul no logon (o console nasce antes do
+  # PowerShell ler o parametro). conhost --headless (Windows 10 1809+) nao cria janela.
+  $conhost = Join-Path $env:WINDIR 'System32\conhost.exe'
+  if ([Environment]::OSVersion.Version.Build -ge 17763 -and (Test-Path $conhost)) {
+    $act = New-ScheduledTaskAction -Execute $conhost -Argument ('--headless "{0}" {1}' -f $ps, $argPs)
+  } else {
+    $act = New-ScheduledTaskAction -Execute $ps -Argument $argPs
+  }
   $trg = New-ScheduledTaskTrigger -AtLogOn -User $usuario
   $trg.Delay = 'PT15S'
   $set = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit ([TimeSpan]::Zero) `

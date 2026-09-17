@@ -170,4 +170,5 @@ longa.
 - Tarefa agendada `HWiNFO64 (monitoramento)`: logon do usuário, atraso 15 s, `RunLevel
   Highest`, `LogonType Interactive`, sobe na bateria, sem limite de tempo,
   `MultipleInstances IgnoreNew`, reinicia 2× a cada 1 min se falhar. Ação:
-  `powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File <Raiz>\_Config\iniciar-monitoramento.ps1`.
+  `conhost.exe --headless powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File <Raiz>\_Config\iniciar-monitoramento.ps1`
+  (o `conhost --headless` evita a janela azul piscando no logon; ver armadilha 33).

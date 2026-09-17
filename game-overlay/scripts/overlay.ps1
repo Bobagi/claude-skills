@@ -502,7 +502,9 @@ function Acao-Verificar {
   try { $t = Get-ScheduledTask -TaskName $script:GO_TAREFA -ErrorAction Stop; $ti = Get-ScheduledTaskInfo -TaskName $script:GO_TAREFA
         Chk 'tarefa agendada elevada' ($t.Principal.RunLevel -eq 'Highest' -and $t.State -ne 'Disabled') ("estado {0}, RunLevel {1}, ultimo resultado {2}" -f $t.State, $t.Principal.RunLevel, $ti.LastTaskResult)
         $st = $t.Settings
-        Chk 'tarefa sobe na bateria' (-not $st.DisallowStartIfOnBatteries -and -not $st.StopIfGoingOnBatteries) "AllowStartIfOnBatteries/DontStopIfGoingOnBatteries" }
+        Chk 'tarefa sobe na bateria' (-not $st.DisallowStartIfOnBatteries -and -not $st.StopIfGoingOnBatteries) "AllowStartIfOnBatteries/DontStopIfGoingOnBatteries"
+        $ac = $t.Actions[0]
+        Chk 'tarefa sem janela no logon (conhost --headless)' ($ac.Execute -like '*conhost.exe' -and $ac.Arguments -like '--headless*') ("{0} {1}" -f $ac.Execute, $ac.Arguments) }
   catch { Chk 'tarefa agendada elevada' $false 'nao existe' }
   $run = $false
   foreach ($hive in @('HKCU:\Software\Microsoft\Windows\CurrentVersion\Run','HKLM:\Software\Microsoft\Windows\CurrentVersion\Run')) { if ((Get-ItemProperty $hive -Name RTSS -ErrorAction SilentlyContinue).RTSS) { $run = $true } }

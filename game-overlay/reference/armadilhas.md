@@ -129,6 +129,15 @@ com data, em vez de guardar só na cabeça.
     dos campos ANSI vêm cópias UTF-8 (grupo em 264/392; leitura em 316/444/572). Os nomes de
     grupo UTF-8 originais vêm em **inglês** (`System: ASUS`, `Memory Timings`, `PresentMon`),
     ao contrário dos ANSI, que vêm localizados. A `Read-HwinfoSensores` prefere os UTF-8.
+33. **`powershell.exe -WindowStyle Hidden` na tarefa agendada pisca uma janela azul vazia no
+    logon.** O console (conhost) é criado antes de o PowerShell ler o parâmetro; com o logon
+    carregado a janela fica segundos na tela (título `C:\WINDOWS\System32\WindowsPowerShell\
+    v1.0\powershell.exe`) e some sozinha, sem dar tempo de print. A ação da tarefa é
+    `conhost.exe --headless "<powershell.exe>" <args>` (Windows 10 1809+): o conhost hospeda o
+    console sem janela e o PowerShell herda o token elevado da tarefa normalmente. VBScript
+    (`wscript` + `Run ..., 0`) também resolveria, mas está em remoção no Windows 11. Para
+    diagnosticar "qual janela é essa", o log `Windows PowerShell` evento 400 traz a linha de
+    comando completa (`HostApplication=`) de cada PowerShell iniciado desde o boot.
 
 ## Histórico de aprendizados por máquina
 
@@ -138,3 +147,5 @@ com data, em vez de guardar só na cabeça.
   chave por chave o registro existente (única diferença real: a linha RAM, porque o PC tem
   40 GB e o rótulo antigo dizia 48 GB), `verificar -TesteCubo` 21/22 (a falha é essa RAM).
   Itens 26 a 32.
+- 2026-09-17, PC: janela azul do PowerShell piscando no logon (item 33); a tarefa passou a
+  chamar o launcher por `conhost --headless` e o `verificar` ganhou a checagem.
