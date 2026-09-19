@@ -1675,3 +1675,10 @@ click, drive them separately for now (interaction steps are a planned engine fea
   de texto. Em engines, confira tambem a ORDEM DE CAMADAS (zorder): caixa de dialogo vazia e menu rapido
   aparecendo por cima de telas modais proprias sao bugs tipicos que so o screenshot da tela real revela.
   E um logo claro reutilizado sobre fundo claro (card de aviso) perde o texto fino: tenha uma variante.
+
+- 2026-09-19 · **HUD de jogo: revisar os estados que CONVIVEM, nao cada tela sozinha.** Widgets de canto
+  (caixa de dialogo, legenda de radio, mostradores) sao inquilinos das mesmas faixas da tela; cada um
+  isolado estava certo, juntos se cobriam. Monte a matriz de estados simultaneos possiveis (conversa +
+  radio + mostradores, mapa aberto + HUD) e cheque sobreposicao par a par por retangulo; resolva por regra
+  de prioridade (quem cede, quem sobe). E todo rotulo GERADO (nomes num mapa, marcadores) precisa de
+  anticolisao, porque centros calculados coincidem (um bairro em volta de um lugar tem o mesmo centroide).
