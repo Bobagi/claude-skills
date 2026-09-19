@@ -1682,3 +1682,9 @@ click, drive them separately for now (interaction steps are a planned engine fea
   radio + mostradores, mapa aberto + HUD) e cheque sobreposicao par a par por retangulo; resolva por regra
   de prioridade (quem cede, quem sobe). E todo rotulo GERADO (nomes num mapa, marcadores) precisa de
   anticolisao, porque centros calculados coincidem (um bairro em volta de um lugar tem o mesmo centroide).
+
+- 2026-09-19 · **Anticolisao de rotulos gerados tem que incluir o que o USUARIO desenha.** Um mapa evitava nomes
+  sobre nomes, sobre o jogador e sobre a bussola, mas nao sobre as marcas que o proprio usuario coloca: a primeira
+  marca num lugar nomeado apagou os dois. Cheque: toda camada de anotacao do usuario (pino, marca, desenho, comentario)
+  esta na lista de obstaculos dos rotulos automaticos, e o rotulo tenta posicoes alternativas (acima, abaixo, lados)
+  antes de sumir. Teste colocando uma anotacao exatamente sobre um rotulo.
