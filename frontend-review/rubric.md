@@ -1668,3 +1668,10 @@ click, drive them separately for now (interaction steps are a planned engine fea
   junto: distância mínima entre um alvo de toque perigoso (abrir anúncio, excluir) e o botão primário deve
   ser **asserção sobre retângulos**, não avaliação visual.
 
+- 2026-09-19 · **Engines de jogo/VN (Ren'Py, Unity UI): "parece clicavel" e o criterio numero 1, e o
+  screenshot automatico do proprio engine substitui o capture.mjs.** Botao so de texto sobre arte
+  (mesma cor para todos, sem fundo) foi a reclamacao central do dono. Cheque: todo controle tem fundo
+  solido + borda + hover distinto; acao primaria difere da secundaria por preenchimento, nao so por cor
+  de texto. Em engines, confira tambem a ORDEM DE CAMADAS (zorder): caixa de dialogo vazia e menu rapido
+  aparecendo por cima de telas modais proprias sao bugs tipicos que so o screenshot da tela real revela.
+  E um logo claro reutilizado sobre fundo claro (card de aviso) perde o texto fino: tenha uma variante.
