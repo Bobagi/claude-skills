@@ -19,3 +19,4 @@ admob-token.json
 # python bytecode
 __pycache__/
 *.pyc
+synced/
