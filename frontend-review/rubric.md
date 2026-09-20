@@ -1688,3 +1688,24 @@ click, drive them separately for now (interaction steps are a planned engine fea
   marca num lugar nomeado apagou os dois. Cheque: toda camada de anotacao do usuario (pino, marca, desenho, comentario)
   esta na lista de obstaculos dos rotulos automaticos, e o rotulo tenta posicoes alternativas (acima, abaixo, lados)
   antes de sumir. Teste colocando uma anotacao exatamente sobre um rotulo.
+
+- 2026-09-20 · **Check de layout por RETANGULO nao ve texto que transborda: meca o texto.** Dois bugs reais
+  na mesma tela passaram por uma suite que ja comparava caixas. (1) Um rotulo longo desenhou por cima do
+  controle vizinho porque o rect dele tem largura fixa e o texto estava em modo overflow: o rect nao
+  encostava em nada, o desenho sim. (2) Um paragrafo passou um terco para fora do cartao, por cima da dica
+  e do botao, pelo mesmo motivo na vertical. Regra: para todo texto com overflow ligado, compare
+  `preferredWidth`/`preferredHeight` (ou o equivalente do framework) com a caixa, alem de comparar caixas
+  entre si. E o medidor so funciona com a FONTE carregada: num harness que constroi a UI sem o ciclo de
+  vida normal, resolva a fonte antes, senao todo texto mede zero e o check passa numa tela vazia.
+
+- 2026-09-20 · **Arte gerada tem que ser julgada contra o fundo REAL onde vai aparecer.** Um diagrama
+  desenhado na cor de fundo do proprio painel sumiu por completo na tela (so a peca de destaque aparecia),
+  e ninguem percebeu porque a arte, isolada, estava "certa". Cheque: renderize a arte SOBRE o container de
+  destino (nao no canvas de autoria) e confirme que cada peca tem contraste com ele; nos temas claro e
+  escuro quando houver os dois.
+
+- 2026-09-20 · **Painel mais largo que a referencia do scaler vaza no aspecto mais estreito.** Com um
+  escalonamento tipo "expand" sobre uma referencia (ex.: 800x600), a janela mais quadrada da exatamente a
+  largura de referencia: qualquer painel maior que isso fica com um pedaco fora da tela, e no monitor
+  16:9 do autor nada aparece errado. Cheque: todo painel cabe na referencia do scaler, nao na janela em
+  que voce esta olhando, e capture tambem no aspecto mais estreito que o jogo aceita.
