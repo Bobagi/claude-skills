@@ -1709,3 +1709,12 @@ click, drive them separately for now (interaction steps are a planned engine fea
   largura de referencia: qualquer painel maior que isso fica com um pedaco fora da tela, e no monitor
   16:9 do autor nada aparece errado. Cheque: todo painel cabe na referencia do scaler, nao na janela em
   que voce esta olhando, e capture tambem no aspecto mais estreito que o jogo aceita.
+
+- 2026-09-22 · **Arte PROVISORIA precisa parecer intencional, nao bug.** Um concept com fundo liso colocado
+  cru entre pecas finalizadas (silhuetas, cards) le como erro de carregamento, e o usuario reporta como
+  defeito. Cheque toda tela com placeholder: ele esta ENQUADRADO de um jeito que faz sentido no universo do
+  produto (moldura de foto, card "em breve", silhueta), ou esta so solto? Prefira um enquadramento
+  diegetico por codigo que some sozinho quando a arte final existir. E interacao que o harness de teste
+  nao consegue exercitar de forma confiavel (arrasto sintetico, gesto) nao deve ser a UNICA forma de
+  avancar: ofereca um controle clicavel equivalente e teste por ele, senao a tela pode travar o fluxo sem
+  ninguem perceber.
