@@ -1718,3 +1718,30 @@ click, drive them separately for now (interaction steps are a planned engine fea
   nao consegue exercitar de forma confiavel (arrasto sintetico, gesto) nao deve ser a UNICA forma de
   avancar: ofereca um controle clicavel equivalente e teste por ele, senao a tela pode travar o fluxo sem
   ninguem perceber.
+
+- 2026-09-24 · **Controle novo no HUD: teste contra os elementos CENTRADOS, nao contra os fixos.** Um
+  icone posicionado por offset da borda esquerda parece ter folga porque os vizinhos daquele canto sao
+  fixos; mas uma barra/medidor centrado tem a borda esquerda em `(W - larguraDaBarra)/2`, que ANDA com a
+  largura da tela, e num aparelho mais estreito ela avanca sobre o icone. Cheque: para cada controle novo,
+  calcule a distancia ate o elemento centrado mais proximo na LARGURA MINIMA suportada, nao so na que voce
+  esta olhando. Cantos costumam ser mais seguros que meio-termos, e liberar um canto ocupado (movendo o
+  ocupante para um slot central ja existente) costuma melhorar os dois.
+
+- 2026-09-24 · **Aviso de "modo ativo" mora perto do alvo do modo, nao por cima dele.** Instrucao do tipo
+  "toque em X para..." ancorada logo acima da area de trabalho invade o cabecalho em telas baixas e corre
+  ate a borda no idioma mais verboso. Use a regiao que o proprio modo DESATIVOU (uma bandeja/toolbar
+  esmaecida, um painel em pausa) como lugar da instrucao e do botao de cancelar: o alvo fica 100% visivel,
+  a area apagada ganha funcao, e o aviso pode ter `wordWrap` na largura do viewport sem competir com nada.
+
+- 2026-09-24 · **Pagina com animacao continua (canvas/rAF/video) nunca atinge `networkidle`.** O capture
+  falha com "Navigation timeout" e parece problema de Chrome ou de servidor. Use
+  `--wait-until domcontentloaded` + `--wait` generoso nesse tipo de alvo. E quando a UI e desenhada em
+  canvas (sem DOM para clicar), os `--scenarios` nao alcancam os estados: dirija-os pelos hooks de debug
+  que o proprio app expoe e capture ali, mas **sem pular** a grade rota x viewport da skill, que e quem
+  pega colisao de layout.
+
+- 2026-09-24 · **Todo estado condicional de um painel de compra tem que ser capturado, inclusive o
+  "sem saldo".** O estado desabilitado e o que a maioria dos jogadores ve primeiro; se ele sumir (item
+  escondido, preco apagado demais) o jogador nao descobre o objetivo. Regra: capture "pode pagar" e "nao
+  pode pagar" lado a lado e confirme que o segundo continua LEGIVEL, com o preco visivel, em vez de
+  desaparecer.
