@@ -1782,3 +1782,16 @@ click, drive them separately for now (interaction steps are a planned engine fea
   método: para fluxo com efeitos encadeados (linha, confete, modal, chips), 4 a 5 fps de screencast em
   tile 6x4 mostram o encadeamento inteiro numa imagem só; e leia o `marks.tsv` dos toques antes de
   julgar, porque um toque processado tarde (app ainda carregando) cai em outra tela e vira "bug" falso.
+- **2026-09-25 (via um jogo Capacitor/Phaser em Android) - "botao atras da barra de navegacao" e uma
+  classe de bug que screenshot em browser NUNCA mostra, e `env(safe-area-inset-*)` NAO e a resposta
+  na WebView.** Regras: (a) todo elemento ancorado em `H - n` (rodape, bandeja, botao principal, Cancelar)
+  precisa subtrair um `safeBottom` real, e todo elemento em `0 + n` um `safeTop`; grep por `H - px(`/
+  `height - ` e por `top: 0` e exigir a subtracao; (b) o valor tem que vir de uma medicao NATIVA da
+  sobreposicao (insets da janela x retangulo da WebView) porque o CSS env() devolve 0 na WebView e o
+  ajuste automatico de margem do framework deixa faixas vazias; (c) para provar no headless, exponha um
+  parametro de dev (`?insets=top,bottom`) que injeta os mesmos valores pelo MESMO caminho de dados e
+  capture a matriz {menor tela} x {0/0, 32/48 (notch + 3 botoes), 0/24 (gestos)}; um layout "que cabe"
+  em 0/0 costuma encolher o conteudo principal para 60% em 32/48, e isso se decide olhando, nao
+  calculando. Bonus de ritmo: texto flutuante que "nunca aparece" no screenshot pode ser fade rapido
+  demais, nao ausencia; sonde a cena a cada 100 ms (alpha/scale por objeto) antes de cacar o bug no
+  codigo de criacao, e de a mensagens de 1 leitura um `hold` explicito antes do fade.
