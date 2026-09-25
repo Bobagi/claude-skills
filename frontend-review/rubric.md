@@ -1759,3 +1759,9 @@ click, drive them separately for now (interaction steps are a planned engine fea
   escondido, preco apagado demais) o jogador nao descobre o objetivo. Regra: capture "pode pagar" e "nao
   pode pagar" lado a lado e confirme que o segundo continua LEGIVEL, com o preco visivel, em vez de
   desaparecer.
+- 2026-09-25 · **Juice de jogo precisa de uma chave de desligar e de um teto de repeticao.** Ao adicionar
+  feedback animado (flash de tela, tremor, particulas, som de hover) confira dois pontos antes de aprovar:
+  (a) existe uma preferencia para desligar os efeitos visuais (fotossensibilidade e jogadores que se
+  irritam), e o codigo passa por UM gate so, nao por N `if`s espalhados; (b) som de hover em "todo botao"
+  inclui barras de 6-10 botoes lado a lado (quick menu, toolbar): o mouse cruzando a barra dispara uma
+  rajada. Regra: hover com som so em botoes de decisao; barras utilitarias ficam mudas.
