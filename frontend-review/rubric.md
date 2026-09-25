@@ -1765,3 +1765,11 @@ click, drive them separately for now (interaction steps are a planned engine fea
   irritam), e o codigo passa por UM gate so, nao por N `if`s espalhados; (b) som de hover em "todo botao"
   inclui barras de 6-10 botoes lado a lado (quick menu, toolbar): o mouse cruzando a barra dispara uma
   rajada. Regra: hover com som so em botoes de decisao; barras utilitarias ficam mudas.
+- 2026-09-25 · **Feedback transiente (partícula, confete, contador, estado "pensando") se captura por
+  TEMPO, não por rota, e o pipeline headless tem latência maior que o efeito.** Um screenshot 2x com
+  swiftshader leva 300 a 600ms; um estado de 550ms some antes do disparo. Regra: (1) dispare o shot no
+  MESMO passo do toque (wait 0) e aceite que o frame capturado é o da transição; (2) para efeitos de
+  mais de 1s (confete, contador), capture em 3 instantes (início, meio, fim) para provar que nasce,
+  vive e morre; (3) o que não der para capturar, declare "verificado por código" no relatório em vez
+  de fingir que a captura provou. E em app canvas (Flutter web) o estado se semeia por `localStorage`
+  (`flutter.<chave>` com valor JSON-encodado) e a navegação exige `touchscreen.tap` + `hasTouch`.

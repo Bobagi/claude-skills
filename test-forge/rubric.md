@@ -309,3 +309,11 @@ Pule: getters/setters triviais, o que o compilador/framework já garante, UI pur
   antes da feature. Isso muda a conversa com o dono (bug antigo achado de brinde ≠ regressão introduzida) e
   evita tanto se culpar à toa quanto deixar o defeito antigo passar batido.
 
+- **2026-09-25 (via app Flutter - teste de layout "tudo junto" acha o que o teste por feature deixa passar):**
+  Cada feature nova do modal (chip de sequência, barra de nível, chip de conquista) cabia sozinha na
+  menor tela, e os testes por feature passavam. O teste que renderiza **o pior caso combinado** (todas as
+  variantes ligadas ao mesmo tempo, na menor tela, em cada idioma) estourou 137px e forçou a rolagem
+  interna com ações fixas. Regra: para superfície que acumula elementos opcionais, escreva UM teste com
+  todos os opcionais ligados, além dos testes de cada um. Segunda lição: widget com animação infinita
+  (pulso) quebra `pumpAndSettle` para sempre; troque por um `settle()` com pumps de duração fixa e
+  documente no teste o porquê, senão o próximo a mexer "conserta" voltando ao `pumpAndSettle`.
