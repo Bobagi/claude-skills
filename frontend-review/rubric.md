@@ -213,6 +213,20 @@ click, drive them separately for now (interaction steps are a planned engine fea
 ---
 
 ## Learnings log (append-only; this is how the reviewer improves)
+- **2026-09-25 (via um passe de "juice" num jogo em canvas) - texto/toast TRANSIENTE também é
+  layout: some do screenshot por acaso e volta em cima de outro elemento.** Um HUD com piso fixo
+  (`max(H*0.16, 96px)`) deixava 60 px entre a barra de progresso e o tabuleiro no menor viewport
+  (360x640); ali brigavam três coisas que nunca aparecem juntas numa captura "estática": o toast
+  de estado, a palavra de elogio do clear e a dica de primeiro uso. O review anterior do mesmo
+  HUD não pegou porque só capturou o estado ocioso. Regra: (a) ao revisar feedback efêmero,
+  disparar o evento e capturar em 2-3 instantes (150/400/850 ms) no MENOR viewport, com o toast
+  de dica ativo de propósito; (b) todo elemento transiente ancorado "logo acima de X" precisa de
+  um clamp contra "logo abaixo de Y" (toast: `y = max(y, barraBottom + folga + altura)`), senão
+  o valor que cabe no telefone grande invade o vizinho no pequeno; (c) o piso de altura de uma
+  faixa (HUD, header) tem que ser a SOMA medida das linhas que ela contém mais uma linha de
+  aviso, não um número redondo. Bônus de renderer: em canvas 2D/Phaser, `tint` de partícula e
+  gradiente de Graphics são WebGL-only; se o headless cai no Canvas, particulas saem brancas e
+  o review parece "sem cor" sem ser bug de design - conferir `game.renderer.type` antes de julgar.
 - **2026-09-12 (via um dropdown de autocomplete de busca) - `min-width:auto` num filho flex de texto
   força o CONTAINER a estourar largura, mesmo sem nenhum `min-width`/`width` fixo na regra suspeita.**
   Um item de sugestão (`display:flex`, ícone + nome + rótulo secundário com `margin-left:auto`) não
