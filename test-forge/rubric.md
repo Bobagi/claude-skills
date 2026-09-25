@@ -317,3 +317,14 @@ Pule: getters/setters triviais, o que o compilador/framework já garante, UI pur
   todos os opcionais ligados, além dos testes de cada um. Segunda lição: widget com animação infinita
   (pulso) quebra `pumpAndSettle` para sempre; troque por um `settle()` com pumps de duração fixa e
   documente no teste o porquê, senão o próximo a mexer "conserta" voltando ao `pumpAndSettle`.
+
+- **2026-09-25 (via um jogo de tabuleiro - "célula especial" nova é testada pelo que ela NÃO faz):** ao
+  introduzir um valor de célula que se parece com os outros (parede = "ocupado" para encaixe, mas nunca
+  some, nunca pontua, nunca vira moeda), os testes que valem são os NEGATIVOS por caminho que consome a
+  célula: o clear não a remove, o contador de células limpas (que vira moeda) não a soma, o poder de
+  quebrar não a cobra, a contagem de ocupação não a conta, e o preview reflete a linha "mais curta". Um
+  único teste positivo ("a linha com parede completa") passa mesmo com a parede sendo apagada junto. Regra
+  geral: para cada consumidor do valor antigo (grep pelo tipo), um assert de que o valor novo passa por ele
+  sem virar o valor antigo. Segunda lição: curva de progressão (meta por nível) precisa de asserção de
+  TETO e de alcance ("nível 20 <= X"), não só "cresce"; a curva +35%/nível passava no teste de monotonia e
+  pedia 300 mil pontos no nível 20.
