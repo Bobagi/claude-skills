@@ -1773,3 +1773,12 @@ click, drive them separately for now (interaction steps are a planned engine fea
   vive e morre; (3) o que não der para capturar, declare "verificado por código" no relatório em vez
   de fingir que a captura provou. E em app canvas (Flutter web) o estado se semeia por `localStorage`
   (`flutter.<chave>` com valor JSON-encodado) e a navegação exige `touchscreen.tap` + `hasTouch`.
+- 2026-09-25 (b) · **Animação que "recomeça do meio" e captura estática nunca pega: grave a sessão
+  inteira (CDP `Page.startScreencast`) e leia os frames em folha de contato.** O bug era de árvore
+  de widgets: um wrapper de tremida devolvia `child` puro parado e `Transform(child)` animando; a troca
+  de forma remontava o subtree no primeiro e no último frame, reiniciando a linha da vitória e o pop-in
+  das peças. Regra de review para Flutter: todo `AnimatedBuilder`/wrapper de efeito deve devolver a
+  MESMA forma de árvore em repouso e em movimento (ramificar só por `disableAnimations`). Regra de
+  método: para fluxo com efeitos encadeados (linha, confete, modal, chips), 4 a 5 fps de screencast em
+  tile 6x4 mostram o encadeamento inteiro numa imagem só; e leia o `marks.tsv` dos toques antes de
+  julgar, porque um toque processado tarde (app ainda carregando) cai em outra tela e vira "bug" falso.
