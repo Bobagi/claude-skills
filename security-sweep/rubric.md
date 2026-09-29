@@ -833,3 +833,14 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   container em vez de endpoint web de admin (superfície zero); e em better-sqlite3 o check-then-act
   dos tetos é atômico por ser SÍNCRONO no event loop (sem await entre COUNT e INSERT - corolário da
   lição 2026-08-27), provado com Promise.all de 20 distintos → exatamente teto×201.
+- **2026-09-29 (via um jogo multiplayer com servidor autoritativo) - em jogo, o "endpoint" que mais vaza
+  e o MOVIMENTO, e a folga do detector e o proprio furo.** O cliente e dono do proprio personagem: ele
+  pode mudar a velocidade localmente e o servidor so ve as posicoes. Um detector de teleporte com
+  folga calculada pelo MAXIMO TEORICO (todos os bonus sempre ligados + margem grande) deixa passar ~2,5x
+  de velocidade, o que num modo de roubo/fuga e vitoria garantida. Padrao de fix: limite = pico da
+  velocidade que o SERVIDOR concedeu na janela x ~1,15 + poucos studs de jitter; teleportes do servidor
+  passam por uma funcao que abre uma janela de graca. Testar ao vivo: andar legitimo (nao pode resetar)
+  e hack de 1,5x (tem que resetar). Segunda licao: todo RemoteEvent que "substitui" um prompt fisico
+  (ex.: botao de UI que faz o mesmo que pisar num pad) precisa repetir no servidor a checagem de
+  distancia que o prompt fazia; senao vira atalho de teleporte. E: em prompts, o engine ja valida a
+  distancia do lado do servidor, mas o handler deve checar de novo (dono + distancia).
