@@ -338,3 +338,10 @@ Pule: getters/setters triviais, o que o compilador/framework já garante, UI pur
   conectado; mudancas de arquivo sim. (3) `require` fica em cache por instancia na mesma VM: para a
   checagem de mutacao, clone o pacote alterado e o spec (reescrevendo o caminho do require) e rode o
   clone; sem isso o teste "passa" contra a versao antiga e a mutacao parece nao ser pega.
+- **2026-09-29 (via um jogo Roblox com testes rodados por uma ponte de editor) - antes de confiar no verde,
+  prove que o runner le o codigo ATUAL.** Runners que vivem num processo persistente (plugin de editor,
+  REPL, servidor de dev com cache de modulo) podem guardar a versao antiga de um modulo editado: o teste
+  roda contra codigo velho e passa. Aqui uma mutacao obvia (desligar a idempotencia) saiu VERDE no
+  runner do editor e VERMELHA num processo novo. Regra: valide por mutacao sempre, e se a mutacao nao
+  ficar vermelha, suspeite primeiro do cache do runner, nao do teste; fixe no repo o comando que sobe um
+  processo novo por execucao.
