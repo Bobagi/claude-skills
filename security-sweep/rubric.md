@@ -844,3 +844,13 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   (ex.: botao de UI que faz o mesmo que pisar num pad) precisa repetir no servidor a checagem de
   distancia que o prompt fazia; senao vira atalho de teleporte. E: em prompts, o engine ja valida a
   distancia do lado do servidor, mas o handler deve checar de novo (dono + distancia).
+- **2026-09-29 (via um jogo com compras in-app por recibo) - o recibo pago que NUNCA e entregue e bug
+  financeiro, nao so o recibo entregue duas vezes.** Em plataformas onde a compra chega por callback de
+  recibo com re-tentativa (ProcessReceipt e similares), o contexto da compra (qual item/alvo) costuma
+  ficar num "pendente" em memoria no servidor. Se esse pendente e UM por usuario, abrir outra oferta antes
+  do recibo chegar (ou reentrar no jogo) apaga o contexto e o handler responde "ainda nao" para sempre: o
+  usuario paga e nao recebe. Padrao de fix: pendente por produto e, sem contexto, um fallback
+  deterministico de valor equivalente (nunca aleatorio); o handler so devolve "nao processado" quando nada
+  foi alterado. **Testar ao vivo:** (a) mesmo id de recibo N vezes em paralelo -> 1 concessao; (b) N ids
+  distintos em paralelo -> N concessoes; (c) recibo sem contexto pendente -> tem que conceder algo. Mantenha
+  checar-e-registrar o id sem yield entre eles (idempotencia por construcao).
