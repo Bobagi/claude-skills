@@ -328,3 +328,13 @@ Pule: getters/setters triviais, o que o compilador/framework já garante, UI pur
   sem virar o valor antigo. Segunda lição: curva de progressão (meta por nível) precisa de asserção de
   TETO e de alcance ("nível 20 <= X"), não só "cresce"; a curva +35%/nível passava no teste de monotonia e
   pedia 300 mil pontos no nível 20.
+- **2026-09-29 (via um jogo Roblox/Luau com Rojo) - engine sem runner de CLI: rode a suite DENTRO do
+  editor pelo MCP, e prove a mutacao com CLONES.** Sem `lune`/`run-in-roblox`, os testes viram
+  ModuleScripts `*.spec` num container server-only (ServerStorage) + um Runner que devolve "PASS n" /
+  "FAIL x/n", executados via `execute_luau` no DataModel de Edit. Tres armadilhas: (1) o command bar /
+  MCP roda numa VM separada da do jogo, entao testes de servico com estado precisam de uma ponte
+  (BindableFunction so no Studio); funcoes puras e utilitarios com relogio INJETADO (parametro
+  opcional `clock`) testam direto. (2) Mudar o project file do Rojo nao entra no `rojo serve` ja
+  conectado; mudancas de arquivo sim. (3) `require` fica em cache por instancia na mesma VM: para a
+  checagem de mutacao, clone o pacote alterado e o spec (reescrevendo o caminho do require) e rode o
+  clone; sem isso o teste "passa" contra a versao antiga e a mutacao parece nao ser pega.
