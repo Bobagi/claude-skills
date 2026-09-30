@@ -345,3 +345,11 @@ Pule: getters/setters triviais, o que o compilador/framework já garante, UI pur
   runner do editor e VERMELHA num processo novo. Regra: valide por mutacao sempre, e se a mutacao nao
   ficar vermelha, suspeite primeiro do cache do runner, nao do teste; fixe no repo o comando que sobe um
   processo novo por execucao.
+- **2026-09-30 (via um jogo Roblox - dado salvo que vira PODER: asserte o poder derivado, não só o campo
+  limpo).** Um save adulterado (ou antigo) com equipamento "vestido" sem ser comprado, no slot errado ou
+  com `owned = "yes"` precisa ser saneado na migração. O teste que vale não para em "o campo sumiu": ele
+  afirma o valor que o jogador GANHA com aquilo (aqui, corações máximos == base). Motivo: há vários campos
+  que alimentam o mesmo poder, e sanear um e esquecer outro deixa o assert por campo verde com o poder
+  ainda inflado. Mutation check confirmou: afrouxar `owned == true` para "qualquer valor truthy" só ficou
+  vermelho porque o teste checava também o total derivado. Irmão da regra de 2026-08-01: a ação "grátis"
+  (vestir o que já tem) foi testada com saldo ZERO, o único estado em que o caminho pago errado falha.
