@@ -69,4 +69,9 @@ Nunca importar as 4096 do Meshy direto. Metal + rugosidade viram um único mapa 
   entre LOD1 (22 mil) e LOD2 (8,2 mil): iguais. Ficou o LOD2, abaixo do mínimo de `character`, sem perda. Personagem em
   primeira pessoa: separar a cabeça (só sombra), a câmera fica dentro dela. Nomes de osso do MetaHuman: `indextoe`,
   `middletoe`... começam como os dos dedos da mão; filtre "toe" ao separar mãos por peso.
+- 2026-09-30 · corpo do jogador, 2a rodada: o LOD2 (8,2 mil) igualava nas mãos, mas olhando para baixo o peito e os
+  ombros ficam a um palmo da lente e mostraram facetas grandes. Subi para o LOD1 (22 mil, dentro da faixa) e passei
+  cabeça, pescoço, ombros e peito alto para só-sombra. Lição: compare a malha no ângulo e na DISTÂNCIA em que o jogador
+  vê cada parte (as mãos não representam o peito). Não troque a textura original de um asset (pus uma roupa de
+  mergulho por conta própria e o Gustavo queria o MetaHuman como veio, de cueca, para vestir depois).
 
