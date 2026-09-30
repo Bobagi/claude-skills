@@ -83,8 +83,9 @@ barbatana, alça) justifica subir triângulos. Referências e contas em `budgets
   Y da malha vira -Z. Confira pelos bounds da malha e ache a frente medindo (ex.: a ponta mais larga é a
   lente) antes de escolher a rotação. Nada de supor pelo render.
 - **Compare no ângulo e na distância de uso de CADA parte**: no corpo em primeira pessoa as mãos passaram no LOD2,
-  mas o peito, a um palmo da lente olhando para baixo, facetou. Personagem em primeira pessoa: cabeça, pescoço,
-  ombros e peito alto só na sombra.
+  mas o peito, a um palmo da lente olhando para baixo, facetou.
+- **Corpo em primeira pessoa**: câmera nos olhos da cabeça animada, corpo parado nos pés do jogador; esconda só a
+  cabeça (sombra). Ancorar o corpo na câmera faz o pé deslizar; esconder ombros/peito abre buraco no tronco.
 - **Não mude a aparência do asset por conta própria** (textura, roupa, cor): o dono pode ter planos para ele.
 - **Objeto na mão atrás da própria luz** (lanterna) fica preto no escuro: luz de vazamento fraca a ~20 cm
   do corpo, sem sombra, ligada junto com o facho (a 5 cm a queda com o quadrado da distância estoura).
