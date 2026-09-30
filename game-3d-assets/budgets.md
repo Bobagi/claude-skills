@@ -65,4 +65,8 @@ Nunca importar as 4096 do Meshy direto. Metal + rugosidade viram um único mapa 
   64 mil no LOD0). Para `character` (10 a 30 mil) o LOD1 já está na faixa sem reduzir nada; o LOD2 fica abaixo
   do mínimo. O DCC export dá texturas de cabeça e corpo em 4 conjuntos (Basecolor, Normal, SRMF = specular,
   roughness, metal, fuzz). Sem cabelo, sem roupa, sem animação facial fora do Unreal.
+- 2026-09-30 · corpo do jogador (MetaHuman, primeira pessoa): comparei as mãos de perto (o que mais aparece na tela)
+  entre LOD1 (22 mil) e LOD2 (8,2 mil): iguais. Ficou o LOD2, abaixo do mínimo de `character`, sem perda. Personagem em
+  primeira pessoa: separar a cabeça (só sombra), a câmera fica dentro dela. Nomes de osso do MetaHuman: `indextoe`,
+  `middletoe`... começam como os dos dedos da mão; filtre "toe" ao separar mãos por peso.
 
