@@ -1795,3 +1795,12 @@ click, drive them separately for now (interaction steps are a planned engine fea
   calculando. Bonus de ritmo: texto flutuante que "nunca aparece" no screenshot pode ser fade rapido
   demais, nao ausencia; sonde a cena a cada 100 ms (alpha/scale por objeto) antes de cacar o bug no
   codigo de criacao, e de a mensagens de 1 leitura um `hold` explicito antes do fade.
+- **2026-09-30 (via um jogo com câmera de mouse travado) - quando a app CAPTURA o ponteiro (pointer lock /
+  mouse travado no centro), todo painel que pede clique vira armadilha se não liberar o cursor.** Checklist
+  para qualquer app que trava o ponteiro: (a) liste TODOS os painéis clicáveis (loja, menus de contexto,
+  painéis de admin) e confirme que cada um libera o cursor ao abrir e devolve ao fechar, inclusive pelos
+  botões internos que fecham o painel, não só pelo "X"; um painel de admin fora da lista ficou sem cursor;
+  (b) a saída tem que estar escrita na tela (tecla para soltar o mouse) enquanto o modo estiver ativo; (c)
+  quando um painel cresce (linha nova), procure o elemento TRANSIENTE ancorado abaixo dele por número fixo
+  (pilha de toasts), porque ele passa a nascer por cima; e (d) se o review ligou emulador de dispositivo,
+  desligue-o no fim e diga que desligou, porque o próximo teste manual do dono herda o modo.
