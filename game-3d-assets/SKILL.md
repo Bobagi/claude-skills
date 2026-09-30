@@ -102,6 +102,14 @@ manifesto) + MetaHuman Creator para montar e exportar FBX, e escolher um LOD per
 `character`. A licença (desde junho de 2025) permite usar em Unity/Godot; o rig facial (RigLogic) não roda
 fora do Unreal. Detalhes e números em `budgets.md`.
 
+**Exportar MetaHuman para FBX (UE 5.8, testado):** o Creator não tem botão de FBX. Com o editor aberto e a
+execução remota do Python ligada **pelo usuário** (Project Settings > Plugins > Python > Enable Remote
+Execution), use o cliente oficial `Engine/Plugins/Experimental/PythonScriptPlugin/Content/Python/remote_execution.py`
+e rode no editor: `MetaHumanCharacterEditorSubsystem.try_add_object_to_edit(ch)`, depois
+`MetaHumanCharacterExportBlueprintLibrary.export_geometry(ch, MetaHumanGeometryExportParams(full_body_skeletal_mesh=True, ...))`
+(cria malhas esqueletais no projeto) e `unreal.Exporter.run_asset_export_task` com `FbxExportOption`
+(`level_of_detail=True`) para cada malha. `export_dcc` grava só DNA + texturas (sem FBX).
+
 ## 6. Feche aprendendo
 
 Todo uso que ensinar algo novo (defeito que as métricas não pegaram, faixa que precisou subir, formato novo)

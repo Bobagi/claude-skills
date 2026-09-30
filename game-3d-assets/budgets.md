@@ -60,4 +60,9 @@ Nunca importar as 4096 do Meshy direto. Metal + rugosidade viram um único mapa 
   pelos bounds da malha e ache a "frente" medindo (a lente é a ponta mais larga) antes de girar. (4) O Meshy
   deixou um lado do vidro do frasco aberto: casca de vidro transparente simples por fora. (5) Lanterna na mão,
   atrás do próprio facho, fica preta embaixo d'água: luz de vazamento fraca a ~20 cm (a 5 cm estourou).
+- 2026-09-30 · MetaHuman base masculino (Fab, UE 5.8): FBX de corpo inteiro com LODs prontos: LOD0 95 mil,
+  LOD1 22 mil, LOD2 8,2 mil, LOD3 2,3 mil triângulos; esqueleto de 341 ossos (a cabeça separada tem 874 ossos e
+  64 mil no LOD0). Para `character` (10 a 30 mil) o LOD1 já está na faixa sem reduzir nada; o LOD2 fica abaixo
+  do mínimo. O DCC export dá texturas de cabeça e corpo em 4 conjuntos (Basecolor, Normal, SRMF = specular,
+  roughness, metal, fuzz). Sem cabelo, sem roupa, sem animação facial fora do Unreal.
 
