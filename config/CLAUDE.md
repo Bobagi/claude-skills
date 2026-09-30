@@ -128,6 +128,12 @@ teste confiável que roda e pode falhar - priorize o caminho do dinheiro) e, em 
 - **`unity-mcp-skill`** - orquestra o Unity Editor via MCP for Unity (GameObjects, scripts,
   cenas, testes, automação do editor). Use ao trabalhar em projeto Unity numa máquina com o
   MCP for Unity conectado.
+- **`game-3d-assets`** - **pipeline de modelos 3D para jogo**: todo modelo entra no orçamento de triângulos do
+  seu tipo (fundo 1-3 mil, mão 2-5 mil, grande ~5 mil, criatura 10-20 mil, personagem 10-30 mil) começando pelo
+  MÍNIMO; Blender em segundo plano (`scripts/optimize_model.py`) reduz, faz UV nova, assa cor/metal/rugosidade/
+  normal do original, mede contorno e sombreamento contra o original e só sobe se aparecer perda; depois importa
+  na engine (checklist Unity URP) e compara no jogo. Use SEMPRE que mexer com 3D (importar/gerar modelo, trocar
+  placeholder, "reduz polígonos", avaliar asset do Fab/MetaHuman).
 - **`vps`** - gerenciar o VPS bobagi.space via SSH.
 - **`resume`** - resumir um vídeo do YouTube a partir do link.
 - **`google-play`** - releases na Play Store via Play Developer API (service account): sobe
