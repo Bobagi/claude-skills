@@ -854,3 +854,14 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   foi alterado. **Testar ao vivo:** (a) mesmo id de recibo N vezes em paralelo -> 1 concessao; (b) N ids
   distintos em paralelo -> N concessoes; (c) recibo sem contexto pendente -> tem que conceder algo. Mantenha
   checar-e-registrar o id sem yield entre eles (idempotencia por construcao).
+- **2026-09-30 (via um jogo multiplayer autoritativo) - toda "janela de graça" nova do anti-cheat é
+  superfície: audite o que o jogador PODE FAZER dentro dela, não só quanto ela dura.** Uma animação
+  controlada pelo servidor (ser arremessado para fora de uma área) precisou desligar o detector de
+  teleporte por alguns segundos. A pergunta de auditoria não é "a janela é curta?", e sim "quais ações
+  continuam permitidas enquanto ela está aberta?": liste cada remote/prompt que dá vantagem (roubar,
+  comprar, entregar, sair de área) e confirme que o estado da janela (ex.: flag "sendo expulso",
+  atordoado, ainda dentro da instância) está no guard de cada um. Se o guard já existe por outro motivo,
+  registre essa dependência no código, porque quem mudar o guard depois reabre a janela sem saber.
+  Segunda lição, de compra com moeda do jogo: teste a rajada **concorrente de itens DIFERENTES com saldo
+  para um só** (o furo de "dois itens pelo preço de um" não aparece repetindo o mesmo item, que cai no
+  "já possui"), e confirme que não há yield entre checar saldo e debitar.
