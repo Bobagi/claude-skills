@@ -213,6 +213,13 @@ click, drive them separately for now (interaction steps are a planned engine fea
 ---
 
 ## Learnings log (append-only; this is how the reviewer improves)
+- **2026-10-03 (via um jogo mobile com banner de anúncio fixo) - feature nova na home precisa caber
+  ACIMA DA DOBRA na menor tela atendida, com o anúncio no tamanho real.** O atalho novo (bônus diário,
+  loja) estava pronto e testado, mas em 360x640 o retângulo médio de anúncio (300x250) o empurrava para
+  baixo de uma rolagem que ninguém faz. Cheque: altura somada (app bar + cabeçalho + ações + atalhos +
+  anúncio) <= altura da menor tela; se não couber, encolha o formato do anúncio por ALTURA (não só por
+  largura) ou compacte o cabeçalho (logo ao lado do título). Bônus: área rolável com `clip` padrão corta
+  a sombra/glow dos filhos nas bordas e desenha um retângulo claro; em Flutter, `Clip.none` no scroll.
 - **2026-09-25 (via um passe de "juice" num jogo em canvas) - texto/toast TRANSIENTE também é
   layout: some do screenshot por acaso e volta em cima de outro elemento.** Um HUD com piso fixo
   (`max(H*0.16, 96px)`) deixava 60 px entre a barra de progresso e o tabuleiro no menor viewport
