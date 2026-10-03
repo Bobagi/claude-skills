@@ -174,7 +174,8 @@ e reincidência costuma ser permanente. Audite as regras do provedor como classe
   anterior REALMENTE apareceu, a função que exibe precisa **devolver bool** - "mandei exibir" não é
   "exibiu" (sem anúncio carregado ela é no-op silenciosa).
 - [ ] **Clique acidental:** o convite não pode imitar nem encostar no botão primário. Cor/forma distintas
-  e folga mínima - **trave com teste** comparando os retângulos (`getRect`), não no olho.
+  e folga mínima - **trave com teste** comparando os retângulos (`getRect`), não no olho. E card que
+  SURGE sob o dedo (após um toque) arma os botões de anúncio só depois de ~600 ms.
 - [ ] Consentimento (UMP/GDPR) roda antes de qualquer requisição de anúncio; formato novo herda o mesmo
   fluxo, não abre caminho paralelo.
 - [ ] Build de debug/dev serve ad unit de **teste**; o id real é gated por modo de release.
@@ -264,6 +265,16 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
 ---
 
 ## Learnings log (append-only, geral)
+- **2026-10-03 (via um jogo mobile com rewarded e rewarded interstitial) - card de oferta que
+  SURGE sob um dedo ainda ativo é clique acidental garantido.** O caso clássico de clique acidental
+  não é o botão do anúncio encostado no primário: é o card que APARECE no lugar onde o jogador acabou
+  de tocar (fim de partida -> "jogar de novo" -> card de bônus com "assistir" no mesmo ponto; game
+  over -> card de "continuar com vídeo"). Um toque duplo vira abertura de anúncio. **Testar ao vivo:**
+  toque o botão que abre o card e, 100-150 ms depois, toque na posição do botão de anúncio do card;
+  conferir que nenhum anúncio abriu. **Fix:** todo botão que inicia anúncio ignora toques por
+  ~600 ms após o card aparecer (o botão de recusar fica livre). Segunda lição: modos simulados
+  (`?fakeAds`, `?fakeShop`, `?debug`) se desligam pela PLATAFORMA (nativo), não pela ausência de
+  query na URL.
 - **2026-08-10 (via um comparador web, coletor client-side) - "chave" embarcada no cliente NAO e
   auth, e a defesa real e o resto.** Um endpoint de ingestao protegido por uma chave que viaja DENTRO
   do artefato distribuido (extensao/app baixavel, bundle JS, APK) e efetivamente publico: qualquer um
