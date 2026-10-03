@@ -213,6 +213,16 @@ click, drive them separately for now (interaction steps are a planned engine fea
 ---
 
 ## Learnings log (append-only; this is how the reviewer improves)
+- **2026-10-03 (via um HUD de jogo em canvas) - mover um controle exige reconferir tudo que ANCORA
+  nele, e o campo central precisa de orçamento para o valor MÁXIMO.** (1) Balões, tooltips e halos
+  posicionados relativos a um botão (x/y do botão + offset) migram junto quando o botão muda de linha
+  e passam a cobrir o vizinho; ao reposicionar um controle, grep por quem lê a posição dele e
+  recapture esses estados. (2) Um número centralizado entre clusters de botões (placar, saldo,
+  contador) deve ser testado com o MAIOR valor realista (5 a 6 dígitos), não com o valor do seed:
+  a colisão com o cluster lateral só aparece com o número grande. Regra prática: largura livre =
+  W - 2 x (maior cluster lateral + gap); se não cabe o valor máximo, equilibre os clusters ou mude
+  o campo de linha. (3) Emoji como ícone de HUD varia por fabricante; um set próprio desenhado no
+  mesmo material da UI resolve consistência e corte de métrica de uma vez.
 - **2026-10-03 (via um jogo mobile com banner de anúncio fixo) - feature nova na home precisa caber
   ACIMA DA DOBRA na menor tela atendida, com o anúncio no tamanho real.** O atalho novo (bônus diário,
   loja) estava pronto e testado, mas em 360x640 o retângulo médio de anúncio (300x250) o empurrava para
