@@ -48,6 +48,13 @@ Pule: getters/setters triviais, o que o compilador/framework já garante, UI pur
   (só 1 passou, saldo consistente) — em Go use goroutines + `-race`; em app rodando, N requests paralelos.
 
 ## Learnings log (append-only, geral)
+- **2026-10-03 (via um jogo offline com rewarded ad) - limite "1 por X" tem que ser testado ATRAVES da
+  persistencia.** Um teto por partida/dia (continues, bonus, tentativas) que vive num contador salvo
+  quebra de dois jeitos que o teste em memoria nao ve: o contador nao entra no snapshot (o save/restore
+  devolve o direito) e um valor corrompido/negativo no storage reabre o teto. Teste os tres: usar ate o
+  teto, salvar+restaurar e conferir que continua bloqueado, e injetar `-5`/`50` no save e conferir o
+  clamp. Feche com mutacao em uma linha (sed na condicao do teto, rodar, restaurar): se continuar verde,
+  o teste nao trava a regra.
 - **2026-09-07 (via um mural de feedback público) - as regras da CAMADA HTTP não moram no service e o
   unit do service não as cobre: suba o router REAL numa porta efêmera.** Honeypot que responde
   `{ok:true}` FALSO sem gravar, gate de `Content-Type: application/json` (text/plain cross-site não
