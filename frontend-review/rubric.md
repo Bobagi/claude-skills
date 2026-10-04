@@ -1821,3 +1821,8 @@ click, drive them separately for now (interaction steps are a planned engine fea
   quando um painel cresce (linha nova), procure o elemento TRANSIENTE ancorado abaixo dele por número fixo
   (pilha de toasts), porque ele passa a nascer por cima; e (d) se o review ligou emulador de dispositivo,
   desligue-o no fim e diga que desligou, porque o próximo teste manual do dono herda o modo.
+- **2026-10-04 (via uma loja dentro de app) - mensagem de sucesso não repete o estado que o próprio
+  componente já passou a mostrar, e migração se revisa semeando o estado da versão ANTERIOR.** (1) Se o
+  cartão comprado vira "Comprado. Obrigado!", um aviso no topo com a mesma frase é ruído: escolha um dos
+  dois. (2) Quando a versão muda um padrão (tema, item inicial, preço), semeie o storage no formato antigo
+  antes de capturar: a tela de quem já usava o app é a que mais importa e a que um estado limpo esconde.
