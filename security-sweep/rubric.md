@@ -885,3 +885,15 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   (2) Loja/pagamento simulado ligado por flag de build (`FAKE_STORE`, `?fakeShop`) só pode valer em
   debug ou web de QA; build de release nativo ignora a flag, senão um build errado distribui o produto
   pago de graça.
+- **2026-10-04 (via um jogo mobile com compras na loja) - compra dentro do app sem servidor é a classe
+  "reembolsa e fica com o produto"; o conserto é servidor + 4 invariantes testáveis.** (1) Verificar o
+  token na API da loja no servidor e só entregar com `purchased` (pendente/cancelado/erro do provedor =
+  nada; erro 5xx = "tente de novo", NUNCA entrega). (2) Resgate idempotente: UNIQUE no token + checagem e
+  gravação na mesma transação, DEPOIS da chamada externa; o app credita e grava ANTES de consumir/confirmar
+  na loja. (3) Amarrar o consumível a quem comprou (id de conta ofuscado enviado na compra) e, na
+  restauração de compra única em outra instalação, devolver só o DIREITO, nunca as moedas. (4) Puxar a
+  lista de compras anuladas (reembolso/estorno) de tempos em tempos e desfazer no app: tirar o saldo e, se
+  já gastou, devolver à loja os itens comprados até cobrir (dívida se não cobrir). **Testar ao vivo:** token
+  forjado, rajada concorrente do mesmo token e campos extras contra o servidor real. Armadilha de infra:
+  com `trust proxy` incluindo a rede privada do Docker, o proxy reverso TEM de sobrescrever o
+  `X-Forwarded-For` com o IP real, senão o cliente escolhe o próprio IP do limite.
