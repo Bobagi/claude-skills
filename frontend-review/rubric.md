@@ -1832,3 +1832,7 @@ click, drive them separately for now (interaction steps are a planned engine fea
   o widget ao vivo: o envoltório opaco aparece como cantos quadrados fora da moldura arredondada. (2) Card de
   chamada (desafio, oferta) com meta + prêmio numa linha corta exatamente o prêmio: texto curto dedicado ao card
   e até 2 linhas, conferido no idioma mais longo e na tela mais estreita.
+- **2026-10-04 (via um jogo mobile) - efeito contínuo que respeita "reduzir animações" tem de PARAR o
+  relógio, não só deixar de desenhar.** Retornar o filho parado com o controlador em `repeat()` gasta
+  bateria e quebra o teste de árvore descartada. Revisar animação em movimento = vários quadros
+  seguidos (tira de 4 a 8), não um print só: balanço, brilho que passa e raios só aparecem na sequência.
