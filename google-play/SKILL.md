@@ -1,6 +1,6 @@
 ---
 name: google-play
-description: Gerencia apps na Google Play via Play Developer API com service account — subir/lançar AAB em qualquer track (internal/beta/production), promover release, rollout gradual, ver/responder avaliações, ler/editar a ficha da loja (listing) e checar status de versões. Use quando o usuário pedir para lançar/subir/publicar uma versão na Play Store, promover ou pausar um rollout, responder reviews, mexer no texto/título da loja, ou ver em que estado está uma release. App padrão - Tic Tac Verse (com.bobagi.tictacverse).
+description: Gerencia apps na Google Play via Play Developer API com service account — subir/lançar AAB em qualquer track (internal/beta/production), promover release (sempre a 100%), ver/responder avaliações, ler/editar a ficha da loja (listing) e checar status de versões. Use quando o usuário pedir para lançar/subir/publicar uma versão na Play Store, promover ou pausar um rollout, responder reviews, mexer no texto/título da loja, ou ver em que estado está uma release. App padrão - Tic Tac Verse (com.bobagi.tictacverse).
 allowed-tools: Bash, Read
 ---
 
@@ -27,7 +27,7 @@ python3 $S doctor                       # valida setup de ponta a ponta
 python3 $S tracks                       # o que está em cada track (status/rollout)
 python3 $S bundles                      # versionCodes já enviados
 python3 $S upload --aab dist/app.aab --track internal --notes "Correções de bugs"
-python3 $S promote --from-track internal --to-track production --rollout 0.2
+python3 $S promote --from-track internal --to-track production --rollout 1.0
 python3 $S rollout --fraction 1.0 --track production
 python3 $S reviews --limit 10
 python3 $S reviews-reply --review-id XYZ --text "Obrigado! Corrigido na v1.0.5."
@@ -52,8 +52,11 @@ Outro app: `--package com.exemplo.app` (padrão: `com.bobagi.tictacverse`).
    (pergunta direta, resposta afirmativa). Só então exporte
    `GPLAY_CONFIRM_PROD=yes` no comando — o script bloqueia sem isso.
    Tracks de teste (`internal`, `alpha`, `beta`) não precisam de confirmação.
-2. Primeira ida à produção de uma versão nova: prefira **rollout gradual**
-   (`--rollout 0.2`) e complete depois com `rollout --fraction 1.0`.
+2. **Produção é SEMPRE a 100% (`--rollout 1.0`), ordem do operador em 2026-10-04,
+   vale para todos os apps.** Nada de rollout gradual (0.2, 0.5): ele deixou 80% da
+   base do Tic Tac Verse presa numa versão velha por um mês. Só use fração menor
+   se o operador pedir naquela conversa. Se achar um release `inProgress` parado,
+   leve a 100% (`rollout --fraction 1.0`) com a confirmação dele.
 3. `versionCode` deve ser maior que o último publicado (`bundles` mostra).
    Quem define é o `pubspec.yaml` (`version: X.Y.Z+CODE`) no build Flutter.
 4. Nunca leia/imprima o JSON da service account; nunca o copie para dentro
