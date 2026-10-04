@@ -876,3 +876,12 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   Segunda lição, de compra com moeda do jogo: teste a rajada **concorrente de itens DIFERENTES com saldo
   para um só** (o furo de "dois itens pelo preço de um" não aparece repetindo o mesmo item, que cai no
   "já possui"), e confirme que não há yield entre checar saldo e debitar.
+- **2026-10-04 (via uma loja de compras em app cliente) - a trava anti-toque-duplo precisa ser provada
+  com o toque CAINDO no alvo, e flag de modo simulado não pode ser a única chave.** (1) Um teste de
+  "toque duplo não compra" passou com a defesa removida porque o toque caía fora da tela do teste
+  (viewport padrão menor que o layout): passou por vacuidade. Ao testar defesa de toque, afirme que o
+  alvo está visível/achado ANTES de tocar e rode o mutante sem a defesa; se ele não morrer, o teste é
+  teatro. O mesmo mutante revelou que a primeira trava (baseada no relógio de frame) não travava nada.
+  (2) Loja/pagamento simulado ligado por flag de build (`FAKE_STORE`, `?fakeShop`) só pode valer em
+  debug ou web de QA; build de release nativo ignora a flag, senão um build errado distribui o produto
+  pago de graça.
