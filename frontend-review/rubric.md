@@ -1826,3 +1826,9 @@ click, drive them separately for now (interaction steps are a planned engine fea
   cartão comprado vira "Comprado. Obrigado!", um aviso no topo com a mesma frase é ruído: escolha um dos
   dois. (2) Quando a versão muda um padrão (tema, item inicial, preço), semeie o storage no formato antigo
   antes de capturar: a tela de quem já usava o app é a que mais importa e a que um estado limpo esconde.
+- **2026-10-04 (via um jogo com "compartilhar resultado") - fundo posto na tela só para uma captura de imagem
+  vaza na UI; e card de largura total com texto longo precisa de versão curta.** (1) Para exportar um widget
+  como imagem com fundo opaco, pinte o fundo NA IMAGEM gerada (compor no canvas da exportação), não envolvendo
+  o widget ao vivo: o envoltório opaco aparece como cantos quadrados fora da moldura arredondada. (2) Card de
+  chamada (desafio, oferta) com meta + prêmio numa linha corta exatamente o prêmio: texto curto dedicado ao card
+  e até 2 linhas, conferido no idioma mais longo e na tela mais estreita.
