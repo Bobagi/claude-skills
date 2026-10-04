@@ -193,3 +193,13 @@ Nomes de serviço e de tipo trocados por genéricos, o repo é público.
   de esconder atras de "melhorias de desempenho". Fato seco, sem spin, que e o mesmo
   padrao do "listar o que continua faltando, com o motivo" do log de 2026-08-14.
   Ainda **nao validado pela reacao dele**: entrou em producao sem revisao linha a linha.
+- 2026-10-04 · Contexto novo: **formulário para revisor do Google** (pedido de acesso à
+  produção da Play, 8 perguntas por escrito). Registro: informal-polido em primeira pessoa
+  do singular (é um dev solo falando com um revisor), sem piada, frases diretas. Regras
+  que valeram: (a) **admitir a falha anterior em uma linha e mostrar o que mudou com fato
+  verificável** (datas, quantas versões, o que cada uma trouxe), nunca adjetivo;
+  (b) **número que só o dono sabe vira lacuna marcada** ([quantos testadores ativos no
+  Console]) em vez de estimativa, porque o revisor confere e número inventado derruba a
+  credibilidade do resto; (c) feedback citado tem que ser real e rastreável a uma
+  correção publicada (bug do som, emoji cortado no Samsung, barra do aparelho cobrindo
+  o jogo). Ainda **não validado pela reação dele**.
