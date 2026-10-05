@@ -1847,3 +1847,16 @@ click, drive them separately for now (interaction steps are a planned engine fea
   de um texto com quebra de linha acaba por baixo dele no idioma longo; posicione pela altura medida.
   E um estado de "falha de rede" que o app trata como "precisa fazer login" é bug de lógica que só o
   cenário offline revela: capture-o sempre.
+- **2026-10-05 (via um jogo com banner de anúncio global) - aviso GLOBAL de topo precisa de duas regras:
+  ceder a quem ocupa a mesma faixa, e esperar enquanto um painel modal está aberto.** Um banner que o
+  servidor manda para todos (drop raro, recorde, evento) chega a qualquer momento, inclusive quando o
+  jogador já tem um aviso pessoal na mesma faixa (no celular a pilha de avisos mora logo abaixo do topo)
+  ou um painel centralizado aberto (cujo topo invade a faixa). Regras que fecharam: (a) quem nasce depois
+  EMPURRA o vizinho por medida (a pilha desce `altura do banner + gap` enquanto ele está visível), nunca
+  por número fixo; (b) com painel modal aberto a fila de banners PAUSA e retoma ao fechar, e o banner
+  interrompido volta à frente da fila sem repetir o som; (c) o temporizador de "esconder em N s" carrega
+  um token, senão o timer de um banner antigo corta o próximo. Segundo achado: painel que escala por
+  `UIScale` num celular pequeno (0,6x) transforma o botão de 44 px de projeto em ~26 px de toque - meça o
+  `AbsoluteSize` no simulador do menor aparelho e use medidas de projeto próprias para toque. E um rótulo
+  com `TextScaled` que ganhou mais texto vira limitado pela LARGURA e encolhe: compare `TextBounds.Y` com a
+  altura da caixa para saber se ele ainda usa a altura toda.
