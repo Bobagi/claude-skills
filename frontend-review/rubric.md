@@ -1860,3 +1860,10 @@ click, drive them separately for now (interaction steps are a planned engine fea
   `AbsoluteSize` no simulador do menor aparelho e use medidas de projeto próprias para toque. E um rótulo
   com `TextScaled` que ganhou mais texto vira limitado pela LARGURA e encolhe: compare `TextBounds.Y` com a
   altura da caixa para saber se ele ainda usa a altura toda.
+- 2026-10-05 (3D previews in UI, e.g. ViewportFrame/thumbnail of a model): never trust the comment that says
+  where the preview camera sits; compute the camera vector and check its sign ("a little from above" was below
+  the piece). Check every preview faces front by looking for the feature only the front has (visor, face,
+  emblem); a front/back symmetric piece hides the bug. Flat objects (traps, mats) need a steeper angle or they
+  read as a blob. A tinted texture can render much darker in the preview than in the world: judge the preview
+  capture itself. An empty preview right after load may just be the texture streaming in: capture again before
+  calling it broken.
