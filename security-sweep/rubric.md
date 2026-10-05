@@ -920,3 +920,12 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   furável com `X-Forwarded-For` direto na porta do container; prove que só o proxy alcança a porta e
   que ele SOBRESCREVE o cabeçalho. **Testar:** rajada de N logins do mesmo usuário e contar linhas;
   replay no teto de ações cronometrado; 260 requests com XFF rotativo direto no container e via proxy.
+- **2026-10-05 (via um jogo com fusão de itens) - recurso "em trânsito" que continua nos dados do dono
+  precisa ficar fora de TODA ação nova que consome recursos.** Quando um item está sendo levado (roubo em
+  andamento, troca pendente, leilão aberto) mas os dados ainda o mantêm com o dono para não se perder numa
+  queda, cada feature nova que CONSOME itens (fundir, vender em massa, trocar, sacrificar) reabre a
+  duplicação: o dono consome o item e o ladrão/comprador entrega o mesmo item depois. Regra: a função que
+  lista "itens consumíveis" exclui os em trânsito, e é a MESMA usada pela UI e pelo servidor. **▶ Testar ao
+  vivo:** ponha o item em trânsito e dispare a ação durante a janela; confira nos dados que nada foi
+  consumido. Segunda lição: quando a ação consome N itens, deixe o SERVIDOR escolher quais (o cliente só
+  manda a categoria/chave): sem id de item no payload não existe IDOR para testar.
