@@ -1836,3 +1836,14 @@ click, drive them separately for now (interaction steps are a planned engine fea
   relógio, não só deixar de desenhar.** Retornar o filho parado com o controlador em `repeat()` gasta
   bateria e quebra o teste de árvore descartada. Revisar animação em movimento = vários quadros
   seguidos (tira de 4 a 8), não um print só: balanço, brilho que passa e raios só aparecem na sequência.
+- **2026-10-05 (via um placar online num jogo em canvas) - linha cujo texto chega DEPOIS do layout
+  precisa reservar a altura da MAIOR resposta possível.** Um card montado com o texto provisório
+  ("Enviando...") mediu 1 linha; a resposta real de erro tinha 2 e colou na linha de baixo. Nenhuma
+  captura do caminho feliz mostra isso. Regra: ao revisar texto preenchido por rede/async, (a) liste
+  todas as respostas possíveis (sucesso, offline, sem login, versão velha, recusado) e capture cada
+  uma no menor viewport e no idioma mais longo; (b) no código, meça cada candidata, reserve a maior,
+  centralize na faixa e atualize só depois da animação de entrada (tween de `y` sobrescreve um
+  `setY` feito no meio dele). Irmão do mesmo achado: controle posicionado a uma distância FIXA abaixo
+  de um texto com quebra de linha acaba por baixo dele no idioma longo; posicione pela altura medida.
+  E um estado de "falha de rede" que o app trata como "precisa fazer login" é bug de lógica que só o
+  cenário offline revela: capture-o sempre.
