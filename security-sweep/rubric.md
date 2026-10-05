@@ -908,3 +908,15 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   já entregue por palpite. **Testar:** rajada de verificações vazias em pouco tempo (nao pode revogar),
   ausências espaçadas (revoga), avistamento no meio (zera), mesmo token após revogar (sem repagar), e
   validar cada teste por mutação.
+- **2026-10-05 (via um placar online que refaz cada partida no servidor) - "validação por replay"
+  move o risco de fraude para CPU, e "login cria sessão" precisa de teto.** (1) Quando o servidor
+  recalcula o resultado a partir da lista de ações do cliente, o custo por envio vira superfície:
+  MEÇA o tempo por ação e multiplique pelo teto de ações; esse número, vezes o rate limit por IP, é
+  quanto um atacante segura o event loop. Conte a tentativa ANTES do replay e mantenha o teto de ações
+  e o de envios por dia. (2) Todo endpoint que troca prova de identidade por sessão (OAuth code,
+  token de provedor) insere uma linha por chamada: sem "manter só as N mais recentes" na MESMA
+  transação, a tabela cresce sem limite com uma conta só. Ao cortar, exclua a sessão recém-criada do
+  corte (empate de timestamp pode apagá-la). (3) Rate limit com `trust proxy` na rede do Docker é
+  furável com `X-Forwarded-For` direto na porta do container; prove que só o proxy alcança a porta e
+  que ele SOBRESCREVE o cabeçalho. **Testar:** rajada de N logins do mesmo usuário e contar linhas;
+  replay no teto de ações cronometrado; 260 requests com XFF rotativo direto no container e via proxy.
