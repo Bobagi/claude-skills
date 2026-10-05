@@ -897,3 +897,14 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   forjado, rajada concorrente do mesmo token e campos extras contra o servidor real. Armadilha de infra:
   com `trust proxy` incluindo a rede privada do Docker, o proxy reverso TEM de sobrescrever o
   `X-Forwarded-For` com o IP real, senão o cliente escolhe o próprio IP do limite.
+- **2026-10-05 (via um jogo cliente sem servidor que passou a revogar compra única reembolsada) -
+  "lista vazia" de um SDK de loja pode significar FALHA, e revogar com base nela pune quem pagou.**
+  Antes de transformar "a loja não listou o item" em "tira o direito", leia o código nativo do plugin:
+  muitos resolvem com lista vazia quando a consulta falha, em vez de rejeitar. Padrão de fix: revogar só
+  depois de N ausências em verificações separadas E um intervalo mínimo de tempo; qualquer avistamento
+  zera; guardar o token já pago por produto para que a MESMA compra voltando (troca de conta, falha
+  resolvida) devolva o direito sem repagar bônus. Efeito colateral a auditar: depois de revogar, o item
+  volta à venda, e recomprar com token novo repaga os bônus (laço compra/reembolso); nao retire moeda
+  já entregue por palpite. **Testar:** rajada de verificações vazias em pouco tempo (nao pode revogar),
+  ausências espaçadas (revoga), avistamento no meio (zera), mesmo token após revogar (sem repagar), e
+  validar cada teste por mutação.
