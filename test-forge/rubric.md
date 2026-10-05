@@ -360,3 +360,13 @@ Pule: getters/setters triviais, o que o compilador/framework já garante, UI pur
   ainda inflado. Mutation check confirmou: afrouxar `owned == true` para "qualquer valor truthy" só ficou
   vermelho porque o teste checava também o total derivado. Irmão da regra de 2026-08-01: a ação "grátis"
   (vestir o que já tem) foi testada com saldo ZERO, o único estado em que o caminho pago errado falha.
+- **2026-10-05 (via um jogo com fusão de itens) - ação que CONSOME e CRIA valor: extraia um "plano" puro
+  (o que sai, o que entra) e teste o plano; o serviço só aplica.** A regra que importa numa fusão/troca/
+  crafting não é "a escada de níveis", é QUAIS itens são consumidos e o que o resultado HERDA (proteção,
+  origem, progresso). Isso costuma nascer dentro do serviço, junto de dados e rede, e fica sem teste.
+  Mover para `plan(entradas, pedido) -> {consome, resultado} | nil` deixa testar com valor exato: consome
+  exatamente N e deixa o (N+1)-ésimo, herda proteção SÓ se uma entrada tinha (teste os dois lados), a
+  origem segue a prioridade em cada degrau, pedido inválido devolve nil. Método que barateou a prova: num
+  runner de editor com cache de `require`, rode TODAS as mutações num único comando clonando o pacote por
+  mutação (módulos novos = sem cache) e reescrevendo o caminho do spec para o clone, com um controle sem
+  mutação que precisa passar; 10 mutações, 10 vermelhos, sem 40 reinícios do jogo.
