@@ -134,6 +134,12 @@ teste confiável que roda e pode falhar - priorize o caminho do dinheiro) e, em 
   normal do original, mede contorno e sombreamento contra o original e só sobe se aparecer perda; depois importa
   na engine (checklist Unity URP) e compara no jogo. Use SEMPRE que mexer com 3D (importar/gerar modelo, trocar
   placeholder, "reduz polígonos", avaliar asset do Fab/MetaHuman).
+- **`store-promo-video`** - **vídeo promocional da ficha da loja** (Play; base para anúncios) no padrão "dopamina":
+  grava o app REAL quadro a quadro (relógio virtual no build web, 60 fps perfeitos; scrcpy/Unity para nativo), som
+  do próprio app sincronizado ao quadro, música CC0 com o drop no gancho (`find_drop.py`), cortes no compasso,
+  zoom/tremor/flash/câmera lenta, legenda curta por idioma, fecho com o ícone animado no ComfyUI (Wan 2.2), um
+  vídeo por idioma e o link na ficha via `google-play`. Regras da Play em `reference/play-video-rules.md`. Use em
+  "faça o vídeo da loja/da Play", "vídeo promocional/trailer do app", "vídeo viciante do jogo".
 - **`vps`** - gerenciar o VPS bobagi.space via SSH.
 - **`resume`** - resumir um vídeo do YouTube a partir do link.
 - **`google-play`** - releases na Play Store via Play Developer API (service account): sobe
