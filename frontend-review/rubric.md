@@ -1867,3 +1867,8 @@ click, drive them separately for now (interaction steps are a planned engine fea
   read as a blob. A tinted texture can render much darker in the preview than in the world: judge the preview
   capture itself. An empty preview right after load may just be the texture streaming in: capture again before
   calling it broken.
+- 2026-10-08 (capture harness): when a state is ONE-SHOT per install (a first-launch greeting, an
+  onboarding card, a "read once" flag in storage), capture each locale/viewport in a FRESH browser
+  context (incognito context per run), or only the first capture shows it and the rest time out or,
+  worse, silently show the post-state. Also: a tiny static server must map `/` to `index.html` with a
+  `text/html` content type, or Chrome treats the page as a download (`net::ERR_ABORTED`).
