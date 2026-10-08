@@ -66,6 +66,16 @@ VPS** (anti-bot/2FA + risco de travar a conta dona do AdMob/Play). Itens
 UI-only: guiar o operador; último recurso = chrome-devtools-mcp **na máquina
 do operador**, logado e presente. Nunca guardar cookies Google na VPS.
 
+## AdSense (sites/web) - `scripts/adsense.py`
+
+Mesmo OAuth client, token SEPARADO (`adsense-token.json`, escopo `adsense.readonly`; o do AdMob
+não tem esse escopo e dá 403). Setup único sem terminal interativo: `adsense.py auth-url` → o
+operador abre logado na conta dona → cola a URL de `localhost:8765/?code=...` → `adsense.py
+auth-code '<url>'`. Exige a "AdSense Management API" ativada no projeto GCP do client. Uso:
+`sites` (estado de aprovação: READY / GETTING_READY / REQUIRES_REVIEW / NEEDS_ATTENTION),
+`alerts`, `policy`, `adclients`, `report --days 30`. Só leitura: aprovar site, ligar Auto ads e
+criar bloco é no painel. Use em "como está o AdSense", "o site foi aprovado?", "quanto o site rendeu".
+
 ## Regras
 
 1. Dados financeiros: apresentar como estimativas do AdMob (a receita final
