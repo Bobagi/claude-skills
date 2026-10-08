@@ -929,3 +929,10 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   vivo:** ponha o item em trânsito e dispare a ação durante a janela; confira nos dados que nada foi
   consumido. Segunda lição: quando a ação consome N itens, deixe o SERVIDOR escolher quais (o cliente só
   manda a categoria/chave): sem id de item no payload não existe IDOR para testar.
+- 2026-10-08 (cliente mobile, crescimento): **install referrer / deep link / link compartilhado e input do
+  ATACANTE**, nao do sistema: qualquer um monta um link da loja com `referrer=` arbitrario e espalha. Parse
+  por allowlist estrita (regex ancorada por campo, cap de tamanho do texto cru, bounds numericos), render
+  so por `textContent`/texto do motor, e nada de credito/recompensa derivado dele. Testar ao vivo com o
+  hook de simulacao: markup, negativo, zero, estouro, 2 KB, fonte errada, parametro duplicado. E todo
+  hook de teste que le a URL (`?fake*`) devolve vazio dentro do shell nativo, mesmo que a WebView "nao
+  tenha query": nao confie nisso.
