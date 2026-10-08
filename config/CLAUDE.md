@@ -155,6 +155,8 @@ teste confiável que roda e pode falhar - priorize o caminho do dinheiro) e, em 
 - **`admob`** - relatórios AdMob via API (receita, eCPM, impressões por dia/ad unit/país) +
   inventário. OAuth do dono da conta (setup único: `admob/SETUP.md`); escrita de inventário
   é restrita pelo Google (fallback manual).
+  **AdSense (web, warframe):** `admob/scripts/adsense.py` (mesmo OAuth client, token próprio com
+  `adsense.readonly`): status de aprovação do site, alertas, política e receita, só leitura.
 - **`google-ads`** - relatórios Google Ads via API (**somente leitura**): status/orçamento de
   campanha, gasto por dia, CPI, conversões (instalações) por campanha/grupo. Exige developer
   token com acesso Básico aprovado (setup único: `google-ads/SETUP.md`); reusa o OAuth client
