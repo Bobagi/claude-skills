@@ -936,3 +936,14 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   hook de simulacao: markup, negativo, zero, estouro, 2 KB, fonte errada, parametro duplicado. E todo
   hook de teste que le a URL (`?fake*`) devolve vazio dentro do shell nativo, mesmo que a WebView "nao
   tenha query": nao confie nisso.
+
+### 2026-10-10 · long poll / conexões presas (via tictacverse-api)
+- **Long poll precisa de teto POR identidade, não só global.** Com teto só global, poucos tokens seguram todas
+  as vagas e os clientes legítimos passam a receber resposta imediata (e, se o cliente não tiver pausa, entram em
+  loop apertado contra o próprio servidor). Defesa: teto por usuário/token, responder já quando o cursor do
+  cliente (`since`/versão) é impossível (maior que o atual), e **pausa no cliente** quando a resposta volta rápida
+  sem novidade. ▶ Testar ao vivo: N esperas simultâneas do mesmo token com o cursor atual; contar quantas voltam na
+  hora (deve ser N - teto) e mandar um cursor maior que o atual (deve voltar na hora).
+- Atrás de Cloudflare, um cliente que manda `CF-Connecting-IP` forjado recebe **403 do próprio Cloudflare**; ao
+  testar spoof de IP, mande só `X-Forwarded-For`/`X-Real-IP`, senão o 403 parece "limite respeitado" e o teste
+  não mede nada.
