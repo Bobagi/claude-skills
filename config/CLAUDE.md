@@ -134,6 +134,13 @@ teste confiável que roda e pode falhar - priorize o caminho do dinheiro) e, em 
   normal do original, mede contorno e sombreamento contra o original e só sobe se aparecer perda; depois importa
   na engine (checklist Unity URP) e compara no jogo. Use SEMPRE que mexer com 3D (importar/gerar modelo, trocar
   placeholder, "reduz polígonos", avaliar asset do Fab/MetaHuman).
+- **`game-audio`** - **pipeline de sons para jogo**: busca sons sem crédito (Freesound filtrado por CC0, Kenney),
+  confere a licença na página de cada um (`scripts/freesound.py`), baixa os originais pelo Chrome logado (navegando
+  para cada URL `/download/`, com "perguntar onde salvar" desligado), ANALISA sem ouvir (`scripts/analyze.py`:
+  níveis, piso de ruído, faixas, eventos com tempos e imagem de forma de onda + espectrograma), edita e converte
+  (`scripts/audiokit.py`: corte, separação de eventos, camadas, loop sem emenda, filtros, pitch; WAV 16 bits 48 kHz)
+  e liga no jogo (Unity: regras de importação + `SoundLibrary` por papel) conferindo em Play. Use SEMPRE que mexer
+  com áudio de jogo ("baixe os sons", "corta/converte esse áudio", "faz um loop", trocar som sintetizado por gravado).
 - **`store-promo-video`** - **vídeo promocional da ficha da loja** (Play; base para anúncios) no padrão "dopamina":
   grava o app REAL quadro a quadro (relógio virtual no build web, 60 fps perfeitos; scrcpy/Unity para nativo), som
   do próprio app sincronizado ao quadro, música CC0 com o drop no gancho (`find_drop.py`), cortes no compasso,

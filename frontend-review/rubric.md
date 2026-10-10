@@ -213,6 +213,15 @@ click, drive them separately for now (interaction steps are a planned engine fea
 ---
 
 ## Learnings log (append-only; this is how the reviewer improves)
+- **2026-10-10 (via um menu principal de jogo em engine 3D) - UI de jogo tem que ser capturada em várias PROPORÇÕES,
+  não só tamanhos, e com os valores carregados de verdade.** (1) Em canvas com escala por resolução de referência
+  (Unity CanvasScaler e afins), misturar largura e altura (match 0,5) faz a UI crescer além da ALTURA da tela em
+  ultrawide (21:9): blocos ancorados no topo e no centro se sobrepõem (menu por cima do título). Em jogo deitado,
+  escalar pela altura e deixar as laterais sobrarem; testar sempre 16:9, 21:9, 16:10 e 4:3. (2) Página de opções
+  mostrando zero/mínimo em tudo (volume 0%, menor resolução) não é design: é estado não carregado. Em editor de
+  engine, recompilar no Play zera estáticos sem rodar o boot de novo; carregue preguiçosamente no primeiro acesso.
+  (3) Bloco de texto longo centralizado verticalmente numa caixa fixa transborda PARA CIMA e para baixo ao mesmo
+  tempo; alinhe ao topo e dimensione pela soma das linhas.
 - **2026-10-03 (via um HUD de jogo em canvas) - mover um controle exige reconferir tudo que ANCORA
   nele, e o campo central precisa de orçamento para o valor MÁXIMO.** (1) Balões, tooltips e halos
   posicionados relativos a um botão (x/y do botão + offset) migram junto quando o botão muda de linha

@@ -65,6 +65,9 @@ def parse():
     p.add_argument("--pivot", choices=("bottom", "center"), default="bottom")
     p.add_argument("--previews", help="folder for the comparison image and the report (default: --out)")
     p.add_argument("--samples", type=int, default=24)
+    p.add_argument("--smooth-angle", type=float, default=40.0,
+                   help="edges sharper than this stay hard (degrees). 180 = all smooth: use it for skinned characters "
+                        "that cast shadows (hard edges split the vertices and the shadow normal bias cracks them apart)")
     return p.parse_args(argv)
 
 
@@ -85,8 +88,11 @@ def resolve_source(src, work):
         mesh = meshes[0]
     else:
         mesh = src
+    # Beside the mesh, in a "textures" folder next to it (Poly Haven) or one level up (a gltf/ subfolder).
     folder = os.path.dirname(mesh)
-    images = [f for f in glob.glob(os.path.join(folder, "*")) if f.lower().endswith((".png", ".jpg", ".jpeg", ".tga"))]
+    images = []
+    for d in (folder, os.path.join(folder, "textures"), os.path.join(os.path.dirname(folder), "textures")):
+        images += [f for f in glob.glob(os.path.join(d, "*")) if f.lower().endswith((".png", ".jpg", ".jpeg", ".tga"))]
 
     def pick(*keys):
         for f in images:
@@ -95,14 +101,18 @@ def resolve_source(src, work):
                 return f
         return None
 
+    # Meshy names (_normal, _metallic, _roughness) and Poly Haven ones (_nor_gl, _metal_, _rough_, _diff_).
     tex = {
-        "normal": pick("_normal", "normal."),
-        "metallic": pick("_metallic.", "_metalness", "_metallic_"),
-        "roughness": pick("_roughness"),
+        "normal": pick("_normal", "normal.", "_nor_gl"),
+        "metallic": pick("_metallic.", "_metalness", "_metallic_", "_metal_"),
+        "roughness": pick("_roughness", "_rough_"),
+        "base": pick("_diff_", "_diffuse", "_basecolor", "_base_color", "_albedo"),
     }
-    used = {v for v in tex.values() if v}
-    rest = [f for f in images if f not in used and "metallic_roughness" not in f.lower() and "emissive" not in f.lower()]
-    tex["base"] = max(rest, key=os.path.getsize) if rest else None
+    if not tex["base"]:
+        skip = ("metallic_roughness", "emissive", "_nor_", "_ms.", "opacity", "alpha", "_arm_", "_ao_", "_disp", "_mask")
+        used = {v for v in tex.values() if v}
+        rest = [f for f in images if f not in used and not any(k in os.path.basename(f).lower() for k in skip)]
+        tex["base"] = max(rest, key=os.path.getsize) if rest else None
     return mesh, tex
 
 
@@ -191,10 +201,41 @@ def source_material(obj, tex):
         nt.links.new(nm.outputs['Normal'], bsdf.inputs['Normal'])
     if tex["roughness"]:
         n = nt.nodes.new('ShaderNodeTexImage'); n.image = load_image(tex["roughness"], True)
+        nt.links.new(uv.outputs['UV'], n.inputs['Vector'])
         nt.links.new(n.outputs['Color'], bsdf.inputs['Roughness'])
+    else:
+        # No roughness map: most props are worn wood, cloth, painted metal. Blender's 0.5 reads as plastic.
+        bsdf.inputs['Roughness'].default_value = 0.7
+    if tex["metallic"]:
+        n = nt.nodes.new('ShaderNodeTexImage'); n.image = load_image(tex["metallic"], True)
+        nt.links.new(uv.outputs['UV'], n.inputs['Vector'])
+        nt.links.new(n.outputs['Color'], bsdf.inputs['Metallic'])
+    else:
+        bsdf.inputs['Metallic'].default_value = 0.0
     obj.data.materials.clear()
     obj.data.materials.append(mat)
     return mat
+
+
+def has_image_textures(obj):
+    for m in obj.data.materials:
+        if m and m.use_nodes and any(n.type == 'TEX_IMAGE' and n.image for n in m.node_tree.nodes):
+            return True
+    return False
+
+
+def surface_bsdf(mat):
+    """The Principled BSDF that feeds the material output, or None."""
+    if not mat or not mat.use_nodes:
+        return None
+    out = next((n for n in mat.node_tree.nodes if n.type == 'OUTPUT_MATERIAL' and n.is_active_output), None)
+    out = out or next((n for n in mat.node_tree.nodes if n.type == 'OUTPUT_MATERIAL'), None)
+    if out is None or not out.inputs['Surface'].links:
+        return None
+    node = out.inputs['Surface'].links[0].from_node
+    if node.type != 'BSDF_PRINCIPLED':
+        node = next((n for n in mat.node_tree.nodes if n.type == 'BSDF_PRINCIPLED'), None)
+    return out, node
 
 
 def preview_material(obj, base_img, normal_img):
@@ -215,6 +256,9 @@ def preview_material(obj, base_img, normal_img):
 
 
 # ---------------------------------------------------------------- decimation and silhouettes
+
+SMOOTH_ANGLE = 40.0
+
 
 def decimated_copy(high, tris, remesh_voxel=None):
     """Light copy of high. With remesh_voxel, the copy is first rebuilt as a voxel remesh: Blender's collapse
@@ -237,8 +281,8 @@ def decimated_copy(high, tris, remesh_voxel=None):
     bpy.ops.object.modifier_apply(modifier=mod.name)
     # Smooth by angle, not plain smooth: on thin parts (a slate, a strap) front and back share the rim
     # vertices, plain smooth bends the normals across whole faces and the baked normal map fights it
-    # (dark wedges on the dive slate, 2026-09-30). Edges sharper than 40 degrees stay hard.
-    bpy.ops.object.shade_smooth_by_angle(angle=math.radians(40))
+    # (dark wedges on the dive slate, 2026-09-30). Edges sharper than 40 degrees stay hard (--smooth-angle).
+    bpy.ops.object.shade_smooth_by_angle(angle=math.radians(SMOOTH_ANGLE))
     return low
 
 
@@ -341,25 +385,36 @@ def bake_channels(high, low, tex, size, tex_size):
     low.data.materials.clear()
     low.data.materials.append(target)
 
-    src = high.data.materials[0].node_tree
-    out = src.nodes["Material Output"]
-    bsdf_socket = out.inputs['Surface'].links[0].from_socket
-    emit = src.nodes.new('ShaderNodeEmission')
+    # Every material of the original (a Poly Haven model can have several, each with its own texture set):
+    # whatever feeds its Principled BSDF input (texture, or the plain value) goes through an emission shader.
+    wired = []
+    for mat in high.data.materials:
+        found = surface_bsdf(mat)
+        if found is None:
+            continue
+        out, bsdf = found
+        nt = mat.node_tree
+        wired.append((nt, out, out.inputs['Surface'].links[0].from_socket, bsdf, nt.nodes.new('ShaderNodeEmission')))
     # Distances scale with the object: a 16 cm flask and a 2 m tank both get sensible rays.
     rays = dict(use_selected_to_active=True, cage_extrusion=size * 0.01, max_ray_distance=size * 0.04, margin=16)
     images = {}
-    for channel, non_color in (("base", False), ("metallic", True), ("roughness", True)):
-        if not tex[channel]:
-            continue
-        tnode = src.nodes.new('ShaderNodeTexImage')
-        tnode.image = load_image(tex[channel], non_color)
-        src.links.new(tnode.outputs['Color'], emit.inputs['Color'])
-        src.links.new(emit.outputs[0], out.inputs['Surface'])
+    for channel, socket, non_color in (("base", "Base Color", False), ("metallic", "Metallic", True), ("roughness", "Roughness", True)):
+        for nt, out, _, bsdf, emit in wired:
+            for l in list(emit.inputs['Color'].links):
+                nt.links.remove(l)
+            source = bsdf.inputs[socket]
+            if source.links:
+                nt.links.new(source.links[0].from_socket, emit.inputs['Color'])
+            else:
+                v = source.default_value
+                emit.inputs['Color'].default_value = tuple(v) if channel == "base" else (v, v, v, 1.0)
+            nt.links.new(emit.outputs[0], out.inputs['Surface'])
         node.image = images[channel] = new_image(channel, tex_size, non_color)
         select_only(high, low)
         bpy.ops.object.bake(type='EMIT', **rays)
         print("BAKED", channel, flush=True)
-    src.links.new(bsdf_socket, out.inputs['Surface'])
+    for nt, out, socket, _, _ in wired:
+        nt.links.new(socket, out.inputs['Surface'])
     node.image = images["normal"] = new_image("normal", tex_size, True)
     select_only(high, low)
     bpy.ops.object.bake(type='NORMAL', **rays)
@@ -460,7 +515,9 @@ def fresh_uvs(obj):
 # ---------------------------------------------------------------- main
 
 def main():
+    global SMOOTH_ANGLE
     a = parse()
+    SMOOTH_ANGLE = a.smooth_angle
     a.out = os.path.abspath(a.out)
     a.previews = os.path.abspath(a.previews) if a.previews else None
     lo_budget, hi_budget, tex_default = BUDGETS[a.type]
@@ -481,7 +538,12 @@ def main():
         v = verts(high)
         dims = (v.max(0) - v.min(0)).tolist()
         size = max(dims)
-        source_material(high, tex)
+        # Keep the original's own materials when they carry textures and either there are several (one
+        # texture set each) or no loose texture set was found; otherwise rebuild one from the files found.
+        if has_image_textures(high) and (len(high.data.materials) > 1 or not tex["base"]):
+            tex["materials"] = [m.name for m in high.data.materials if m]
+        else:
+            source_material(high, tex)
         high_masks = silhouettes(high, high, work, "high")
         comparison_rig(a.samples)
         high_row = render_row(high, high, work, a.samples)

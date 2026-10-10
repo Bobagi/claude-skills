@@ -120,3 +120,17 @@ App que toca arquivos de áudio (não sintetiza): registre `{arquivo, t}` e mixe
 - Autoplayer em cena sorteada muda entre idiomas → confira os marks de cada gravação.
 - Zoom alto em cena larga corta o conteúdo → teste o enquadramento num quadro antes do render final.
 - Hook do Claude Code bloqueia `rm` de glob relativo depois de `cd` → escreva em pasta nova em vez de limpar.
+- **Flutter web** (Tic Tac Verse, exemplo em `D:/Projetos/tictacverse/tool/promo/`): o relógio virtual funciona,
+  mas `setTimeout(0)` em cadeia (rolagem) trava o `advance` num laço infinito → atraso mínimo de 1 ms. Sem
+  ganchos de debug no app: clique em `flt-semantics-placeholder` liga a árvore de acessibilidade e os botões
+  viram nós com `aria-label` (ache pelo texto do ARB de cada idioma). Som do `audioplayers`: embrulhe
+  `HTMLMediaElement.prototype.play` e registre `{src, t}`; o caminho vem como `assets/assets/...`.
+- **Partida contra a CPU**: aleatoriedade (partículas também gastam `Math.random`) faz cada idioma jogar outra
+  partida → no editor, corte por **marca** (`boom`, `modal`, `boom-700`), nunca por número de quadro. Ler a
+  jogada da CPU na tela: espere o tremor de captura acabar; quando a CPU fecha um mini-tabuleiro a peça grande
+  cobre tudo, então deduza pela regra dela.
+- **Pillow sem libraqm** (Windows) quebra conjuntas de hindi/bengali/nepali → renderize as legendas no Chrome
+  (PNG transparente, fonte embutida em base64; `file://` não carrega em `setContent`).
+- `loudnorm` de uma passada fica ~1,5 dB abaixo do alvo → duas passadas (mede com `print_format=json`, aplica).
+- Wan no ícone pode deformar a marca: rode 2 ou 3 sementes com "stay rigid and keep their exact shape" e confira
+  a folha de contato; se nenhuma servir, anime o ícone real por código.
