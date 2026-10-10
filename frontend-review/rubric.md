@@ -1872,3 +1872,10 @@ click, drive them separately for now (interaction steps are a planned engine fea
   context (incognito context per run), or only the first capture shows it and the rest time out or,
   worse, silently show the post-state. Also: a tiny static server must map `/` to `index.html` with a
   `text/html` content type, or Chrome treats the page as a download (`net::ERR_ABORTED`).
+- **2026-10-10 (via um app de jogo com modo online e servidor falso) - estado "esperando" some antes da
+  captura.** Telas de espera que mudam sozinhas (adversário robô que entra, timer de convite, fila) passam
+  para o próximo estado durante o tempo que o navegador headless leva para navegar e fotografar, e o
+  revisor fotografa a tela seguinte achando que capturou a de espera. Deixe o atraso do falso/robô da build
+  de QA maior que a latência da captura (vários segundos), ou exponha um gatilho manual. Junto: diálogo de
+  oferta/sugestão que abre sozinho na entrada cobre as telas de baixo em algumas rodadas e não em outras;
+  semeie o storage (em Flutter web, `localStorage` com chave `flutter.<chave>`) e recarregue antes de clicar.
