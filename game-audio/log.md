@@ -39,3 +39,18 @@
 - Bala na parede não existe pronta no Kenney: camadas `impactMining` (+5 st, high-pass 700) + `impactWood_heavy`
   (low-pass 2,5 kHz, high-pass 90) + `impactGlass_light` 40 ms depois. **Cortar cada camada em ~0,13 s**: a 1ª versão
   tinha a picareta ressoando como tons fixos de 1 a 5 kHz e um 2º golpe aos 0,3 s (só apareceu no espectrograma).
+
+## 2026-10-10 · rangido de lamparina e chamado abissal (menu do Beneath the Shroud)
+
+- "Rugido abafado" que soa como arroto: grunhido curto (0,8 s) com pitch para baixo e low-pass a 700 Hz. Um chamado de
+  monstro do fundo precisa ser LONGO e tonal: canto de baleia (taure 361423, J.R.Mythical 563690) 7 a 11 semitons
+  abaixo + um rugido largo bem embaixo (-12 st, low-pass 600, -7 dB) + cauda de reverb por convolução (ruído com
+  decaimento de 4,5 s, low-pass 1,8 kHz, pré-delay 80 ms, wet -4 dB). Conferir que sobra energia entre 200 e 600 Hz:
+  só sub (<120 Hz) some em alto-falante de notebook.
+- Rangido que funciona para objeto pendurado: atrito de corda num balanço (Valerie-Vivegnis 862995, 30 rangidos
+  limpos a cada 1,4 s, piso -78 dB). Tocar na VIRADA do balanço (produto escalar velocidade x ângulo troca de sinal),
+  não por cronômetro: fica sincronizado com o que se vê.
+- Disparo por limiar de velocidade nunca disparava (balanço real ~1,5 grau/s contra limiar 2,5): medir a variável em
+  Play antes de escolher o limiar.
+- Prévia HQ do Freesound (mp3, sem login) pega por curl na página do som (`cdn.freesound.org/previews/...-hq.mp3`)
+  serve para pré-selecionar sem baixar originais, e como fonte de som que vai ser muito processado.
