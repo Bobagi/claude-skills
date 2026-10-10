@@ -947,3 +947,11 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
 - Atrás de Cloudflare, um cliente que manda `CF-Connecting-IP` forjado recebe **403 do próprio Cloudflare**; ao
   testar spoof de IP, mande só `X-Forwarded-For`/`X-Real-IP`, senão o 403 parece "limite respeitado" e o teste
   não mede nada.
+
+### 2026-10-10 · app self-hosted de prateleira: cada porta de login é uma superfície (via deploy de drive)
+- Software pronto (drive/wiki/etc.) costuma proteger só o **form web** (captcha após N falhas) e deixar o
+  **endpoint de token da API** (usado pelos apps desktop/mobile) sem lockout nenhum. Teste CADA entrada de
+  login separadamente: form, endpoint de token, 2FA, WebDAV.
+- Fix que não depende do app: `limit_req` no proxy, chaveado no **IP real** (header do CDN via realip), e
+  re-teste trocando `X-Forwarded-For` a cada request para provar que o limite não é burlável.
+- Evite "congelar conta após N falhas" quando o sistema é de um dono só: vira botão de DoS para terceiros.
