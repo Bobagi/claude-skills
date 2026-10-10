@@ -54,3 +54,7 @@
   Play antes de escolher o limiar.
 - Prévia HQ do Freesound (mp3, sem login) pega por curl na página do som (`cdn.freesound.org/previews/...-hq.mp3`)
   serve para pré-selecionar sem baixar originais, e como fonte de som que vai ser muito processado.
+- (mesmo dia) O Gustavo tirou o rangido e os chamados de baleia; ficou o rugido antigo mais baixo + um rugido "da
+  criatura colossal bem longe, ouvido de baixo": 837799 -5 st, low-pass 420 Hz, cauda de reverb de 7 s com o wet
+  ACIMA do seco (+2 dB), intervalo de 45 a 90 s. Lição de processo: oferecer a pasta com os candidatos para ele
+  ouvir ANTES de montar camadas; o gosto é dele e a análise não mede "parece rangido".
