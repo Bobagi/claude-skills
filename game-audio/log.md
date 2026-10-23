@@ -58,3 +58,28 @@
   criatura colossal bem longe, ouvido de baixo": 837799 -5 st, low-pass 420 Hz, cauda de reverb de 7 s com o wet
   ACIMA do seco (+2 dB), intervalo de 45 a 90 s. Lição de processo: oferecer a pasta com os candidatos para ele
   ouvir ANTES de montar camadas; o gosto é dele e a análise não mede "parece rangido".
+- 2026-10-13 (BeneathTheShroud, casa das artes novas): 6 sons CC0 baixados navegando para as URLs `/download/` sem
+  problema (porta de vidro 736559, chacoalho 583228, chuva no vidro 869851, água fervendo 370217, batimento 369017, bolhas
+  521392). Água fervendo de -48 dB RMS no arquivo subiu limpa com `make_loop` (loudness -24). Batimento de coração para uma
+  planta: pitch -3 + low-pass 900 Hz deixa de soar humano. Busca "rain on glass" volta vazia; "rain window" acha.
+
+## 2026-10-17 · sons do final da demo (Beneath the Shroud)
+
+- O Chrome do usuário estava DESLOGADO do Freesound (botão "Log in" na home) e ele não estava presente: sem originais.
+  Saída: previews HQ (mp3 320 kbps) por `curl` na página do som (`https://freesound.org/people/<user>/sounds/<id>/`,
+  regex `https://cdn.freesound.org/previews/[^"' ]*-hq.mp3`); a URL da página precisa do `/sounds/<id>/` (sem ele a
+  busca do preview volta vazia). Pasta `Sounds/Finale` + `SOURCES.md` dizendo que são previews e como trocar pelos originais.
+- `freesound.py search` funcionou de primeira hoje (sem 502). Termos que acharam: "revolver" (tambor Remington 795318,
+  8 cliques limpos a cada 0,9 s), "revolver reload" (177863 abre/fecha), "brass drop concrete", "zombie breathing",
+  "metal pot drop", "door break kick", "gunshot indoor"; termos que voltaram vazio: "revolver cylinder open", "shell
+  casing single drop", "pan falling floor kitchen", "gunshot reverb tail indoor", "power outage hum".
+- Respiração de zumbi 426409 vem a -50 dB RMS: `make_loop` com `rms_target_db=-26` resolve; 847400 (idle) dá 5 chamados
+  separados por segmento (eventos do analyzer 5, 7, 9, 14, 19).
+
+## 2026-10-23 · Happy Harvest, musica do menu (country alegre) e sting da loja
+- OpenGameArt e a melhor fonte para MUSICA CC0 com download direto (curl funciona nos links `/sites/default/files/`); o Freesound so tem loops curtos de banjo. incompetech nao tem filtro de genero country/bluegrass. Escolhido "Gone Fishin" (Memoraphile, CC0 confirmado pelo autor nos comentarios); rejeitados: Sunny Side Up (17k amostras clipadas), Country1 (mp3 64 kbps), Down The River (fade longo no fim), Apple Cider (chiptune).
+- Ponto de loop de musica: autocorrelacao do envelope de onsets da o compasso (2,2427 s), depois correlacao do espectrograma entre `d[L:L+xf]` e `d[0:xf]` em multiplos de 4 compassos escolhe L (36 compassos, corr 0,94); crossfade de 1 compasso alinhado na grade. Conferir a emenda com RMS por janela e onsets ao redor da juncao.
+- LUFS sem pyloudnorm: `ffmpeg -af ebur128=peak=true -f null -` (binario do imageio-ffmpeg) e ler o Summary; OGG Vorbis q5 tambem pelo ffmpeg (`-c:a libvorbis -q:a 5`). Script do projeto: `SourceAssets/Tools/convert_music.py`.
+
+## 2026-10-23 · Happy Harvest · voz neural
+- SAPI rejeitado pelo dono ("MUITO robótica, zero emoção"). Qwen3-TTS CustomVoice local com instrução por fala resolveu: 29 falas em 10 min de GPU, emoção mensurável no F0 (100 Hz frio, 230 Hz grito). Filtro de rádio suavizado para não achatar. Script genérico em `scripts/tts_voice.py`, seção 8 do SKILL.md.

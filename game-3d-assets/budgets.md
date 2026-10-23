@@ -170,3 +170,25 @@ Nunca importar as 4096 do Meshy direto. Metal + rugosidade viram um único mapa 
   para o remesh em voxel: a 5 mil com `--remesh-res 200` perdeu os fios e a grade do ventilador atrás do painel
   rasgado; 8 mil com `--remesh-res 360` devolveu a grade (contorno 0,40 px). Painel 2,5 mil, tablet 3,9 mil,
   escada 5 mil (contorno 0,09 px), vara 2 mil (contorno 1,39 px no limite pedido de 2 mil, gancho fino).
+- 2026-10-11, mobília da mansão (BeneathTheShroud, 53 modelos Poly Haven pelo `optimize_model.py` em lote, 5 Blenders em
+  paralelo, ~25 min): móveis grandes partindo de 5 mil ou da contagem original quando menor (sofá 2,7 mil, cômoda 3,9 mil,
+  cama gótica 18,7 para 5 mil, armário vintage 61 para 5 mil), objetos de mão em 2 mil. **Vidro translúcido e trama vazada
+  não passam pelo bake**: garrafas de vinho saíram brancas opacas (ponto quente 0,44 no máximo da faixa), o relógio de
+  lareira perdeu o mostrador (o vidro da frente virou disco preto, 0,41), o cesto de vime perdeu a trama (contorno 2,9 px).
+  Garrafas: material escurecido na engine; relógio e cesto ficaram fora. O ponto quente acima de 0,15 no máximo da faixa
+  é o aviso: abra a comparação antes de usar. **Bug do importador glTF do Blender 5.2** (`IndexError ... out of bounds`) em
+  `vintage_grandfather_clock_01` e `side_table_tall_01`: use o FBX 1k do Poly Haven (texturas .exr trocadas por .jpg). A
+  fileira de baixo da comparação não mostra metal: confira o `_MetallicSmoothness.png` (a lamparina parecia bege, mas o
+  canal R tinha média 0,32); os mapas de suavidade do Poly Haven são de objeto novo (0,6 a 0,73 em latão e cerâmica): numa
+  cena de abandono, escale a suavidade na engine (projeto: 55%).
+- 2026-10-13 (BeneathTheShroud, lista da Dayse): **GLB do Sketchfab com metal como fator** (sem mapa): o bake deixa o
+  `_MetallicSmoothness` com R zero e o objeto fica claro e fosco na comparação (cálice, prato dourado, talheres). Conferir
+  a linha de baixo da `_compare.png` em todo objeto metálico e, se perdeu, pôr R=255 no mapa. **Escala de móvel do
+  Sketchfab**: o `--size` é o maior lado; meça pela altura conhecida (mesa de jantar 0,76 m: a "Large Dining Table" tinha
+  0,52 de altura com 2,6 de comprimento, o certo era 3,77 m). **Kits modulares** do Poly Haven (modular_pipes, cables,
+  airduct) chegam como peças espalhadas num plano: não servem como um objeto só. **Meshy imagem para 3D a partir de
+  desenho conceitual** funcionou muito bem (cogumelo e palma fiéis ao desenho): recorte a figura, apague texto e setas por
+  cor e mantenha só a maior forma conectada. Custo medido: 30 créditos por imagem para 3D com PBR, 20 o preview de texto, 10
+  o refine.
+- 2026-10-14 (Beneath the Shroud, Sketchfab da lista da Dayse): KitchenTableSet 9.790 -> 4.998 (large, mesa e 4 cadeiras numa malha; o --size de 1,7 deixou a mesa com 0,85 m: escala 0,9 no jogo), ToolBox 17.931 -> 3.750, SplitAC 11.404 -> 2.999, CeilingAC 960, VictorianWallLamp 2.970, MetalCase 1.576 (originais abaixo do mínimo). Lições: (1) **Windows não diferencia maiúsculas**: copiar `ToolBox` para `Props/` sobrescreveu o `Toolbox` que já existia (refeito); conferir nome existente sem caixa antes de copiar. (2) o bake perdeu o metal do latão da arandela de novo (GLB com metal por fator): R=255 onde a cor é latão. (3) a escala dos GLB do Sketchfab vem em qualquer unidade (cm, mm, 1000x): medir a proporção real (altura da mesa) e não só o maior lado. (4) unidade de teto vem com a grelha para cima: virar no jogo.
+- 2026-10-22 (Beneath the Shroud, porta interna, Sketchfab "Mid-poly Wooden Door with Animations" de GUIBEL, CC BY): folha 3.181 -> 2.499 (hand, 2048), batente 986 (abaixo do mínimo, fica). Lições: (1) **GLB esqueletizado** (armature, mesmo trivial: o autor animava a folha por um osso na dobradiça) guarda os vértices crus em Y-up do glTF e deixa a conversão no rest pose do armature: `flatten_model.py` agora aplica os modificadores antes (sem isso a porta chegava deitada quando o otimizador descarta o armature); uma "Icosphere" solta sem material (forma de osso) tem de ser descartada. (2) **Peça que gira na engine (folha de porta)**: separar pela pesagem dos ossos (folha/maçaneta/trinco no osso da dobradiça, batente na raiz), pôr o pivô no eixo da dobradiça medido no próprio osso (aresta da folha, na face para onde abre, no chão) e `--pivot keep` no otimizador; batente exportado com a MESMA origem para montar no mesmo transform. (3) Malhas juntadas de um GLB podem deixar várias camadas UV (uma por malha de origem); o smart project só enchia a ativa e a engine lê a primeira: `fresh_uvs` agora zera as camadas e cria uma só. (4) Métricas passaram a 2.000 (contorno 0,002 px, ponto quente 0,036), mas o close-up a 45 cm mostrou um canto mordido na placa da maçaneta: +25% (2.499) fechou. **Objeto que se vê a um palmo: render de perto além da folha de contato.** (5) Metal por fator no GLB (maçaneta e placa factor 1) assou certo (R 255 nas duas); trinco e contra-chapa são factor 0 no original (escolha do autor, mantida).

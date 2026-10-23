@@ -62,7 +62,8 @@ def parse():
     p.add_argument("--remesh-res", type=int, default=200, help="voxels along the longest side when the collapse gets stuck")
     p.add_argument("--uv", choices=("keep", "smart"), default="smart", help="bake into the decimated UVs or into fresh ones")
     p.add_argument("--no-metal", action="store_true", help="zero the metallic map (AI tools often guess metal on skin, cloth, plastic)")
-    p.add_argument("--pivot", choices=("bottom", "center"), default="bottom")
+    p.add_argument("--pivot", choices=("bottom", "center", "keep"), default="bottom",
+                   help="keep = leave the source's origin where it is (a door leaf pivoting on its hinge edge)")
     p.add_argument("--previews", help="folder for the comparison image and the report (default: --out)")
     p.add_argument("--samples", type=int, default=24)
     p.add_argument("--smooth-angle", type=float, default=40.0,
@@ -168,6 +169,8 @@ def normalise(obj, size, pivot):
     scale = size / float((hi - lo).max()) if size else 1.0
     base_z = lo[2] if pivot == "bottom" else (lo[2] + hi[2]) / 2
     centre = Vector(((lo[0] + hi[0]) / 2, (lo[1] + hi[1]) / 2, base_z))
+    if pivot == "keep":
+        centre = Vector((0.0, 0.0, 0.0))  # the source already put its pivot where the engine wants it (scaled about it)
     obj.data.transform(Matrix.Scale(scale, 4) @ Matrix.Translation(-centre))
     obj.data.update()
 
@@ -505,6 +508,12 @@ def save_comparison(high_row, low_row, path):
 
 
 def fresh_uvs(obj):
+    # One UV layer only: parts joined from a GLB can carry several (one name per source mesh, or a TEXCOORD_1), the
+    # smart project only fills the active one and the engine reads the FIRST (the Sketchfab door's leaf exported 4
+    # layers, 22/10). Drop them all and start a single fresh "UVMap".
+    for layer in list(obj.data.uv_layers):
+        obj.data.uv_layers.remove(layer)
+    obj.data.uv_layers.new(name="UVMap")
     select_only(obj)
     bpy.ops.object.mode_set(mode='EDIT')
     bpy.ops.mesh.select_all(action='SELECT')

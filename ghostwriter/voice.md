@@ -29,7 +29,7 @@ esforço aparente, e alérgico a texto que "se acha".
 |---|---|---|
 | Texto publicado profissional (Sobre do LinkedIn, currículo, ficha de loja) | Informal-polido | Forma completa: "em uma" (não "numa"), "para" (não "pra"), "para o" (não "pro"), "cerca de" (não "uns"). O humor fica; a grafia sobe um degrau. |
 | Semi-informal (recomendação no LinkedIn, README pessoal, post) | Natural | "pra" liberado, piada solta, pode zoar com carinho. |
-| Totalmente informal (bio de app de namoro, chat) | Como ele fala | "pra", "tô", "rolê", "q" no lugar de "que", "kk" como riso; no máximo 1 emoji por texto. |
+| Totalmente informal (bio de app de namoro, chat) | Como ele fala | "pra", "tô", "rolê", "q" no lugar de "que", "kk" como riso; no máximo 1 emoji por texto. **Sem ponto final** em frase nenhuma (ponto final em chat denuncia IA, pedido dele 2026-10-17): separar frase com vírgula, "kk" ou quebra de linha simples. |
 
 ## Marcadores de estilo (o que faz parecer ele)
 
@@ -97,18 +97,16 @@ esforço aparente, e alérgico a texto que "se acha".
 
 (A versão EN aprovada é a tradução direta desse texto, mesma estrutura.)
 
-### Bio de app de namoro · Boo (aprovada 2026-08-13, registro totalmente informal)
+### Bio de app de namoro · Tinder (aprovada 2026-10-17, registro totalmente informal, bloco único, sem ponto final)
 
-> Introvertido do tipo funcional: em festa eu rendo pouco, mas em conversa... eu tento.
->
-> Trabalho programando e nas horas vagas eu relaxo... programando também. Já saiu até
-> um joguinho que tá na Play Store, mais fofo do que útil, igual a mim.
->
-> Meu rolê ideal envolve sofá, comida boa, um filme ou um jogo, e alguém que ria
-> fácil, inclusive de mim, porque eu forneço material com frequência.
->
-> Se você prefere plano tranquilo a lugar lotado, me chama e vem descobrir se em
-> conversa eu rendo mesmo.
+Substitui a bio do Boo de 2026-08-13, que ele passou a achar "óbvio que foi IA". Tinder não
+aceita linha em branco, então é um bloco só. As frases "a vida escolheu pra mim" e "a tal da
+bateria baixa" são dele; ele também pediu zero ponto final.
+
+> 1,70 e programador, um eu não escolhi, o outro a vida escolheu pra mim kk em festa eu
+> rendo pouco, a tal da bateria baixa, então meu rolê favorito é sofá, comida boa e um
+> filme q a gente provavelmente não vai terminar de ver, se vc ri fácil e prefere isso a
+> lugar lotado me chama
 
 ### Chat técnico com colega de time · Teams (enviada por ele 2026-08-26, registro totalmente informal)
 
@@ -203,3 +201,47 @@ Nomes de serviço e de tipo trocados por genéricos, o repo é público.
   credibilidade do resto; (c) feedback citado tem que ser real e rastreável a uma
   correção publicada (bug do som, emoji cortado no Samsung, barra do aparelho cobrindo
   o jogo). Ainda **não validado pela reação dele**.
+- 2026-10-17 · **Bio de app de namoro, segunda rodada (Tinder).** A bio do Boo aprovada em
+  2026-08-13 voltou (com retoques dele: linha "1,70 de pura vontade de...", "vergonha de
+  ficar rindo sozinho", emoji no fecho) com o veredito "tá MUITO óbvio q foi feito com IA".
+  Lição: aprovação em agosto não vale pra sempre; reler peça pública com olho de "parece
+  IA?". O que denuncia IA numa bio curta: (a) **toda frase termina em punchline**, ritmo
+  setup/pagamento em cada parágrafo; (b) fórmula "X, igual a mim" de autodepreciação;
+  (c) estrutura simétrica de três blocos iguais; (d) emoji de fecho + "aqui pra vc".
+  Humano soa: menos piada por linha (uma virada boa por texto, o resto é fato seco),
+  blocos desiguais, "q"/"kk" de chat, um detalhe concreto meio aleatório, zero emoji.
+  Bio nova não pode reciclar a antiga (regra de 2026-08-13 vale pra texto dele também).
+  Ainda **não validado pela reação dele** à nova rodada.
+- 2026-10-17 · **Bio de app de namoro, objetivo é atração, não currículo.** Ele descartou a
+  abertura que tratava "viver de horta" como plano real e pediu pra NUNCA citar jogo da
+  Play Store nem projeto pessoal na bio: "isso é Tinder, não LinkedIn". Regras: (a) o
+  trabalho entra em uma linha só e como piada de exaustão ("cansado de tela", "vender tudo
+  e viver de horta" é humor de burnout, não fato), nunca como descrição; (b) nenhum projeto,
+  app ou conquista; (c) a intenção aparece por imagem, não por declaração ("um filme q a
+  gente provavelmente não vai terminar de ver"); (d) ele quer o texto atraente, e no registro
+  dele isso é leveza e convite curto, sem promessa nem elogio a si mesmo. Aprovadas em
+  estrutura as aberturas "1,70 e programador, um eu não escolhi, o outro eu escolheria de
+  novo" e "Programador cansado de tela, com planos sérios de largar tudo e viver de horta
+  (os planos param aí kk)". Versão final ainda pendente de escolha dele.
+- 2026-10-17 · **Fechamento da bio do Tinder.** Ele editou o rascunho e o que trocou diz
+  o padrão: "o outro eu escolheria de novo" virou "o outro a vida escolheu pra mim" (menos
+  autoconfiança montada, mais fatalismo bem-humorado) e "em conversa de dois eu rendo
+  bastante" virou "a tal da bateria baixa" (expressão de fala corrente no lugar da frase
+  simétrica). Lição: quando a piada fica "redondinha demais", ele troca por expressão de
+  boca, que é o que mais humaniza. Restrição de plataforma: Tinder não tem parágrafo, texto
+  de bio tem que fechar em um bloco só, com conectivo entre as frases pra não virar lista.
+- 2026-10-17 · **Ponto final denuncia IA em texto de chat.** Depois de aprovar o conteúdo
+  da bio do Tinder, ele pediu pra tirar todos os pontos finais ("deixam óbvio que foi feito
+  por IA"). Virou regra dura da linha "Totalmente informal" da tabela de registro. Sem ponto,
+  a frase se separa com vírgula emendada (marca dele), "kk" no meio da linha ou quebra de
+  linha simples; o "kk" entra no lugar do ponto depois da piada, não no fecho.
+- 2026-10-20 · Contexto novo: **página de jogo no itch.io** (Beneath the Shroud, demo de terror),
+  inglês principal + resumos em PT e ES em blocos recolhíveis. Registro "ficha de loja", voz
+  impessoal (quem fala é o jogo, não "eu" nem "nós"). O que guiou: (a) premissa só com fato do
+  roteiro (falas da Dayse e decisões no CLAUDE.md), nada de enredo inventado para render frase;
+  (b) mecânica contada como consequência concreta ("Without a mask you cough until you can't.
+  With one, the filters run out.") em vez de adjetivo de marketing; (c) **dizer o que ainda é
+  provisório** (vozes sintetizadas) na própria página, mesmo padrão do changelog de 2026-08-31;
+  (d) evitar o tique de IA de punchline em toda frase: só a premissa e os itens de mecânica têm
+  virada, o resto (controles, requisitos, idiomas) é seco; (e) número só se medido: cortei
+  "roda a 90 FPS" porque não foi medido nesta build. Ainda **não validado pela reação dele**.

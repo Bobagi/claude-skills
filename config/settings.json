@@ -68,6 +68,17 @@
             "statusMessage": "no-em-dash check"
           }
         ]
+      },
+      {
+        "matcher": "Write|Edit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/skills/game-visual-review/scripts/game-visual-reminder.sh\"",
+            "timeout": 10,
+            "statusMessage": "game visual/voice reminder"
+          }
+        ]
       }
     ]
   },

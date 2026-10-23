@@ -112,3 +112,23 @@ Normalize todos ao mesmo pico e deixe o **volume de cada uso** no código/ajuste
 
 - GDD/lista de pedidos: marque o que entrou e diga o que ficou de fora e por quê (sem CC0 bom, depende de compra).
 - Créditos atualizados, `log.md` com a lição do dia.
+
+## 8. Voz de personagem (TTS neural com emoção, nunca SAPI)
+
+Voz de NPC gerada com `Microsoft David`/SAPI soa robótica e sem emoção; o dono do Happy Harvest rejeitou na hora
+(23/10/2026). O caminho é `scripts/tts_voice.py`: **Qwen3-TTS 12Hz 1.7B CustomVoice** (Apache 2.0, local, 4,5 GB
+de VRAM, roda numa RTX 3060 Ti), com **direção de entrega por fala em palavras** (`instruct`: "warm, cheerful,
+unhurried" / "shouting" / "quiet, devastated") e falantes sintéticos embutidos (`aiden`, `ryan` masculinos em
+inglês americano, `serena` feminina), sem clonar pessoa real. Setup numa venv própria (uv, Python 3.12, torch cu128,
+`qwen-tts`): ver a docstring do script. Fluxo:
+1. JSON de falas com `id`, `text` e `delivery` por linha (e opcionalmente `speaker`, `pitch` em semitons, `tempo`).
+   Personagem mais velho: pitch -2 a -3 semitons e tempo 0,85.
+2. `python tts_voice.py --lines falas.json --out raw/` gera WAV 48 kHz mono 16 bits e um manifesto por linha.
+3. Filtro de rádio/telefone SÓ depois, e suave (banda 250 a 4000 Hz, saturação leve x1,6): filtro agressivo
+   (350 a 3200 Hz, tanh x4) comeu 4 dB de fator de crista e achatou a emoção.
+4. Conferir sem ouvir: `analyze.py` (pico -1 dB, piso de ruído, sem silêncio nas pontas) e, se houver Whisper
+   na venv, transcrever e comparar palavra a palavra com o texto. O F0 mediano por linha deve seguir a entrega
+   (grito mais agudo, frieza mais grave).
+5. Retake de uma linha: ajustar a frase do `delivery` ou a seed e regenerar só aquele id.
+Alternativas avaliadas e descartadas: Chatterbox (só um escalar de exagero, voz padrão feminina, build quebra no
+Windows por `pkuseg`), Orpheus 3B (tags, apertado em 8 GB), Kokoro (plano), edge-tts (estilos SSML removidos).

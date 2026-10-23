@@ -157,6 +157,12 @@ teste confiável que roda e pode falhar - priorize o caminho do dinheiro) e, em 
   (`scripts/audiokit.py`: corte, separação de eventos, camadas, loop sem emenda, filtros, pitch; WAV 16 bits 48 kHz)
   e liga no jogo (Unity: regras de importação + `SoundLibrary` por papel) conferindo em Play. Use SEMPRE que mexer
   com áudio de jogo ("baixe os sons", "corta/converte esse áudio", "faz um loop", trocar som sintetizado por gravado).
+- **`game-visual-review`** - **olha a tela real do jogo antes de dizer que ficou pronto**: captura cada estado (Unity
+  via MCP `ScreenCapture`, web via Chrome), monta a folha de contato com a referência do usuário e a versão anterior
+  (`scripts/contact_sheet.py`: luminância, saturação, variedade de matiz, área chapada, distância de paleta), pontua a
+  `rubric.md` (primeira impressão, luz/cor, props legíveis e clicáveis, UI, fidelidade à referência) e bloqueia em nota
+  2 ou menos. Hook `PostToolUse` lembra ao gravar arquivo visual de jogo. Use SEMPRE que mexer em menu/cena/prop/luz/UI
+  e em "ficou muito ruim", "parece placeholder", "faça igual à referência". Nasceu do menu do Happy Harvest (23/10/2026).
 - **`web-research`** - **pesquisa na internet ANTES de diagnosticar ou decidir**: todo erro/crash/
   travamento/log estranho de ferramenta de terceiros e toda decisão dependente de versão/preço/limite
   começa com 2-4 buscas em paralelo (sintoma + versão exata, erro literal, release notes/issue tracker),
