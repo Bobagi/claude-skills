@@ -48,6 +48,22 @@ autorização** - e o Gustavo cobra, com razão ("obviamente é pra fazer, por q
 - Antes de escrever "limite honesto" num relatório, releia o pedido original: se aquilo estava
   dentro dele, apague a frase e vá fazer.
 
+## ★★ PESQUISE NA INTERNET SEMPRE (regra dura, todo projeto, cobrada várias vezes)
+
+**Todo problema (erro, crash, travamento, "fica carregando", log estranho, regressão) e toda
+decisão que depende de informação que muda (versão, preço, limite, API, política de loja,
+biblioteca) começa com `WebSearch`, na PRIMEIRA rodada, em paralelo com a leitura dos logs
+locais.** Não esgote hipóteses locais (limpar cache, reinstalar, atualizar) antes de pesquisar,
+e nunca espere o Gustavo mandar ("PESQUISE NA INTERNET, vc nunca pesquisa os problemas",
+2026-10-23).
+
+- Se `WebSearch`/`WebFetch` estiverem diferidas, carregue com `ToolSearch` logo no início.
+- Busque o sintoma + produto + **versão exata**, a mensagem de erro literal e as release notes /
+  issue tracker oficial; abra as fontes boas com `WebFetch` (staff, mantenedor, tracker).
+- Se a correção encontrada não resolver, **pesquise de novo** com o que aprendeu.
+- Cite as fontes na resposta. Fluxo completo na skill **`web-research`**.
+- Só pule quando o problema é 100% do código do próprio projeto e o stack trace já aponta a linha.
+
 ## ★ Política SKILL-FIRST (vale para todo comando, em todo projeto)
 
 **Antes de executar qualquer tarefa, procure ativamente uma skill ou plugin que ajude
@@ -141,6 +157,11 @@ teste confiável que roda e pode falhar - priorize o caminho do dinheiro) e, em 
   (`scripts/audiokit.py`: corte, separação de eventos, camadas, loop sem emenda, filtros, pitch; WAV 16 bits 48 kHz)
   e liga no jogo (Unity: regras de importação + `SoundLibrary` por papel) conferindo em Play. Use SEMPRE que mexer
   com áudio de jogo ("baixe os sons", "corta/converte esse áudio", "faz um loop", trocar som sintetizado por gravado).
+- **`web-research`** - **pesquisa na internet ANTES de diagnosticar ou decidir**: todo erro/crash/
+  travamento/log estranho de ferramenta de terceiros e toda decisão dependente de versão/preço/limite
+  começa com 2-4 buscas em paralelo (sintoma + versão exata, erro literal, release notes/issue tracker),
+  `WebFetch` nas fontes de staff/mantenedor, cruzamento com o log local, correção, nova pesquisa se não
+  resolver, fontes citadas. Use SEMPRE em "não funciona", "trava", "crasha", "erro", "fica carregando".
 - **`store-promo-video`** - **vídeo promocional da ficha da loja** (Play; base para anúncios) no padrão "dopamina":
   grava o app REAL quadro a quadro (relógio virtual no build web, 60 fps perfeitos; scrcpy/Unity para nativo), som
   do próprio app sincronizado ao quadro, música CC0 com o drop no gancho (`find_drop.py`), cortes no compasso,
