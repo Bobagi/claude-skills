@@ -159,10 +159,10 @@ claude-skills/
 │   └── scripts/capture.mjs     #   screenshots multi-viewport (Puppeteer headless)
 ├── resume/SKILL.md             # skill: resumo de vídeo do YouTube
 ├── game-overlay/               # skill: overlay de jogos (HWiNFO + RTSS) em qualquer PC Windows
-├── web-research/               # skill: pesquisa na internet antes de diagnosticar/decidir
 │   ├── SKILL.md
 │   ├── reference/              #   layout.md (por que de cada linha), armadilhas.md, LEIAME-modelo.md
 │   └── scripts/                #   overlay.ps1 (CLI), lib.ps1, layout-padrao.json, iniciar-monitoramento.ps1, runner.ps1, captura.ps1
+├── web-research/SKILL.md       # skill: pesquisa na internet antes de diagnosticar/decidir
 ├── product-review/             # skill: PM do portfolio (coleta + analisa + publica Artifact)
 │   ├── SKILL.md
 │   └── assets/                 #   collect.sh, analyze_logs.py, build.py, template.html, fonts/*.woff2
