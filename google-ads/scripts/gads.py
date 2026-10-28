@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-"""gads.py — CLI da Google Ads API (status de campanha, gasto, CPI, conversões).
+"""gads.py - CLI da Google Ads API (status de campanha, gasto, CPI, conversões).
 
 Somente LEITURA (GAQL search). A Google Ads API exige, além do OAuth do dono
-da conta, um DEVELOPER TOKEN aprovado (Central da API dentro do Google Ads —
+da conta, um DEVELOPER TOKEN aprovado (Central da API dentro do Google Ads -
 ver SETUP.md). Token em nível "conta de teste" NÃO lê contas reais
 (erro DEVELOPER_TOKEN_NOT_APPROVED até o acesso Básico ser aprovado).
 
 Credenciais (fora do repo, chmod 600):
-  ~/.config/bobagi-google/admob-client.json — OAuth client (REUSADO do AdMob)
-  ~/.config/bobagi-google/gads-token.json   — refresh token escopo adwords (`auth`)
-  ~/.config/bobagi-google/gads-config.json  — developer_token, customer_id,
+  ~/.config/bobagi-google/admob-client.json - OAuth client (REUSADO do AdMob)
+  ~/.config/bobagi-google/gads-token.json   - refresh token escopo adwords (`auth`)
+  ~/.config/bobagi-google/gads-config.json  - developer_token, customer_id,
                                               api_version (auto), login_customer_id (opcional)
 
 Uso:
@@ -39,7 +39,7 @@ CONFIG_PATH = os.path.join(CFG_DIR, "gads-config.json")
 SCOPE = "https://www.googleapis.com/auth/adwords"
 REDIRECT = "http://localhost:8765"
 API_HOST = "https://googleads.googleapis.com"
-VERSION_CANDIDATES = ["v22", "v21", "v20", "v19", "v18"]
+VERSION_CANDIDATES = ["v26", "v25", "v24"]
 
 
 def die(msg: str, code: int = 1):
@@ -151,7 +151,7 @@ def access_token() -> str:
     except RuntimeError as e:
         die(
             f"refresh falhou ({e}).\nSe o consent screen do GCP estiver em modo 'Testing', "
-            "o refresh token expira em 7 dias — publique-o e rode `gads.py auth` de novo."
+            "o refresh token expira em 7 dias - publique-o e rode `gads.py auth` de novo."
         )
 
 
@@ -170,9 +170,9 @@ def friendly_api_error(e: RuntimeError):
     s = str(e)
     if "DEVELOPER_TOKEN_NOT_APPROVED" in s:
         die(
-            "o developer token ainda está em nível 'Conta de teste' — não lê contas reais.\n"
+            "o developer token ainda está em nível 'Conta de teste' - não lê contas reais.\n"
             "Solicite o acesso Básico: Google Ads → Ferramentas → Central da API → "
-            "'Solicitar acesso básico' (aprovação típica: 1–3 dias úteis). Depois rode de novo."
+            "'Solicitar acesso básico' (aprovação típica: 1-3 dias úteis). Depois rode de novo."
         )
     if "DEVELOPER_TOKEN_PROHIBITED" in s or "NOT_ADS_USER" in s:
         die(f"a conta OAuth não tem acesso ao Google Ads (logou com o e-mail certo?): {s}")
@@ -182,7 +182,8 @@ def friendly_api_error(e: RuntimeError):
 def api_version(token: str) -> str:
     cfg = load_config()
     ver = cfg.get("api_version")
-    if ver:
+    # versao em cache que saiu da lista (o Google desliga ~1 por trimestre) e reprobada
+    if ver and ver in VERSION_CANDIDATES:
         return ver
     for v in VERSION_CANDIDATES:
         try:
@@ -191,9 +192,9 @@ def api_version(token: str) -> str:
                 headers=base_headers(token),
             )
         except RuntimeError as e:
-            if "HTTP 404" in str(e):
+            if "HTTP 404" in str(e) or "UNSUPPORTED_VERSION" in str(e):
                 continue
-            # 403/401 etc: a versão existe; o erro é de permissão — serve pra fixar a versão
+            # 403/401 etc: a versão existe; o erro é de permissão - serve pra fixar a versão
         cfg["api_version"] = v
         save_config(cfg)
         return v
@@ -248,8 +249,8 @@ def gaql(token: str, query: str) -> list:
 def cmd_doctor(_args):
     cfg = load_config()
     print(f"OAuth client   : {CLIENT_PATH} {'(ok)' if os.path.exists(CLIENT_PATH) else '(FALTA)'}")
-    print(f"refresh token  : {TOKEN_PATH} {'(ok)' if os.path.exists(TOKEN_PATH) else '(FALTA — rode auth)'}")
-    print(f"developer token: {'ok' if cfg.get('developer_token') else 'FALTA — rode set-config (ver SETUP.md)'}")
+    print(f"refresh token  : {TOKEN_PATH} {'(ok)' if os.path.exists(TOKEN_PATH) else '(FALTA - rode auth)'}")
+    print(f"developer token: {'ok' if cfg.get('developer_token') else 'FALTA - rode set-config (ver SETUP.md)'}")
     token = access_token()
     print("token OAuth    : ok")
     ver = api_version(token)
@@ -259,7 +260,7 @@ def cmd_doctor(_args):
     cid = customer_id(token)
     rows = gaql(token, "SELECT customer.descriptive_name, customer.currency_code, customer.time_zone FROM customer")
     c = rows[0]["customer"] if rows else {}
-    print(f"conta ativa    : {cid} — {c.get('descriptiveName')} (moeda={c.get('currencyCode')}, tz={c.get('timeZone')})")
+    print(f"conta ativa    : {cid} - {c.get('descriptiveName')} (moeda={c.get('currencyCode')}, tz={c.get('timeZone')})")
     print("Google Ads API : ok. Tudo pronto.")
 
 
@@ -294,7 +295,7 @@ def print_report(rows, key_fn, label_hdr):
     else:
         cpi = tc / tv if tv else 0.0
         print(f"{'TOTAL':<42} {tc:>10.2f} {int(ti):>8d} {int(tk):>8d} {tv:>7.1f} {cpi:>8.2f}")
-    print("(custo/CPI na moeda da conta; conversões conforme configuradas — p/ campanha de app = instalações)")
+    print("(custo/CPI na moeda da conta; conversões conforme configuradas - p/ campanha de app = instalações)")
 
 
 def date_clause(days: int) -> str:
@@ -315,7 +316,7 @@ def cmd_campaigns(args):
             c = r["campaign"]
             seen[c["name"]] = (c.get("status"), money(r.get("campaignBudget", {}).get("amountMicros")))
         for name, (status, budget) in seen.items():
-            print(f"[{status}] {name} — orçamento {budget:.2f}/dia")
+            print(f"[{status}] {name} - orçamento {budget:.2f}/dia")
         print()
     print_report(rows, lambda r: r["campaign"]["name"], "CAMPANHA")
 
