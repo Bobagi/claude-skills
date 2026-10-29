@@ -28,7 +28,7 @@ S=~/.claude/skills/admob/scripts/admob.py
 
 python3 $S doctor                      # valida credencial + acesso à conta
 python3 $S report --days 7             # receita/eCPM por dia (US$)
-python3 $S report --days 30 --by AD_UNIT
+python3 $S report --days 30 --by AD_UNIT   # tambem pedidos/atendidos: 0 pedidos = o app nunca pediu anuncio
 python3 $S report --days 30 --by COUNTRY
 python3 $S apps                        # apps registrados no AdMob
 python3 $S adunits                     # ad units + IDs (para conferir com o código)

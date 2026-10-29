@@ -1888,3 +1888,4 @@ click, drive them separately for now (interaction steps are a planned engine fea
   de QA maior que a latência da captura (vários segundos), ou exponha um gatilho manual. Junto: diálogo de
   oferta/sugestão que abre sozinho na entrada cobre as telas de baixo em algumas rodadas e não em outras;
   semeie o storage (em Flutter web, `localStorage` com chave `flutter.<chave>`) e recarregue antes de clicar.
+- 2026-10-29: endereço/comando que o usuário COPIA da página (IP, host:porta, comando) precisa ser testado no cliente real, não só renderizado: domínio atrás de proxy HTTP (Cloudflare) não transporta porta de jogo/TCP cru, e o botão "Copiar" entregava um endereço que travava em "Conectando". Conferir também se o cliente aceita "host:porta" num campo só ou pede a porta separada.

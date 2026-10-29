@@ -198,7 +198,7 @@ def cmd_report(args):
                 "endDate": {"year": end.year, "month": end.month, "day": end.day},
             },
             "dimensions": [dim],
-            "metrics": ["ESTIMATED_EARNINGS", "IMPRESSIONS", "IMPRESSION_RPM", "CLICKS"],
+            "metrics": ["ESTIMATED_EARNINGS", "IMPRESSIONS", "IMPRESSION_RPM", "CLICKS", "AD_REQUESTS", "MATCHED_REQUESTS"],
             "localizationSettings": {"currencyCode": "USD"},
             "sortConditions": [{"metric": "ESTIMATED_EARNINGS", "order": "DESCENDING"}],
         }
@@ -211,7 +211,8 @@ def cmd_report(args):
     # resposta é um array-stream: [{header},{row},...,{footer}]
     total_earn = total_impr = 0.0
     printed = 0
-    print(f"{dim:<28} {'ganhos US$':>12} {'impressões':>11} {'eCPM US$':>9} {'cliques':>8}")
+    # pedidos/atendidos separam "ninguem pediu anuncio" de "pediu e nao veio" (sem fill)
+    print(f"{dim:<28} {'ganhos US$':>12} {'impressões':>11} {'eCPM US$':>9} {'cliques':>8} {'pedidos':>8} {'atendidos':>9}")
     for item in rows if isinstance(rows, list) else [rows]:
         row = item.get("row")
         if not row:
@@ -223,9 +224,11 @@ def cmd_report(args):
         impr = int(mv.get("IMPRESSIONS", {}).get("integerValue", 0))
         rpm = numeric(mv.get("IMPRESSION_RPM", {}))
         clicks = int(mv.get("CLICKS", {}).get("integerValue", 0))
+        reqs = int(mv.get("AD_REQUESTS", {}).get("integerValue", 0))
+        matched = int(mv.get("MATCHED_REQUESTS", {}).get("integerValue", 0))
         total_earn += earn
         total_impr += impr
-        print(f"{str(label)[:28]:<28} {earn:>12.4f} {impr:>11d} {rpm:>9.2f} {clicks:>8d}")
+        print(f"{str(label)[:28]:<28} {earn:>12.4f} {impr:>11d} {rpm:>9.2f} {clicks:>8d} {reqs:>8d} {matched:>9d}")
         printed += 1
     if printed == 0:
         print("(sem dados no período — normal com pouco tráfego ou app recém-publicado)")
