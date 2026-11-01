@@ -955,3 +955,7 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
 - Fix que não depende do app: `limit_req` no proxy, chaveado no **IP real** (header do CDN via realip), e
   re-teste trocando `X-Forwarded-For` a cada request para provar que o limite não é burlável.
 - Evite "congelar conta após N falhas" quando o sistema é de um dono só: vira botão de DoS para terceiros.
+- **2026-11-01 - Parser de console/log e superficie de injecao.** Se um processo le um console onde caem textos
+  de usuario (chat, nomes), teste quebra de linha nesse texto: ela forja linhas inteiras, inclusive a resposta do
+  proprio comando que o parser procura. Dispare em loop curto, porque o ataque depende de cair entre o comando e
+  a leitura. Fix: fonte estruturada (arquivo/API que le o estado direto) como principal e console so de reserva.
