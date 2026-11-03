@@ -145,6 +145,13 @@ lock), **é vulnerável**: N requests concorrentes leem o mesmo estado velho e t
 - **Fix:** throttle no app + fail2ban; ler o IP real do header confiável do proxy.
 
 ## 13. Exposição de dados / logs / erros
+- [ ] **Uma requisição não derruba o processo.** Servidor HTTP feito à mão (Node `http`, handler próprio de
+  arquivos estáticos) que decodifica a URL e passa para o sistema de arquivos: `%00` vira byte nulo e o
+  `fs.readFile` do Node **lança exceção síncrona** (ERR_INVALID_ARG_VALUE) em vez de chamar o callback. Fora de
+  `try`, isso mata o processo: o supervisor reinicia, mas qualquer pessoa derruba o site em loop.
+  **▶ Testar ao vivo:** `curl --path-as-is` em `/%00`, `/x%00.png`, `/dir/%00/a` e confira o contador de restarts
+  do supervisor (PM2/systemd) antes e depois. **Fix:** recusar `\0` com 400 logo após decodificar e envolver a
+  chamada de fs num `try` que converte a exceção em erro comum.
 - [ ] Erros ao cliente não vazam stack/SQL/caminhos internos (500 genérico; detalhe só no log server-side).
 - [ ] **Sem PII nem segredos em log** (chaves, senhas, tokens, corpo com credencial). Logar URL é ok; logar
   segredo não.
@@ -959,3 +966,13 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   de usuario (chat, nomes), teste quebra de linha nesse texto: ela forja linhas inteiras, inclusive a resposta do
   proprio comando que o parser procura. Dispare em loop curto, porque o ataque depende de cair entre o comando e
   a leitura. Fix: fonte estruturada (arquivo/API que le o estado direto) como principal e console so de reserva.
+- **2026-11-03 - Byte nulo na URL derrubava um servidor Node de arquivos estáticos.** O handler decodificava a
+  URL, checava traversal certinho (prefixo com separador) e mesmo assim caía: `%00` faz o `fs.readFile` lançar
+  exceção síncrona. A checagem de traversal não cobre isso, porque o problema não é sair da pasta, é o tipo de
+  falha. Teste de path em handler próprio tem que incluir `%00` e olhar o contador de restarts do supervisor, não
+  só o status HTTP (a primeira requisição volta sem resposta e as seguintes viram 502 enquanto o processo sobe).
+  Também validado no mesmo passe: export de jogo/mod lido pelo site como entrada não confiável (nomes vindos de
+  localização de mods): tipar e limitar no servidor, só aceitar ícone que existe numa pasta gerada por nós (nunca
+  montar URL a partir do caminho cru), e provar com um arquivo forjado (`<img onerror>`, `../`, `javascript:`,
+  número gigante, booleano em texto) renderizado num navegador headless que conta dialogs e um marcador global.
+
