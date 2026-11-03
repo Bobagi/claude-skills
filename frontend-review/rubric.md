@@ -158,6 +158,10 @@ Every finding must carry: **what** (the problem), **where** (route + viewport + 
 - [ ] Layout uses fl/grid intentionally; avoid absolute positioning for flow content.
 - [ ] Conditional rendering covers loading/empty/error, not just data-present.
 - [ ] Strings are in the i18n layer, not hardcoded (when the project is localized) - check **every** language dict has the key.
+- [ ] **A fact the page already receives as data is not ALSO typed into the markup.** When a live/status page
+  shows the same fact twice (a badge in the hero and a row in a details panel), grep the HTML for literal copies
+  of values the API carries (size, count, version, difficulty). The copy goes stale the day the underlying thing
+  changes and nobody notices, because the other place is correct. Drive every occurrence from the data.
 - [ ] Images have width/height or aspect-ratio to avoid CLS; lazy-load below the fold.
 - [ ] **Asset de nome estável atrás de CDN precisa de cache-busting para ser EDITÁVEL.** Trocar o
   conteúdo de `/img/x.svg` não troca o que o leitor vê enquanto a borda tiver a cópia antiga (confira
@@ -1893,3 +1897,12 @@ click, drive them separately for now (interaction steps are a planned engine fea
 - 2026-11-01: grade de imagens abaixo da dobra com `loading=lazy` sai vazia na captura de pagina inteira e pode parecer bug real; em grade de icones pequenos remova o lazy. Painel de muitos itens curtos: `minmax` baixo o bastante para 3 colunas no celular, 2 colunas alongam a pagina sem ganho.
 
 - 2026-11-01: ao adicionar item a uma lista data-driven, releia o texto FIXO ao redor (nota, resumo): a afirmacao sobre o conjunto pode ter ficado falsa, e so o olho na captura pega isso.
+
+- **2026-11-03 (via a live status page after the underlying world changed shape) - two quiet regressions that no
+  automated signal raises.** (1) A hero badge kept the OLD value as a literal in the HTML while a panel below had
+  been updated by hand: same fact, two sources, one stale. Grep the markup for literal copies of anything the API
+  already returns and wire them to the data. (2) A canvas viewer that fits content to the container WIDTH left a
+  thin strip glued to the top over an empty screen once the content became very wide (7:1). Check fit-to-container
+  views with the most extreme aspect the content can have; when the fitted content is shorter than the viewport,
+  center it (via the viewer's own pan, so pointer/zoom math keeps working) instead of pinning it to the top.
+\n
