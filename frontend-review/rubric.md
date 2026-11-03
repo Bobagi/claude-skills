@@ -1905,4 +1905,3 @@ click, drive them separately for now (interaction steps are a planned engine fea
   thin strip glued to the top over an empty screen once the content became very wide (7:1). Check fit-to-container
   views with the most extreme aspect the content can have; when the fitted content is shorter than the viewport,
   center it (via the viewer's own pan, so pointer/zoom math keeps working) instead of pinning it to the top.
-\n
