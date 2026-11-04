@@ -64,6 +64,29 @@ e nunca espere o Gustavo mandar ("PESQUISE NA INTERNET, vc nunca pesquisa os pro
 - Cite as fontes na resposta. Fluxo completo na skill **`web-research`**.
 - Só pule quando o problema é 100% do código do próprio projeto e o stack trace já aponta a linha.
 
+## ★★ ASSUMA A MÁQUINA: clique você mesmo em janelas de app (regra dura, pedido 2026-11-04)
+
+Quando um app nativo do Mac abrir uma janela esperando escolha (assistente de instalação, tela de
+boas-vindas, "Allow"/"Continue", seleção de opção), **não devolva para o Gustavo clicar**: clique
+você mesmo. Ordem de tentativa:
+1. Ferramentas de controle de tela (`computer-use`), se existirem na sessão.
+2. **AppleScript / System Events** pelo Bash: liste a janela com
+   `osascript -e 'tell application "System Events" to tell process "<App>" to get entire contents of window 1'`,
+   identifique o botão pela `position`/`description` comparando com o print, e clique com
+   `click button N of group M of window "<nome>"`. Confira depois que a janela mudou.
+   (Funcionou no assistente do OrbStack: o terminal já tem permissão de Acessibilidade.)
+3. Só se as duas falharem, peça para ele clicar, dizendo exatamente qual opção e por quê.
+
+Limites que continuam valendo: não digite senha de login/admin (nem se ele mandar no chat), não
+aceite termos/consentimentos nem conceda permissões de sistema sem ele pedir aquilo.
+
+## ★★ claude-skills: SEMPRE commit + push (regra dura, pedido 2026-11-04)
+
+Toda alteração no repo `Bobagi/claude-skills` (este `CLAUDE.md`, skills, rubrics, scripts) termina
+com `git commit` + `git push` na mesma hora, **sem perguntar**. Antes de editar, `git pull --ff-only`
+(a cópia local costuma estar atrás). Depois, copie `config/CLAUDE.md` para `~/.claude/CLAUDE.md` (ou
+rode `sync.sh`). Commit parcial: adicione só os arquivos que você mexeu (nada de `git add -A`).
+
 ## ★ Política SKILL-FIRST (vale para todo comando, em todo projeto)
 
 **Antes de executar qualquer tarefa, procure ativamente uma skill ou plugin que ajude
