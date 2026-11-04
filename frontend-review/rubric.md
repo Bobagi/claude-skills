@@ -1905,3 +1905,8 @@ click, drive them separately for now (interaction steps are a planned engine fea
   thin strip glued to the top over an empty screen once the content became very wide (7:1). Check fit-to-container
   views with the most extreme aspect the content can have; when the fitted content is shorter than the viewport,
   center it (via the viewer's own pan, so pointer/zoom math keeps working) instead of pinning it to the top.
+- 2026-11-04 · A checklist tile labeled "A or B" is a data bug wearing a UI fix. When the source merges two
+  real things into one flag (a game keeping one "defeated" bit for two bosses), users read the merged tile
+  as "the page doesn't know about B". Fix it at the source (record each one separately, backfill from any
+  history the system already keeps), show one tile per real thing, and keep a fallback for the old payload
+  while the producer is redeployed, so the page never shows a false "not done" in between.
