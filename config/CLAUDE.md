@@ -197,7 +197,10 @@ teste confiável que roda e pode falhar - priorize o caminho do dinheiro) e, em 
   zoom/tremor/flash/câmera lenta, legenda curta por idioma, fecho com o ícone animado no ComfyUI (Wan 2.2), um
   vídeo por idioma e o link na ficha via `google-play`. Regras da Play em `reference/play-video-rules.md`. Use em
   "faça o vídeo da loja/da Play", "vídeo promocional/trailer do app", "vídeo viciante do jogo".
-- **`vps`** - gerenciar o VPS bobagi.space via SSH.
+- **`vps`** - gerenciar o servidor bobagi.space. **Desde 2026-11-04 o "VPS" é a VM Ubuntu `servidor`
+  no Mac mini** (OrbStack; do Mac: `orb -m servidor -u root <cmd>`), com os mesmos caminhos da VPS
+  Hostinger antiga (`/opt`, `/var/www`, `/etc/nginx`, `/root`). A VPS 46.202.144.75 foi aposentada.
+  Doc da arquitetura: `~/server/CLAUDE.md` no Mac.
 - **`resume`** - resumir um vídeo do YouTube a partir do link.
 - **`google-play`** - releases na Play Store via Play Developer API (service account): sobe
   AAB, tracks, promoção, rollout, reviews, listing. Produção exige confirmação explícita do
@@ -224,7 +227,9 @@ teste confiável que roda e pode falhar - priorize o caminho do dinheiro) e, em 
   acumular; `delete <sub>` continua apagando TODOS os tipos do nome, cuidado). **DNS é SÓ no
   Cloudflare** (painel Hostinger morto desde 2026-07-06 - nameservers movidos). Use ao
   subir/derrubar serviço web no VPS ou em "crie um subdomínio"/"altere o DNS". Credenciais só
-  no VPS (`/root/.config/cloudflare/`, chmod 600); de outra máquina, executar via skill `vps`.
+  no servidor (`/root/.config/cloudflare/` da VM `servidor`, chmod 600); de outra máquina, via skill `vps`.
+  Subdomínio novo agora sai pelo **Cloudflare Tunnel** `mac-mini`: `cloudflared tunnel route dns
+  --overwrite-dns mac-mini <host>` no Mac (registro A para IP fixo não existe mais).
 - **`google-search-console`** - **cadastra e monitora sites no Google sem o operador abrir o
   navegador**: pega o token de verificação, cria o TXT via `cloudflare`, verifica a posse,
   adiciona a propriedade (`sc-domain:`), submete o sitemap e lê o desempenho de busca
@@ -238,7 +243,7 @@ teste confiável que roda e pode falhar - priorize o caminho do dinheiro) e, em 
   receita do Google Ads/AdMob, SEO do Search Console, tráfego/estrelas do GitHub, consumo e saúde
   do box), analisa o que tem valor / consome / é usado, e gera ou atualiza um **Artifact único**
   (sempre republicado no mesmo link) com diagnóstico e recomendações priorizadas P0/P1/P2. Reusa as
-  skills google + o `gh` + os bancos. Roda no VPS; assets versionados na própria skill; diretório de
+  skills google + o `gh` + os bancos. Roda no servidor (VM `servidor` do Mac mini); assets versionados na própria skill; diretório de
   trabalho e doc operacional em `/opt/pm-dashboard/`. Um cron de sistema já deixa o `metrics-<data>.txt`
   fresco (segundas), mas quem publica o Artifact é o Claude numa sessão. Use em "revisão de produto",
   "como estão os projetos", "relatório de PM", "atualize o dashboard de produto".
