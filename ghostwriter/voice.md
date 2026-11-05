@@ -245,3 +245,12 @@ Nomes de serviço e de tipo trocados por genéricos, o repo é público.
   (d) evitar o tique de IA de punchline em toda frase: só a premissa e os itens de mecânica têm
   virada, o resto (controles, requisitos, idiomas) é seco; (e) número só se medido: cortei
   "roda a 90 FPS" porque não foi medido nesta build. Ainda **não validado pela reação dele**.
+- 2026-11-05 · Contexto novo: **página de mod na Steam Workshop** (Inferno Aura, tModLoader),
+  inglês, BBCode. Registro "ficha de loja" como o itch.io de 2026-10-20, mas aqui na voz de
+  quem fez o mod falando com o jogador ("This mod swaps..."), que é o costume da Workshop.
+  O que guiou: (a) uma virada só, na abertura ("closer to a fire aura than to a hula
+  hoop"), o resto é seco; (b) seções "What changes" / "What does not change" porque a
+  dúvida real do jogador de mod visual é balanceamento, então o "não muda o dano" vem com
+  o porquê técnico em uma frase; (c) **dizer o limite do efeito** (luz aditiva some no sol
+  forte) na própria página, mesmo padrão de "dizer o que é provisório". Ainda **não
+  validado pela reação dele**.
