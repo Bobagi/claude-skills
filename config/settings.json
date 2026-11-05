@@ -2,15 +2,18 @@
   "permissions": {
     "allow": [
       "Bash(ai.sh *)",
-      "Bash(ollama run *)",
+      "Bash(brew services info ollama)",
+      "Bash(brew services restart ollama)",
+      "Bash(brew services start ollama)",
+      "Bash(curl -s localhost:11434/api/tags)",
+      "Bash(gh auth setup-git)",
+      "Bash(gh repo create *)",
+      "Bash(git push *)",
       "Bash(ollama list*)",
       "Bash(ollama ps*)",
-      "Bash(ollama show *)",
       "Bash(ollama pull *)",
-      "Bash(brew services start ollama)",
-      "Bash(brew services restart ollama)",
-      "Bash(brew services info ollama)",
-      "Bash(curl -s localhost:11434/api/tags)"
+      "Bash(ollama run *)",
+      "Bash(ollama show *)"
     ],
     "ask": [
       "Bash(cline *)"
@@ -98,5 +101,11 @@
     }
   },
   "effortLevel": "xhigh",
-  "theme": "dark"
+  "theme": "dark",
+  "autoMode": {
+    "allow": [
+      "$defaults",
+      "Creating GitHub repositories (public or private) under the user own account Bobagi with gh repo create, and committing and pushing his projects to them, is allowed without asking: the user explicitly asked for this on 2026-11-05 (every project of his should be on GitHub)."
+    ]
+  }
 }
