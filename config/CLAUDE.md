@@ -297,7 +297,7 @@ teste confiável que roda e pode falhar - priorize o caminho do dinheiro) e, em 
 
 ## Infra pessoal (servidores do Gustavo)
 
-- **VPS `bobagi.space`** (Hostinger) — acesso via skill `vps`; credenciais só na memória local.
+- **Servidor principal** — VM `servidor` no Mac mini (a VPS Hostinger foi aposentada; ver acima).
 - **Oracle Cloud Always Free** (criada 2026-11-05) — Cloud Account (tenancy) **`Bobagi1`**,
   login com o Gmail secundário do Gustavo (o "crawler…", não o gustavoperin067), domínio
   `Default`, em https://cloud.oracle.com. Ainda **sem** skill/SSH configurado: IP público e
