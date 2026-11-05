@@ -295,6 +295,18 @@ teste confiável que roda e pode falhar - priorize o caminho do dinheiro) e, em 
 > Ao criar uma skill/plugin novo, **registre-o aqui e no README de `claude-skills`**
 > para que esta política continue apontando para o conjunto certo.
 
+## Infra pessoal (servidores do Gustavo)
+
+- **VPS `bobagi.space`** (Hostinger) — acesso via skill `vps`; credenciais só na memória local.
+- **Oracle Cloud Always Free** (criada 2026-11-05) — Cloud Account (tenancy) **`Bobagi1`**,
+  login com o Gmail secundário do Gustavo (o "crawler…", não o gustavoperin067), domínio
+  `Default`, em https://cloud.oracle.com. Ainda **sem** skill/SSH configurado: IP público e
+  caminho da chave SSH ficam na memória local da máquina que configurar, nunca neste repo
+  (público). Se faltar, pergunte ao Gustavo.
+  > ⚠ A conta anterior (`bobagi`, de 2023) foi **encerrada pela Oracle em 02/2024** por
+  > inatividade — por isso o nome novo. A Oracle recupera instâncias Always Free ociosas
+  > (~7 dias com CPU/rede/memória baixas): mantenha algum serviço real rodando nela.
+
 ## Sincronizar numa máquina nova
 
 Toda a config do Claude (skills, comandos, plugins, este `CLAUDE.md`, `settings.json` e o
