@@ -87,6 +87,16 @@ com `git commit` + `git push` na mesma hora, **sem perguntar**. Antes de editar,
 (a cópia local costuma estar atrás). Depois, copie `config/CLAUDE.md` para `~/.claude/CLAUDE.md` (ou
 rode `sync.sh`). Commit parcial: adicione só os arquivos que você mexeu (nada de `git add -A`).
 
+## ★★ TODO PROJETO VAI PARA O GITHUB (regra dura, pedido 2026-11-05)
+
+Projeto novo, separado ou que ainda não tem repositório: crie o repo na conta **Bobagi**
+(`gh repo create Bobagi/<nome> --source . --push`) e dê push **sem perguntar**, em qualquer
+sessão e em qualquer máquina. Público por padrão; privado só se tiver segredo ou dado de
+terceiro. Trabalho terminado em repo que já existe: commit + push na hora. Se o `gh` estiver
+deslogado, peça `! gh auth login` logo no começo, não no fim. Publicar em loja (Steam
+Workshop, Play, Chrome Web Store) **não** entra nesta regra: isso continua com o Gustavo
+quando ele disser que publica ("deixa que EU publico").
+
 ## ★ Política SKILL-FIRST (vale para todo comando, em todo projeto)
 
 **Antes de executar qualquer tarefa, procure ativamente uma skill ou plugin que ajude
