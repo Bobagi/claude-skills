@@ -69,3 +69,11 @@ Pontue 1 a 5 em cada item, com uma frase de evidência tirada da captura. 2 ou m
   (B4). Testar o holofote ligado dentro da luneta, não só o estado desligado.
 - 2026-10-23, Happy Harvest: prateleira de cartuchos feita de cilindros lisos; o dono não entendeu
   que era clicável (C1/C2). Prop interativo precisa de forma reconhecível E brilho de hover.
+- 2026-11-05, Inferno Aura (mod de Terraria): prints da Workshop entregues com o personagem pequeno
+  em cena noturna escura; o efeito (brilho aditivo suave) não aparecia e o dono achou que "não saiu o
+  efeito" e que o mod tinha sido trocado. Lições: (1) o assunto do print (o efeito) precisa ocupar o
+  quadro: recorte fechado em volta dele (640x360 ampliado 3x, pixel art com NEAREST), não a tela
+  inteira; (2) efeito de luz aditiva se mostra em cena escura com fundo de cor (inferno, caverna
+  iluminada), não em noite preta nem em dia claro; (3) conferir se o zoom pedido entrou de fato
+  (`Main.GameZoomTarget` via mod não aplicou; comparar tamanho do personagem entre capturas);
+  (4) nunca alterar o produto para o print ficar bonito: o print mostra o produto como ele é.
