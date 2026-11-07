@@ -41,6 +41,7 @@ ou `bash <repo>/sync.sh`. Depois, **reinicie o Claude** (um `claude` novo) para 
 ### Skills (raiz do repo → `~/.claude/skills`)
 | Skill | Comando | Descrição |
 |-------|---------|-----------|
+| `servidor-dev` | auto | De qualquer máquina: "usa o servidor" entrega a tarefa ao Claude do servidor via `srv` (Tailscale+SSH), espera e traz só o resumo; `srv` vive em `servidor-dev/scripts/srv` e é instalado em `/usr/local/bin/srv` da VM. |
 | `vps` | `/vps` | Acessa/gerencia o servidor bobagi.space (VM `servidor` no OrbStack do Mac mini) via Tailscale + SSH + `orb`; dados da máquina ficam **fora** do repo, na memória. |
 | `frontend-review` | `/frontend-review` | Revisor de front-end/UX agnóstico: screenshots multi-viewport + crítica de espaçamento/responsividade + review de código + a11y, contra uma `rubric.md` versionada que melhora a cada uso. |
 | `security-sweep` | `/security-sweep` | **Varredura de segurança agnóstica que ENCONTRA, TESTA ao vivo (dispara o ataque) e CORRIGE** - não só reporta. Cobre race conditions/TOCTOU, IDOR/autorização, enumeração, injeção, SSRF, upload, XSS, segredos, sessão/CSRF/step-up, crypto, exposição de dados, lógica financeira, OAuth/federada, trilha+anomalia de login e defaults seguros, contra uma `rubric.md` versionada que cresce. Use em "varredura de segurança"/"pentest"/"está seguro?" **e** ao fim de toda feature sensível. **Par da `app-essentials`** (uma constrói, a outra blinda). |
@@ -206,6 +207,7 @@ claude-skills/
   npx puppeteer browsers install chrome   # ou: npx playwright install chromium
   # alternativa: CHROME_PATH=/caminho/para/chrome se já tiver um Chrome instalado.
   ```
+- **`servidor-dev`** (qualquer SO): o mesmo acesso da `vps` (alias `macmini`). Na VM: `ln -sf /opt/claude-skills/servidor-dev/scripts/srv /usr/local/bin/srv` + `tmux`.
 - **`vps`** (qualquer SO): Tailscale logado na mesma conta do Mac mini + OpenSSH com o alias
   `macmini` (chave dedicada autorizada no Mac; passo a passo em `vps/SKILL.md`). Notas da máquina
   em `~/.claude/projects/<projeto>/memory/vps_bobagi.md` (**fora** do repo).

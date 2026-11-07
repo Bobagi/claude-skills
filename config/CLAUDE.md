@@ -209,6 +209,11 @@ teste confiável que roda e pode falhar - priorize o caminho do dinheiro) e, em 
   zoom/tremor/flash/câmera lenta, legenda curta por idioma, fecho com o ícone animado no ComfyUI (Wan 2.2), um
   vídeo por idioma e o link na ficha via `google-play`. Regras da Play em `reference/play-video-rules.md`. Use em
   "faça o vídeo da loja/da Play", "vídeo promocional/trailer do app", "vídeo viciante do jogo".
+- **`servidor-dev`** - **"usa o servidor pra desenvolver X"**: de QUALQUER máquina, entrega a tarefa
+  inteira ao Claude Code do servidor (Mac mini, VM `servidor`) com o comando `srv` via Tailscale+SSH
+  (`srv start` -> `srv wait` -> resumo de até 15 linhas; `srv continue` segue a mesma conversa). Lá
+  já tem projetos, chaves, credenciais da Play e o `appbuild` (build Android/Flutter no macOS).
+  Não programe por SSH arquivo a arquivo: delegue e traga só o resumo (poupa tokens).
 - **`vps`** - gerenciar o servidor bobagi.space. **Desde 2026-11-04 o "VPS" é a VM Ubuntu `servidor`
   no Mac mini** (OrbStack; do Mac: `orb -m servidor -u root <cmd>`), com os mesmos caminhos da VPS
   Hostinger antiga (`/opt`, `/var/www`, `/etc/nginx`, `/root`). A VPS 46.202.144.75 foi aposentada.

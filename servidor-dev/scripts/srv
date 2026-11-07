@@ -1,0 +1,126 @@
+#!/bin/bash
+# srv: entrega uma tarefa de desenvolvimento ao Claude Code DO SERVIDOR (VM "servidor"
+# no Mac mini) e devolve so o resumo final. Pensado para ser chamado de outra maquina via
+# SSH, gastando o minimo de tokens dela. Instalado em /usr/local/bin/srv da VM.
+#
+#   srv start [-d /opt/proj] "tarefa"     -> imprime JOB (roda em tmux, sobrevive ao SSH)
+#   srv start [-d /opt/proj] -  < arquivo -> idem, tarefa lida do stdin (evita aspas no SSH)
+#   srv wait JOB [segundos]               -> espera ate N s (padrao 540); se acabou, imprime o resumo
+#   srv continue JOB "mensagem" | -       -> segue a mesma conversa (mesmo contexto); imprime JOB novo
+#   srv status [JOB]                      -> estado de um job ou dos ultimos 10
+#   srv log JOB [n]                       -> ultimos n passos (padrao 15), compacto
+#   srv stop JOB                          -> interrompe
+#
+# Fonte versionada: Bobagi/claude-skills, servidor-dev/scripts/srv.
+set -uo pipefail
+JOBS=/root/srv-jobs
+CLAUDE=/root/.local/bin/claude
+mkdir -p "$JOBS"
+
+PREAMBLE='[Tarefa recebida remotamente pelo comando srv. O operador (Gustavo) esta em OUTRA maquina e so vera a sua resposta final. Trabalhe de forma autonoma no servidor seguindo os CLAUDE.md (/root, /opt e do projeto) e as skills. Build Android/Flutter: appbuild (ver /opt/CLAUDE.md). Commit + push ao terminar. Publicar em PRODUCAO na Play exige confirmacao explicita: se a tarefa nao autorizar com essas palavras, suba no maximo para o track de teste (alpha/internal) e diga isso. Se precisar de decisao do operador, pare e pergunte. RESPOSTA FINAL: no maximo 15 linhas, em portugues: o que mudou, como foi testado (com numeros), versao/commit, o que foi publicado e onde, e perguntas pendentes. Nada de despejar codigo ou log.]'
+
+die() { echo "srv: $*" >&2; exit 2; }
+text() { if [ "$*" = "-" ]; then cat; else printf '%s' "$*"; fi; } # "-" = ler do stdin
+newid() { echo "$(date +%Y%m%d-%H%M%S)-$RANDOM"; }
+
+launch() { # $1=job $2=dir $3=prompt $4=resume_session(opcional)
+  local job="$1" dir="$2" prompt="$3" resume="${4:-}" d="$JOBS/$1"
+  mkdir -p "$d"
+  printf '%s\n' "$prompt" > "$d/prompt.txt"
+  echo "$dir" > "$d/dir"
+  local args=(-p --output-format stream-json --verbose)
+  [ -n "$resume" ] && args+=(--resume "$resume")
+  # roda em tmux: a sessao SSH pode cair sem matar o trabalho
+  tmux new-session -d -s "srv-$job" \
+    "cd '$dir' && $CLAUDE ${args[*]} \"\$(cat '$d/prompt.txt')\" > '$d/stream.jsonl' 2> '$d/stderr.log'; echo \$? > '$d/exit'"
+  echo "$job"
+}
+
+state() { # running | done | failed
+  local d="$JOBS/$1"
+  [ -d "$d" ] || { echo "inexistente"; return; }
+  if [ -f "$d/exit" ]; then
+    grep -q '"type":"result"' "$d/stream.jsonl" 2>/dev/null && echo done || echo failed
+  elif tmux has-session -t "srv-$1" 2>/dev/null; then echo running
+  else echo failed; fi
+}
+
+result() { # imprime so o texto final + custo/sessao
+  python3 - "$JOBS/$1/stream.jsonl" <<'PY'
+import json, sys
+res = None
+for line in open(sys.argv[1], errors="replace"):
+    try: ev = json.loads(line)
+    except Exception: continue
+    if ev.get("type") == "result": res = ev
+if not res: print("(sem resultado)"); sys.exit(0)
+print(res.get("result", "").strip())
+print(f"\n[srv] sessao={res.get('session_id')} turnos={res.get('num_turns')} "
+      f"min={round((res.get('duration_ms') or 0)/60000,1)} erro={res.get('is_error')}")
+PY
+}
+
+steps() { # ultimos n passos de forma compacta
+  python3 - "$JOBS/$1/stream.jsonl" "${2:-15}" <<'PY'
+import json, sys
+out = []
+for line in open(sys.argv[1], errors="replace"):
+    try: ev = json.loads(line)
+    except Exception: continue
+    if ev.get("type") != "assistant": continue
+    for c in ev.get("message", {}).get("content", []):
+        if c.get("type") == "text" and c.get("text", "").strip():
+            out.append("fala: " + c["text"].strip().replace("\n", " ")[:160])
+        elif c.get("type") == "tool_use":
+            i = c.get("input", {})
+            hint = i.get("description") or i.get("command") or i.get("file_path") or i.get("skill") or ""
+            out.append(f"{c.get('name')}: " + str(hint).replace("\n", " ")[:140])
+for l in out[-int(sys.argv[2]):]: print(l)
+PY
+}
+
+cmd="${1:-}"; shift || true
+case "$cmd" in
+  start)
+    dir=/opt
+    if [ "${1:-}" = "-d" ]; then dir="$2"; shift 2; fi
+    [ $# -ge 1 ] || die 'uso: srv start [-d /opt/proj] "tarefa"'
+    [ -d "$dir" ] || die "diretorio $dir nao existe"
+    task=$(text "$@"); [ -n "$task" ] || die "tarefa vazia"
+    job=$(launch "$(newid)" "$dir" "$PREAMBLE
+
+$task") && printf '%s\n' "$task" > "$JOBS/$job/task.txt" && echo "$job" ;;
+  continue)
+    [ $# -ge 2 ] || die 'uso: srv continue JOB "mensagem"'
+    old="$1"; shift; msg=$(text "$@"); [ -n "$msg" ] || die "mensagem vazia"
+    sess=$(python3 -c "
+import json,sys
+s=None
+for l in open('$JOBS/$old/stream.jsonl',errors='replace'):
+    try: e=json.loads(l)
+    except Exception: continue
+    s=e.get('session_id') or s
+print(s or '')")
+    [ -n "$sess" ] || die "job $old sem sessao"
+    [ "$(state "$old")" = running ] && die "job $old ainda esta rodando"
+    job=$(launch "$(newid)" "$(cat "$JOBS/$old/dir")" "$msg" "$sess") \
+      && printf '(continua %s) %s\n' "$old" "$msg" > "$JOBS/$job/task.txt" && echo "$job" ;;
+  wait)
+    [ $# -ge 1 ] || die 'uso: srv wait JOB [segundos]'
+    job="$1"; lim="${2:-540}"; t=0
+    while [ "$(state "$job")" = running ] && [ "$t" -lt "$lim" ]; do sleep 5; t=$((t+5)); done
+    s=$(state "$job")
+    case "$s" in
+      running) echo "[srv] $job ainda rodando apos ${lim}s. Ultimos passos:"; steps "$job" 5
+               echo "[srv] chame de novo: srv wait $job" ;;
+      done) result "$job" ;;
+      *) echo "[srv] $job: $s"; tail -5 "$JOBS/$job/stderr.log" 2>/dev/null; steps "$job" 5 ;;
+    esac ;;
+  status)
+    if [ $# -ge 1 ]; then echo "$1 $(state "$1")"
+    else for d in $(ls -1t "$JOBS" | head -10); do
+      echo "$d $(state "$d") $(tr '\n' ' ' < "$JOBS/$d/task.txt" 2>/dev/null | cut -c1-70)"; done; fi ;;
+  log)   [ $# -ge 1 ] || die 'uso: srv log JOB [n]'; steps "$1" "${2:-15}" ;;
+  stop)  [ $# -ge 1 ] || die 'uso: srv stop JOB'; tmux kill-session -t "srv-$1" 2>/dev/null; echo 130 > "$JOBS/$1/exit"; echo "parado" ;;
+  *) sed -n 2,12p "$0"; exit 2 ;;
+esac
