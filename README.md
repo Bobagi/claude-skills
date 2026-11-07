@@ -41,7 +41,7 @@ ou `bash <repo>/sync.sh`. Depois, **reinicie o Claude** (um `claude` novo) para 
 ### Skills (raiz do repo → `~/.claude/skills`)
 | Skill | Comando | Descrição |
 |-------|---------|-----------|
-| `vps` | `/vps` | Acessa/gerencia o VPS pessoal via SSH (credenciais ficam **fora** do repo, na memória). |
+| `vps` | `/vps` | Acessa/gerencia o servidor bobagi.space (VM `servidor` no OrbStack do Mac mini) via Tailscale + SSH + `orb`; dados da máquina ficam **fora** do repo, na memória. |
 | `frontend-review` | `/frontend-review` | Revisor de front-end/UX agnóstico: screenshots multi-viewport + crítica de espaçamento/responsividade + review de código + a11y, contra uma `rubric.md` versionada que melhora a cada uso. |
 | `security-sweep` | `/security-sweep` | **Varredura de segurança agnóstica que ENCONTRA, TESTA ao vivo (dispara o ataque) e CORRIGE** - não só reporta. Cobre race conditions/TOCTOU, IDOR/autorização, enumeração, injeção, SSRF, upload, XSS, segredos, sessão/CSRF/step-up, crypto, exposição de dados, lógica financeira, OAuth/federada, trilha+anomalia de login e defaults seguros, contra uma `rubric.md` versionada que cresce. Use em "varredura de segurança"/"pentest"/"está seguro?" **e** ao fim de toda feature sensível. **Par da `app-essentials`** (uma constrói, a outra blinda). |
 | `app-essentials` | `/app-essentials` | **Implementa** (não só audita) as funcionalidades que todo sistema web sério precisa: login e-mail+senha, **login Google (OAuth)**, verificação de e-mail, reset de senha, sessões/cookies seguros, página de conta + **exclusão (hard delete)**, **Termos+Privacidade versionados com aceite server-side**, **banner de cookies (LGPD) com scripts de 3º só sob consentimento**, trilha de login + alerta de novo dispositivo, e-mail transacional, i18n completa, step-up. Detecta o que falta, implementa adaptado à stack e **fecha com `security-sweep` (blinda) + `test-forge` (trava)**. Use em "adicione login com Google/termos/cookies/verificação de e-mail" e "o que falta pro app ficar sério?". |
@@ -153,7 +153,7 @@ claude-skills/
 │   ├── skill-first-reminder.txt#   -> ~/.claude/skill-first-reminder.txt (payload do hook)
 │   ├── plugins.txt             #   lista de plugins que o sync instala
 │   └── mcp.md                  #   inventário/notas dos MCP servers
-├── vps/SKILL.md                # skill: VPS via SSH
+├── vps/SKILL.md                # skill: servidor (Mac mini) via Tailscale + SSH
 ├── frontend-review/            # skill: review de front-end (3 pilares)
 │   ├── SKILL.md
 │   ├── rubric.md               #   checklist/expertise versionada que cresce
@@ -206,8 +206,9 @@ claude-skills/
   npx puppeteer browsers install chrome   # ou: npx playwright install chromium
   # alternativa: CHROME_PATH=/caminho/para/chrome se já tiver um Chrome instalado.
   ```
-- **`vps`** (qualquer SO): `sshpass`+`git` (Linux/Mac) ou PuTTY (`plink`/`pscp`) no Windows; as
-  credenciais ficam em `~/.claude/projects/<projeto>/memory/vps_bobagi.md` (**fora** do repo).
+- **`vps`** (qualquer SO): Tailscale logado na mesma conta do Mac mini + OpenSSH com o alias
+  `macmini` (chave dedicada autorizada no Mac; passo a passo em `vps/SKILL.md`). Notas da máquina
+  em `~/.claude/projects/<projeto>/memory/vps_bobagi.md` (**fora** do repo).
 - **`chrome-devtools-mcp`** (plugin): Node/npx + Chrome para o MCP conectar.
 
 ### Windows (symlink manual, se preferir não usar o sync.sh)

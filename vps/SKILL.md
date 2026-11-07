@@ -1,44 +1,90 @@
 ---
 name: vps
-description: Acessa e gerencia o VPS pessoal via SSH. Use quando o usuario pedir qualquer operacao no servidor (Nginx, arquivos, servicos, etc).
+description: Acessa e gerencia o servidor bobagi.space (VM Ubuntu "servidor" no OrbStack do Mac mini) via Tailscale + SSH. Use quando o usuario pedir qualquer operacao no servidor (Nginx, arquivos, servicos, docker, bancos, etc).
 disable-model-invocation: true
 allowed-tools: Bash, Read
 ---
 
-# VPS (acesso via SSH)
+# VPS (servidor bobagi.space no Mac mini)
 
-## Credenciais e conexao
+Desde 2026-11-04 o "VPS" e a VM Ubuntu **`servidor`** rodando no **OrbStack do Mac mini**.
+Os caminhos sao os mesmos da VPS Hostinger antiga (`/opt`, `/var/www`, `/etc/nginx`, `/root`).
+A VPS Hostinger (46.202.144.75) foi **apagada**: nao tente conectar nela. Doc da arquitetura:
+`~/server/CLAUDE.md` no Mac e `/opt/CLAUDE.md` dentro da VM.
 
-Todos os dados de conexao (host, usuario, host key fingerprint e senha) ficam
-**fora do repositorio**, no arquivo de memoria do projeto:
+## Como chegar la
 
-`~/.claude/projects/<projeto>/memory/vps_bobagi.md`
+```
+esta maquina --(Tailscale + SSH, usuario do macOS)--> Mac mini --(orb, root)--> VM servidor
+```
 
-Leia esse arquivo para obter `HOST`, `USUARIO`, `HOSTKEY` e `SENHA` antes de conectar.
-A lista de sites habilitados no Nginx tambem esta nesse arquivo.
+- **Rodando no proprio Mac mini:** `orb -m servidor -u root <cmd>` direto.
+- **De outra maquina (Windows, notebook):** precisa estar na mesma rede Tailscale do Mac
+  (`tailscale status` deve listar `mac-mini-de-gustavo`). O alias SSH `macmini` (no
+  `~/.ssh/config` da maquina) usa uma chave dedicada, autorizada no `~/.ssh/authorized_keys`
+  do Mac. Detalhes da maquina atual (alias, chave) ficam na memoria
+  `~/.claude/projects/<projeto>/memory/vps_bobagi.md` (fora do repo).
+- **No SSH nao interativo o `orb` NAO esta no PATH** do macOS: use o caminho completo
+  `/opt/homebrew/bin/orb`.
 
-## Como executar comandos
+## Comandos
 
-Windows (requer PuTTY - instalar com: winget install PuTTY.PuTTY):
-  "/c/Program Files/PuTTY/plink.exe" -pw "SENHA" -batch -hostkey "HOSTKEY" USUARIO@HOST "COMANDO"
+Executar um comando na VM (de outra maquina):
+```bash
+ssh macmini "/opt/homebrew/bin/orb -m servidor -u root sh -c 'COMANDO'"
+```
+Para comando com aspas/variaveis, mande um script pelo stdin (evita aninhar aspas):
+```bash
+ssh macmini "/opt/homebrew/bin/orb -m servidor -u root bash -s" <<'EOF'
+cd /opt/meu-projeto && docker compose ps
+EOF
+```
+Enviar arquivo para a VM:
+```bash
+cat ARQUIVO | ssh macmini "/opt/homebrew/bin/orb -m servidor -u root sh -c 'cat > /DESTINO'"
+```
+Baixar arquivo da VM:
+```bash
+ssh macmini "/opt/homebrew/bin/orb -m servidor -u root cat /ORIGEM" > ARQUIVO
+```
 
-Linux/Mac (requer sshpass - apt install sshpass ou brew install sshpass):
-  sshpass -p "SENHA" ssh -o StrictHostKeyChecking=no USUARIO@HOST "COMANDO"
+## Configurar uma maquina nova (uma vez)
 
-Upload de arquivo (Windows):
-  "/c/Program Files/PuTTY/pscp.exe" -pw "SENHA" -batch -hostkey "HOSTKEY" ARQUIVO USUARIO@HOST:/DESTINO
+1. Instalar o Tailscale e logar na mesma conta (`tailscale up`); conferir com
+   `tailscale ping mac-mini-de-gustavo`.
+2. `ssh-keygen -t ed25519 -N "" -f ~/.ssh/id_ed25519_macmini -C "<maquina>->mac-mini"`.
+3. Pedir ao operador para adicionar a `.pub` no `~/.ssh/authorized_keys` do Mac (usuario
+   `gustavo`). Nao digite senha do macOS por ele.
+4. Adicionar no `~/.ssh/config`:
+   ```
+   Host macmini mac-mini-de-gustavo
+       HostName mac-mini-de-gustavo
+       User gustavo
+       IdentityFile ~/.ssh/id_ed25519_macmini
+       IdentitiesOnly yes
+       StrictHostKeyChecking accept-new
+       ServerAliveInterval 30
+   ```
+5. Testar: `ssh macmini "/opt/homebrew/bin/orb -m servidor -u root uptime"` e anotar na
+   memoria `vps_bobagi.md` da maquina.
+
+## Problemas comuns
+
+- `Permission denied (publickey,...)`: a chave desta maquina nao esta no `authorized_keys` do Mac.
+- Timeout / host nao resolve: o Tailscale desta maquina esta desligado ou o Mac esta offline
+  (`tailscale status`).
+- `orb: command not found`: use `/opt/homebrew/bin/orb`.
 
 ## Instrucoes de execucao
 
-1. Leia o arquivo de memoria para obter HOST, USUARIO, HOSTKEY e SENHA
-2. Detecte o SO verificando se /c/Program Files/PuTTY/plink.exe existe
-3. Use o comando correspondente ao SO atual
-4. Se $ARGUMENTS estiver vazio, execute o diagnostico padrao
-5. Se $ARGUMENTS tiver conteudo, execute esse comando no VPS
+1. Se estiver no Mac mini, use `orb` direto; senao, confira o alias `macmini` (memoria
+   `vps_bobagi.md`) e o Tailscale.
+2. Se $ARGUMENTS estiver vazio, execute o diagnostico padrao.
+3. Se $ARGUMENTS tiver conteudo, execute esse comando na VM `servidor`.
 
 ## Diagnostico padrao (sem argumentos)
 
-Execute e apresente resumo organizado:
+Execute dentro da VM e apresente um resumo organizado:
 - uptime
 - df -h /
 - free -h
