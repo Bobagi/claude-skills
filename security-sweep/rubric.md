@@ -272,6 +272,20 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
 ---
 
 ## Learnings log (append-only, geral)
+### 2026-11-07 · filtro de conteudo e servico HTTP local chamado pelo navegador (via app de personagens com IA)
+- **Filtro de texto por regex: ataque ao vivo com as burlas classicas antes de confiar.** Numero por extenso
+  ("dezesseis", "fifteen"), digito de largura total ("１６"), caractere invisivel entre digitos (U+200B), emoji
+  de tecla ("1️⃣" = digito + U+FE0F + U+20E3) e forma sem a unidade ("idade: 15", "aparenta ter 14") passaram
+  num filtro que so olhava `[0-9]+ anos`. Fix: normalizar SO para checar (NFKC + remover categorias Cf/Mn/Me),
+  cobrir numeros por extenso nos idiomas do produto e as formas sem unidade. E teste os falsos positivos
+  (duracao "ha 10 anos") no mesmo arquivo, senao a correcao trava o produto.
+- **Servico em 127.0.0.1 nao e "seguro por ser local": qualquer site aberto no navegador pode chamá-lo.**
+  Re-validar: Host fixo (DNS rebinding), allowlist de Origin (inclusive `Origin: null`), so
+  `application/json` (text/plain cross-site nao dispara preflight), sem `Access-Control-Allow-Origin: *`.
+- **Validar ANTES de enfileirar trabalho caro (GPU/LLM).** Pedido invalido que falha dentro da fila nao
+  enche a fila mas mascara o teste de DoS; teto de pendentes (429) + validacao sincrona (400).
+- **Notificacoes "toast" costumam renderizar HTML** (toastr por padrao): texto vindo de dado (nome, erro do
+  servidor) precisa de `escapeHtml`/textContent, igual a innerHTML.
 - **2026-10-03 (via um jogo mobile com rewarded e rewarded interstitial) - card de oferta que
   SURGE sob um dedo ainda ativo é clique acidental garantido.** O caso clássico de clique acidental
   não é o botão do anúncio encostado no primário: é o card que APARECE no lugar onde o jogador acabou
