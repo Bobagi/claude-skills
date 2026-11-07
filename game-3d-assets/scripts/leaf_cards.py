@@ -42,6 +42,9 @@ def main():
     p.add_argument("out")
     p.add_argument("--leaves", type=int, default=40)
     p.add_argument("--seed", type=int, default=5)
+    p.add_argument("--colour-from", nargs=2, metavar=("DIFFUSE", "ALPHA"),
+                   help="leaves of another atlas whose mean colour the card takes (the cut-out failed on that atlas: "
+                        "fronds or leaves joined by stalks, 26/10); the card's own atlas mean is used when omitted")
     a = p.parse_args()
     rng = random.Random(a.seed)
     pieces = leaves(a.diffuse, a.alpha)
@@ -65,6 +68,17 @@ def main():
         cx = SIZE / 2 + r * np.cos(ang) - lf.width / 2
         cy = SIZE / 2 + r * np.sin(ang) - lf.height / 2
         card.alpha_composite(lf, (int(np.clip(cx, 0, SIZE - lf.width)), int(np.clip(cy, 0, SIZE - lf.height))))
+    # Mean colour of the opaque card = mean colour of the source leaves: the back-to-front darkening made whole
+    # crowns read darker than the original (26/10, island_tree_01: crowns near black in the comparison).
+    src_d, src_a = a.colour_from or (a.diffuse, a.alpha)
+    sc = np.asarray(Image.open(src_d).convert("RGB")).astype(np.float32)
+    sm = np.asarray(Image.open(src_a).convert("L").resize((sc.shape[1], sc.shape[0]))) > 128
+    want = sc[sm].mean(axis=0)
+    arr = np.asarray(card).astype(np.float32)
+    on = arr[..., 3] > 128
+    have = arr[on][:, :3].mean(axis=0)
+    arr[..., :3] *= want / np.maximum(have, 1.0)
+    card = Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8), "RGBA")
     # Colour bled under the alpha so the mip levels do not fringe.
     rgb = card.convert("RGB")
     al = card.getchannel("A")

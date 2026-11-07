@@ -117,7 +117,9 @@ barbatana, alça) justifica subir triângulos. Referências e contas em `budgets
   `mipMapsPreserveCoverage` na textura de cor (senão a planta "afina" de longe).
   **Árvore ou arbusto de copa cheia** (centenas de mil folhas): o `foliage_reduce.py` deixa a copa pelada. Use
   `scripts/leaf_cards.py <diff> <alpha> <out>/<Name>_cards_BaseColor.png` e depois `scripts/tree_cards.py --src <pasta>
-  --name X --out <...> --tris 4000 --leaf leaves` (copa em cartões de cacho de folhas; ver Registro em `budgets.md`).
+  --name X --out <...> --tris 1500 --leaf leaves --height <m> --card-scale 0.9 --wood-area 0.9` (copa em cartões de cacho de
+  folhas; ver Registro em `budgets.md`) e confira com `scripts/tree_compare.py --src <pasta> --result <Name>.fbx --name X
+  --leaf leaves --height <m>` (gera `_compare.png` e `_report.json`; olhe a imagem: tronco presente, copa sem virar bolo).
 - **Transparentes na URP**: desligar "Preserve Specular" (`_BlendModePreserveSpecular` 0) senão o reflexo
   fica com força total no vidro.
 

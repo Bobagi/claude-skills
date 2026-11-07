@@ -8,7 +8,11 @@
 # Run (Blender 5.2, background):
 #   blender -b --factory-startup --python tree_cards.py -- --src <polyhaven folder with the 1k FBX and textures/>
 #       --name IslandTree --out <Assets/.../Vegetation/IslandTree> --tris 4000 --leaf leaves [--wood 1500] [--seed 3]
+#       [--height 10]
 # The card texture <Name>_cards_BaseColor.png must already be in --out (leaf_cards.py).
+# --height scales the tree to that real height in metres first (Poly Haven trees come at scan size: island_tree_01 is
+# 5 m, jacaranda_tree 19 m). Each wood part also gets <Name>_<part>_MetallicSmoothness.png (R 0, A 1 - roughness).
+# Then check it with tree_compare.py (original x result render, coverage per view, report json).
 import argparse
 import math
 import os
@@ -31,6 +35,12 @@ def args():
     p.add_argument("--wood", type=int, default=0, help="triangles for trunk and branches (default: 35%% of --tris)")
     p.add_argument("--card-scale", type=float, default=1.7)
     p.add_argument("--seed", type=int, default=3)
+    p.add_argument("--wood-area", type=float, default=1.0,
+                   help="keep the loose wood parts with the most surface up to this share of it (0.9 drops fine twigs)")
+    p.add_argument("--weld", type=float, default=0.0,
+                   help="weld split seams closer than this share of the height before the collapse (default off: on "
+                        "tree_small_02, 26/10, welding turned the trunk into a fat wedge)")
+    p.add_argument("--height", type=float, default=0.0, help="scale to this height in metres (0 keeps the source size)")
     return p.parse_args(sys.argv[sys.argv.index("--") + 1:])
 
 
@@ -55,6 +65,49 @@ def joined():
     return obj
 
 
+def texture_parts(tex, asset, leaf):
+    """Parts named by the diffuse textures: <asset>_<part>_diff_* ("main" for the bare <asset>_diff_*)."""
+    parts = []
+    for f in os.listdir(tex):
+        if "_diff_" in f:
+            part = f.split("_diff_")[0][len(asset):].strip("_") or "main"
+            if leaf not in part and part not in parts:
+                parts.append(part)
+    return parts
+
+
+def match_part(mat_part, parts):
+    """Texture part for a material part: same name, one the prefix of the other (branches/branch), else main."""
+    if mat_part in parts:
+        return mat_part
+    if not mat_part:
+        return "main" if "main" in parts else (parts[0] if parts else "main")
+    for p in parts:
+        if p != "main" and (mat_part.startswith(p) or p.startswith(mat_part)):
+            return p
+    return "main" if "main" in parts else (parts[0] if parts else mat_part)
+
+
+def loose_parts(bm):
+    bm.faces.ensure_lookup_table()
+    seen, parts = set(), []
+    for f in bm.faces:
+        if f.index in seen:
+            continue
+        stack, group = [f], []
+        seen.add(f.index)
+        while stack:
+            cur = stack.pop()
+            group.append(cur)
+            for e in cur.edges:
+                for g in e.link_faces:
+                    if g.index not in seen:
+                        seen.add(g.index)
+                        stack.append(g)
+        parts.append(group)
+    return parts
+
+
 def main():
     global SRC
     a = args()
@@ -62,7 +115,10 @@ def main():
     rng = random.Random(a.seed)
     bpy.ops.wm.read_factory_settings(use_empty=True)
     obj = joined()
-    mats = [m.name if m else "" for m in obj.data.materials]
+    if a.height > 0:
+        zs = [v.co.z for v in obj.data.vertices]
+        obj.data.transform(Matrix.Scale(a.height / (max(zs) - min(zs)), 4))
+    mats =[m.name if m else "" for m in obj.data.materials]
     leaf_slots = {i for i, n in enumerate(mats) if a.leaf in n}
     if not leaf_slots:
         raise SystemExit(f"no material with '{a.leaf}' in {mats}")
@@ -79,35 +135,58 @@ def main():
 
     # Wood: collapse to its share of the budget.
     wood_budget = a.wood or int(a.tris * 0.35)
+    # Fine twigs first (island_tree_01, 26/10: 500 thousand triangles of loose twigs inside the crown; the uniform
+    # collapse then shrank the trunk to a few faces and the loose-part pass below threw it away as "small", leaving
+    # a crown floating on air). Keep the loose parts with the most surface until --wood-area of it; the cards
+    # cover the rest.
+    if a.wood_area < 1.0:
+        bm = bmesh.new()
+        bm.from_mesh(obj.data)
+        parts = loose_parts(bm)
+        areas = [sum(f.calc_area() for f in p) for p in parts]
+        total = sum(areas) or 1.0
+        order = sorted(range(len(parts)), key=lambda i: -areas[i])
+        kept, drop = 0.0, []
+        for i in order:
+            if kept >= total * a.wood_area:
+                drop.extend(parts[i])
+            kept += areas[i]
+        bmesh.ops.delete(bm, geom=drop, context='FACES')
+        bm.to_mesh(obj.data)
+        bm.free()
+        print(f"[cards] wood: {len(parts)} loose parts, dropped {len(drop)} faces of the smallest ones")
     wood = sum(len(p.vertices) - 2 for p in obj.data.polygons)
-    if wood > wood_budget:
+    # Optional seam weld before the collapse (UVs stay per loop). Off by default: it did not unstick jacaranda_tree
+    # and it wedged tree_small_02's trunk (26/10).
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    zs = [v.co.z for v in bm.verts]
+    if a.weld > 0:
+        bmesh.ops.remove_doubles(bm, verts=bm.verts[:], dist=(max(zs) - min(zs)) * a.weld)
+    bm.to_mesh(obj.data)
+    bm.free()
+    # One collapse pass can stop far above the ratio (jacaranda_tree, 26/10: 891 thousand -> 9.7 thousand for a
+    # 525 target): repeat while it still shrinks.
+    for _ in range(5):
+        if wood <= wood_budget * 1.1:
+            break
         mod = obj.modifiers.new("Decimate", 'DECIMATE')
         mod.ratio = max(0.002, wood_budget / wood)
         bpy.ops.object.modifier_apply(modifier=mod.name)
+        now = sum(len(p.vertices) - 2 for p in obj.data.polygons)
+        if now > wood * 0.9:
+            break
+        wood = now
     wood = sum(len(p.vertices) - 2 for p in obj.data.polygons)
     # The collapse stalls on thousands of tiny loose twigs (searsia_lucida: 4447 left of a 800 budget, 03/10):
-    # drop loose parts, smallest first and at random among equals, until the wood fits; the big limbs stay.
+    # drop loose parts, smallest SURFACE first (not face count: a collapsed trunk has few faces and a big surface)
+    # and at random among equals, until the wood fits; the big limbs stay.
     if wood > wood_budget * 1.2:
         bm = bmesh.new()
         bm.from_mesh(obj.data)
-        bm.faces.ensure_lookup_table()
-        seen, parts = set(), []
-        for f in bm.faces:
-            if f.index in seen:
-                continue
-            stack, group = [f], []
-            seen.add(f.index)
-            while stack:
-                cur = stack.pop()
-                group.append(cur)
-                for e in cur.edges:
-                    for g in e.link_faces:
-                        if g.index not in seen:
-                            seen.add(g.index)
-                            stack.append(g)
-            parts.append(group)
+        parts = loose_parts(bm)
         rng.shuffle(parts)
-        parts.sort(key=len)
+        parts.sort(key=lambda p: sum(f.calc_area() for f in p))
         drop, left = [], wood
         for p in parts[:-1]:
             if left <= wood_budget:
@@ -187,6 +266,14 @@ def main():
         obj.active_material_index = i
         bpy.ops.object.material_slot_remove()
 
+    # Wood materials renamed <Name>_<part>, the part being the one in the texture names written below (tree_small_02
+    # has a "branches" material on "branch" textures and a "trunk" one on the bare asset textures, 26/10).
+    asset = os.path.basename(os.path.normpath(SRC))
+    tex_parts = texture_parts(os.path.join(SRC, "textures"), asset, a.leaf)
+    for m in obj.data.materials:
+        if m and not m.name.startswith(a.name + "_cards"):
+            m.name = a.name + "_" + match_part(m.name[len(asset):].strip("_"), tex_parts)
+
     final = sum(len(p.vertices) - 2 for p in obj.data.polygons)
     co = [v.co for v in obj.data.vertices]
     base = Vector((sum(v.x for v in co) / len(co), sum(v.y for v in co) / len(co), min(v.z for v in co)))
@@ -229,8 +316,35 @@ def main():
         except RuntimeError as e:
             # Seen once with searsia_lucida's JPG (03/10): convert it outside (PIL) to the same name.
             print(f"[cards] WARNING could not write {target}: {e}")
-        if nor:
-            shutil.copy(os.path.join(tex, nor), os.path.join(a.out, a.name + "_" + part + "_Normal" + os.path.splitext(nor)[1]))
+        rough = next((f for f in files if f.startswith(prefix + "_rough_")), None)
+        if rough:
+            try:
+                r = bpy.data.images.load(os.path.join(tex, rough))
+                rw, rh = r.size
+                rp = r.pixels[:]
+                ms = [0.0] * (rw * rh * 4)
+                for i in range(rw * rh):
+                    ms[i * 4 + 3] = 1.0 - rp[i * 4]
+                img = bpy.data.images.new(a.name + "_" + part + "_ms", rw, rh, alpha=True)
+                img.colorspace_settings.name = 'Non-Color'
+                img.pixels[:] = ms
+                img.filepath_raw = os.path.join(a.out, a.name + "_" + part + "_MetallicSmoothness.png")
+                img.file_format = 'PNG'
+                img.save()
+            except RuntimeError as e:
+                print(f"[cards] WARNING could not write the MetallicSmoothness of {part}: {e}")
+        if nor and nor.lower().endswith(".png"):
+            shutil.copy(os.path.join(tex, nor), os.path.join(a.out, a.name + "_" + part + "_Normal.png"))
+        elif nor:
+            # Poly Haven ships some trunk normals as EXR (island_tree_01, tree_small_02): 8-bit PNG for the engine.
+            n = bpy.data.images.load(os.path.join(tex, nor))
+            n.colorspace_settings.name = 'Non-Color'
+            png = bpy.data.images.new(a.name + "_" + part + "_nor", n.size[0], n.size[1], alpha=False)
+            png.colorspace_settings.name = 'Non-Color'
+            png.pixels[:] = n.pixels[:]
+            png.filepath_raw = os.path.join(a.out, a.name + "_" + part + "_Normal.png")
+            png.file_format = 'PNG'
+            png.save()
     h = max(v.co.z for v in obj.data.vertices)
     print(f"[cards] materials: {[m.name for m in obj.data.materials]}")
     print(f"[cards] {a.name}: {before} -> {final} triangles (wood {wood}, {len(centres)} cards of {size * a.card_scale:.2f} m), height {h:.2f} m")

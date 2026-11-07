@@ -69,6 +69,49 @@ Pontue 1 a 5 em cada item, com uma frase de evidência tirada da captura. 2 ou m
   (B4). Testar o holofote ligado dentro da luneta, não só o estado desligado.
 - 2026-10-23, Happy Harvest: prateleira de cartuchos feita de cilindros lisos; o dono não entendeu
   que era clicável (C1/C2). Prop interativo precisa de forma reconhecível E brilho de hover.
+- 2026-10-24, Happy Harvest (regra permanente do dono): interior da torre liso e celeiro/moinho/silo pobres. Antes de
+  modelar ou texturizar na mão, PESQUISAR online texturas PBR (Poly Haven, ambientCG), shaders e efeitos prontos
+  (paredes, chuva, sangue, faíscas, fogo, vidro) e modelos CC0. Superfície grande sem textura/normal map é nota 2 em A2/C1.
+- 2026-10-24, Happy Harvest: celeiro/silo/moinho refeitos (Sketchfab CC BY + construção no Blender com Poly Haven). A folha
+  inteira contra a referência dá distância de histograma alta por causa do milho e do céu (não dos modelos): para julgar
+  um modelo, recorte a mesma região (o grupo de prédios) da referência e da captura lado a lado, além da folha cheia.
+  Moinho branco galvanizado sumia contra o céu; escurecer o aço (como a referência) devolveu a silhueta (C4/E3).
+- 2026-10-24, Happy Harvest: interior da cabine 'liso'. Medido: área plana 0,30 antes; depois de PBR Poly Haven nas paredes/piso/teto, estrutura aparente e objetos de cena, 0,03 a 0,15 por vista e densidade de bordas +30 a 70%. Para interior, capturar as 4 paredes + teto pelo ponto de vista do jogador (CabinLean.Look) e exigir área plana <= 0,2 em cada uma.
+- 2026-10-24, Wilkins Pest Control (ex-Happy Harvest): milho trocado por cevada de verão feita de cartões finos. De dia lê
+  muito bem (menu dourado); de noite, pela janela e de cima, os cartões viram riscos verticais claros que lembram chuva (C3
+  nota 3). Para plantação baixa que esconde gente, testar com uma "fila" fixa (bicho, pessoa agachada, pessoa em pé lado a
+  lado, tempo parado, holofote ligado) e recortar+clarear a captura: é o único jeito de confirmar que o agachado some e o
+  em pé aparece.
+- 2026-10-24, Wilkins Pest Control: o dono achou três coisas que a revisão não pegou, porque ela só olhava capturas paradas.
+  (1) Volumes em Options eram "<  80%  >" que mudavam por passo: em PC, número contínuo é **slider arrastável** e escolha
+  curta é **palavras clicáveis** (a escolhida destacada) ou liga/desliga; seta só como atalho de teclado/controle (D: nota 2).
+  (2) Botão "How it works" sobrando com um tutorial interativo no jogo: menu não repete o que o tutorial ensina.
+  (3) Minigame de timing impossível: `ProjectSettings/TimeManager.asset` ficou com `m_TimeScale: 7` (um teste acelerou o
+  tempo fora do Play e o editor salvou), e o build saiu 7x rápido. **Regra nova G1/G2 abaixo.**
+
+## G. Jogabilidade medida (não só a imagem)
+- **G1 Escala de tempo**: antes de capturar ou buildar, `grep m_TimeScale ProjectSettings/TimeManager.asset` deve dar 1, e
+  o jogo deve forçar `Time.timeScale = 1` ao iniciar. Teste que acelera o tempo restaura em `finally` e só roda em Play.
+- **G2 Janela de timing**: todo minigame de reflexo tem a janela medida em segundos reais (largura / velocidade do marcador).
+  Abaixo de ~0,35 s por passagem é nota 2 para jogo de jam; jogar o minigame pelo MCP (esperar a janela, clicar) e
+  confirmar que fecha. Erro deve custar um passo, não zerar tudo.
+- **G3 Controles de opção**: volume/sensibilidade = slider; poucas escolhas = palavras clicáveis; nada de "< valor >" como
+  único jeito de mudar com o mouse.
+- 2026-10-25, Wilkins Pest Control: aro redondo da janela em volta de um furo quadrado e moldura low poly sem textura (C1/C4).
+  Forma do elemento interno tem de seguir a moldura; moldura torneada (perfil com chanfros + parafusos) com PBR CC0 recolorido
+  para a paleta. Medido na vista frontal: área plana 0,28 para 0,16. Capturas de olhar para baixo (piso escuro) dão área plana
+  alta (0,37) sem ser placeholder: julgar interior pelas vistas de parede, não pelo piso.
+- 2026-10-26, Wilkins Pest Control: menu ainda "placeholder" para o dono: (1) botões na Special Elite com sombra ficavam
+  grossos demais (D1): botão usa serifa leve (Zilla Slab Regular), máquina de escrever fica para papéis; (2) legenda dourada
+  (Corn) sobre cevada dourada sumia (D2): cor de texto nunca igual à cor dominante do fundo, use creme com contorno escuro e
+  deixe o dourado num filete; (3) título só em fonte não é logo: faça um selo/emblema (ComfyUI SDXL + LoRA LogoRedmond para a
+  ilustração central, texto curvo e anéis desenhados em PIL para o texto ficar nítido) e reuse o mesmo selo no jogo (timbre
+  da carta). Gerador: `SourceAssets/Tools/make_logo.py`.
+- 2026-10-27, Paper Planes: o dono achou a cidade de fundo "muito baixa" e vermelha, longe do "Tóquio neon roxo" pedido.
+  A faixa de prédios ocupava só o terço do meio da tela e o céu era a cor sólida da câmera (área plana 0,44). Em cenário de
+  cidade, o fundo tem de subir até perto do topo da tela em várias camadas (torres que saem do quadro), com o céu em
+  gradiente; conferir a paleta contra o que o dono descreveu em palavras, não só contra o pacote de assets baixado.
+  Correção: skyline própria em 4 camadas (`make_skyline.py`), área plana 0,13.
 - 2026-11-05, Inferno Aura (mod de Terraria): prints da Workshop entregues com o personagem pequeno
   em cena noturna escura; o efeito (brilho aditivo suave) não aparecia e o dono achou que "não saiu o
   efeito" e que o mod tinha sido trocado. Lições: (1) o assunto do print (o efeito) precisa ocupar o

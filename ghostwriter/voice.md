@@ -245,6 +245,37 @@ Nomes de serviço e de tipo trocados por genéricos, o repo é público.
   (d) evitar o tique de IA de punchline em toda frase: só a premissa e os itens de mecânica têm
   virada, o resto (controles, requisitos, idiomas) é seco; (e) número só se medido: cortei
   "roda a 90 FPS" porque não foi medido nesta build. Ainda **não validado pela reação dele**.
+- 2026-10-26 · Contexto novo: **página do itch + devlog de jam** (Wilkins Pest Control, Bezi Jam 14),
+  em inglês. Página: voz impessoal, mecânica como consequência concreta, uma virada só ("He keeps his own
+  count, too."), controles e aviso de conteúdo secos. Devlog: primeira pessoa, decisões e problemas reais
+  da jam (troca do milho pela cevada por causa do tema, o rebuild que apagou edição manual, shaders sumindo
+  no WebGL), e **uso de IA dito com franqueza** ("most of the code and the scene were written by an AI
+  agent from my direction and playtests"), porque a jam pede declarar ferramentas e esconder isso soaria
+  falso. Marcado como rascunho para ele revisar a frase de autoria. Ainda **não validado pela reação dele**.
+- 2026-10-27 · Contexto novo: **comentário em jogo de outro participante na jam** (itch, inglês, objetivo
+  é retribuição de nota). Registro semi-informal ("lol" no máximo uma vez). Regras: (a) [SUPERADA em 2026-10-29: em comentário de jam ele quer elogio GERAL, sem detalhe];
+  (b) convite no fim, curto, pedindo opinião/feedback e não nota, com o link da página de rate; (c) descrever
+  o próprio jogo em meia linha concreta, sem adjetivo; (d) avisar que o comentário sai no nome dele, então
+  ele precisa jogar e trocar uma frase por algo que ele mesmo viu. Duas opções entregues. Ainda **não
+  validado pela reação dele**.
+- 2026-10-29 · Comentário de jam, segunda rodada (Peep the Animal, Paleo Days): o agente jogou cada jogo de
+  verdade no navegador antes de escrever, e cada elogio cita uma cena ou frase vista na tela e o resultado
+  da partida (2 de 15, score 136). Quando o dev fez uma pergunta na comunidade, responder a dúvida em uma linha
+  dentro do comentário. Ainda **não validado pela reação dele**.
+- 2026-10-29 · **Rejeitado: "textos de pura IA".** Os dois comentários de jam (Peep the Animal, Paleo Days)
+  saíram com cara de IA mesmo com a skill carregada: três blocos simétricos, elogio com punchline em toda frase,
+  expressões de crítico ("sold me", "properly unsettling", "fits the theme perfectly"), citação entre aspas da
+  frase bonita do jogo, e o mesmo pitch longo do nosso jogo no fim dos dois. É o mesmo estilo dos comentários
+  copiados por IA que outros participantes deixam (o do AVRDevStudio no nosso jogo é o retrato). Comentário de jam
+  dele em inglês: curto, minúsculas, sem ponto no fim, frase emendada por vírgula, UM detalhe do jogo contado
+  como coisa que aconteceu com ele (não como resenha), "lol"/"haha" uma vez, inglês de brasileiro simples (sem
+  idiomatismo de nativo), convite de uma linha diferente em cada comentário, pedindo opinião e não nota. Nunca
+  inventar fato sobre ele ("my first jam too") para criar empatia.
+- 2026-10-29 · **Rejeitado de novo, regra dele para comentário de jam: "não fale coisas específicas, ninguém elogia
+  assim".** Detalhe de partida (pontuação, frase do jogo, cena) denuncia texto montado. Comentário de jam = 2 ou 3
+  linhas de impressão geral (gostei, arte/clima/som legal, bom trabalho), sem número, sem citação, sem resenha, e o
+  convite de uma linha com o link. A regra "elogio com prova" do perfil vale para recomendação de pessoa, NÃO para
+  comentário de jam.
 - 2026-11-05 · Contexto novo: **página de mod na Steam Workshop** (Inferno Aura, tModLoader),
   inglês, BBCode. Registro "ficha de loja" como o itch.io de 2026-10-20, mas aqui na voz de
   quem fez o mod falando com o jogador ("This mod swaps..."), que é o costume da Workshop.

@@ -83,3 +83,25 @@
 
 ## 2026-10-23 · Happy Harvest · voz neural
 - SAPI rejeitado pelo dono ("MUITO robótica, zero emoção"). Qwen3-TTS CustomVoice local com instrução por fala resolveu: 29 falas em 10 min de GPU, emoção mensurável no F0 (100 Hz frio, 230 Hz grito). Filtro de rádio suavizado para não achatar. Script genérico em `scripts/tts_voice.py`, seção 8 do SKILL.md.
+
+## 2026-10-24 · Happy Harvest, troca dos sons sintetizados por gravações CC0
+- 49 originais baixados de uma vez navegando para as URLs `/download/` (dois `browser_batch` de 24); Chrome logado, sem diálogo de salvar. Nesta máquina o download padrão do Chrome é `D:\Downloads` (ler `download.default_directory` em `Chrome/User Data/Default/Preferences` antes de procurar em `~/Downloads`).
+- Loop de som PERIÓDICO (zumbido de rede, motor): o crossfade equal-power numa fase aleatória cancela os harmônicos graves por um instante. Escolher o ponto de corte por correlação cruzada da parte < 400 Hz e usar crossfade equal-gain quando a correlação > 0,6 (zumbido de lâmpada: 0,98). Motor de gerador real deu só 0,09 (rotação varia): aí equal-power mesmo; conferir o RMS por banda em janelas de 100 ms em volta da emenda (tocar o loop duas vezes).
+- Checar a emenda: salto na volta |d[0]-d[-1]| contra o percentil 99 do passo normal + diferença de nível dos 50 ms das pontas. O wind_loop do Beneath (arquivo cru) pulava 0,027 com passo 0,0016: clique a cada 44 s.
+- Estática/queima com "buracos" (quedas de 8 a 10 dB por 0,5 s) soa como defeito em loop: medir RMS por 100 ms e pegar a janela mais estável (menor desvio). Road flare 348766 tinha dois buracos; sparkler 102264 (-3 st) ficou contínuo.
+- `pitch()` muda a duração: não passar como filtro num helper que corta o preenchimento por número de amostras; aplicar depois do corte.
+- Grilos com ruído largo de vento/trânsito até 2 kHz: high-pass 1,2 kHz (ordem 6) deixa só os grilos (89% em 2 a 8 kHz); o vento fica com o grave.
+- Achados bons (todos CC0): grilos Defelozedd94 522299, gerador Honda Skybonator 709272 (partida + marcha lenta da mesma máquina), estática AM penyasounds 730772, zumbido de lâmpada kyles 454098, catraca única CallFlan 495238, alavanca timgormly 151271, squelch magnuswaker 522164, puxada de corda gthall 222809, sirene distante TRP 568814, galo BenjaminNelan 435508, contador manual revdrmr 664698.
+
+## 2026-10-24 · Happy Harvest, javali (hog_squeal, hog_squeal_2, hog_grunt)
+- Sem Chrome logado nesta maquina: baixei os previews HQ publicos do Freesound com curl. A URL sai da pagina do som
+  (`grep -oE 'https://cdn\.freesound\.org/previews/[0-9]+/[0-9_]+-hq\.mp3'`); o `freesound.py search` ja confirma CC0
+  em cada pagina. Bom o bastante para one-shot ouvido a 40-80 m.
+- Javali selvagem real: felix.blume 612995 "Wild boars" (4 min, CC0) tem gritos tonais perto de 1 kHz; piso de ruido
+  de campo alto (-27 dB no corte), aceitavel com ambiente noturno por baixo. Highpass 180 Hz tira o vento.
+- Para casar RMS alto de referencia (-13.7 dB) com pico -1 dB: `loudness(d, alvo, -1)`; som com pausa no meio
+  (grunhido duplo) fica 1,5 a 2 dB abaixo do alvo, mire mais alto.
+
+## 2026-10-27 · Wilkins Pest Control, toque do rádio e som de carregar repetido
+- "Som de carregamento repetindo": o `breech_load.wav` era a gravação INTEIRA de 22 s (42 cartuchos) copiada sem corte pelo `make_audio.py`. Antes de mexer em código, rode `analyze.py` no arquivo: muitos eventos num one-shot denunciam isso na hora. Vale varrer one-shots com duração > 2,5 s.
+- Chamada de rádio realista montada por camadas (sem nada pronto em CC0 com esse nome): squelch abrindo (magnuswaker 522164) + chiado AM (harrisonlace 812929, banda 300 a 3400 Hz, -7 dB) + dois bipes de roger (bruce965 321906, -11 dB: tom puro a -3 dB domina tudo) + rabo do squelch (LukaCafuka 760245). Buscas vazias: "radio incoming call", "two way radio chirp", "police radio squelch".
