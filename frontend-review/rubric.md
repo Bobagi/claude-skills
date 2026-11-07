@@ -217,6 +217,12 @@ click, drive them separately for now (interaction steps are a planned engine fea
 ---
 
 ## Learnings log (append-only; this is how the reviewer improves)
+- **2026-11-07 (via extensao dentro de um app hospedeiro) - painel embutido herda medidas de desktop do
+  hospedeiro.** Usar as classes do tema do app (consistencia) traz junto a altura de campo de 28px, pequena
+  para o dedo: medir altura dos controles no viewport de toque e corrigir com `@media (pointer: coarse)`, sem
+  mexer no tema. Em formulario de EDICAO, mostre o estado atual que vai ser mantido (ex.: a foto atual ao lado
+  de "manter esta foto"), e confira o gap de campos empilhados FORA de grades (gap so na grade = ritmo
+  irregular). `field-sizing: content` resolve textarea com texto longo escondido atras de rolagem interna.
 - **2026-10-10 (via um menu principal de jogo em engine 3D) - UI de jogo tem que ser capturada em várias PROPORÇÕES,
   não só tamanhos, e com os valores carregados de verdade.** (1) Em canvas com escala por resolução de referência
   (Unity CanvasScaler e afins), misturar largura e altura (match 0,5) faz a UI crescer além da ALTURA da tela em
