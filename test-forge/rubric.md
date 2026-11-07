@@ -48,6 +48,13 @@ Pule: getters/setters triviais, o que o compilador/framework já garante, UI pur
   (só 1 passou, saldo consistente) — em Go use goroutines + `-race`; em app rodando, N requests paralelos.
 
 ## Learnings log (append-only, geral)
+- **2026-11-07 (via um app de personagens com IA) - filtro de conteudo por regex precisa de teste dos
+  DOIS lados.** Cobrir so os casos que devem ser bloqueados deixa passar o falso positivo que trava o
+  produto: o filtro de idade recusava "trabalha ha 10 anos na empresa" (duracao, nao idade). Monte duas
+  tabelas: bloqueia (bordas exatas: 17 recusa, "16 anos de idade", variantes PT/EN, girias) e libera
+  (18 passa, duracoes "ha N anos"/"N anos atras"/"N anos de carreira", "for N years"). Feche com mutacao
+  no limite (1[0-7] -> 1[0-6]) e confira o vermelho. Na camada HTTP local, teste tambem Host fixo
+  (DNS rebinding) e Origin estranha sem cabecalho CORS, subindo o handler real em porta efemera.
 - **2026-10-03 (via um jogo offline com rewarded ad) - limite "1 por X" tem que ser testado ATRAVES da
   persistencia.** Um teto por partida/dia (continues, bonus, tentativas) que vive num contador salvo
   quebra de dois jeitos que o teste em memoria nao ve: o contador nao entra no snapshot (o save/restore
