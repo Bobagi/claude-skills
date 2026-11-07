@@ -196,6 +196,8 @@ teste confiável que roda e pode falhar - priorize o caminho do dinheiro) e, em 
   `rubric.md` (primeira impressão, luz/cor, props legíveis e clicáveis, UI, fidelidade à referência) e bloqueia em nota
   2 ou menos. Hook `PostToolUse` lembra ao gravar arquivo visual de jogo. Use SEMPRE que mexer em menu/cena/prop/luz/UI
   e em "ficou muito ruim", "parece placeholder", "faça igual à referência". Nasceu do menu do Happy Harvest (23/10/2026).
+  **Regra permanente (24/10/2026):** em jogo, sempre pesquisar online texturas PBR, shaders e efeitos prontos (paredes,
+  chuva, sangue, faíscas, fogo, vidro) e modelos CC0 antes de fazer na mão.
 - **`web-research`** - **pesquisa na internet ANTES de diagnosticar ou decidir**: todo erro/crash/
   travamento/log estranho de ferramenta de terceiros e toda decisão dependente de versão/preço/limite
   começa com 2-4 buscas em paralelo (sintoma + versão exata, erro literal, release notes/issue tracker),
@@ -307,14 +309,14 @@ teste confiável que roda e pode falhar - priorize o caminho do dinheiro) e, em 
 
 ## Infra pessoal (servidores do Gustavo)
 
-- **Servidor principal** — VM `servidor` no Mac mini (a VPS Hostinger foi aposentada; ver acima).
-- **Oracle Cloud Always Free** (criada 2026-11-05) — Cloud Account (tenancy) **`Bobagi1`**,
+- **Servidor principal**: VM `servidor` no Mac mini (a VPS Hostinger foi aposentada; ver acima).
+- **Oracle Cloud Always Free** (criada 2026-11-05): Cloud Account (tenancy) **`Bobagi1`**,
   login com o Gmail secundário do Gustavo (o "crawler…", não o gustavoperin067), domínio
   `Default`, em https://cloud.oracle.com. Ainda **sem** skill/SSH configurado: IP público e
   caminho da chave SSH ficam na memória local da máquina que configurar, nunca neste repo
   (público). Se faltar, pergunte ao Gustavo.
   > ⚠ A conta anterior (`bobagi`, de 2023) foi **encerrada pela Oracle em 02/2024** por
-  > inatividade — por isso o nome novo. A Oracle recupera instâncias Always Free ociosas
+  > inatividade, por isso o nome novo. A Oracle recupera instâncias Always Free ociosas
   > (~7 dias com CPU/rede/memória baixas): mantenha algum serviço real rodando nela.
 
 ## Sincronizar numa máquina nova
