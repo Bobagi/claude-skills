@@ -317,12 +317,23 @@ teste confiável que roda e pode falhar - priorize o caminho do dinheiro) e, em 
 - **Servidor principal**: VM `servidor` no Mac mini (a VPS Hostinger foi aposentada; ver acima).
 - **Oracle Cloud Always Free** (criada 2026-11-05): Cloud Account (tenancy) **`Bobagi1`**,
   login com o Gmail secundário do Gustavo (o "crawler…", não o gustavoperin067), domínio
-  `Default`, em https://cloud.oracle.com. Ainda **sem** skill/SSH configurado: IP público e
-  caminho da chave SSH ficam na memória local da máquina que configurar, nunca neste repo
-  (público). Se faltar, pergunte ao Gustavo.
+  `Default`, em https://cloud.oracle.com, região `sa-saopaulo-1`.
+  - **VM `relay-terraria`** (desde 2026-11-08): VM.Standard.E2.1.Micro (1 GB, Ubuntu 24.04),
+    **relay do servidor de Terraria, substituiu o playit.gg**. Jogador -> TCP 7777 no IP público
+    **reservado** da VM -> túnel WireGuard (`wg-quick@wg0`, iniciado pelo Mac, atravessa o CGNAT)
+    -> container `relay` no Mac mini (socat com `nodelay`) -> tmodloader. O endereço dos jogadores é
+    o que aparece em terraria.bobagi.space.
+  - Gerenciada **do Mac mini**: CLI `oci` (`~/.oci/`), SSH `ubuntu@<IP>` com a chave do Mac. Doc
+    completa (arquitetura, rollback para o playit, armadilhas) na seção "Relay na Oracle" de
+    `~/server/CLAUDE.md` no Mac mini. IP, OCIDs e caminho de chave **nunca neste repo** (público):
+    ficam lá e na memória local.
+  - Armadilhas: a imagem Ubuntu da Oracle tem iptables próprio com REJECT (regras novas entram
+    com `-I` acima dele, via PostUp do WireGuard); o security list da VCN bloqueia ICMP (ping no IP
+    público não responde, o jogo sim); A1.Flex vive sem capacidade em São Paulo.
   > ⚠ A conta anterior (`bobagi`, de 2023) foi **encerrada pela Oracle em 02/2024** por
   > inatividade, por isso o nome novo. A Oracle recupera instâncias Always Free ociosas
-  > (~7 dias com CPU/rede/memória baixas): mantenha algum serviço real rodando nela.
+  > (~7 dias com CPU/rede/memória baixas) e o relay quase não usa CPU: converter a conta para
+  > Pay As You Go (segue grátis dentro do Always Free) evita isso. Pendente com o Gustavo.
 
 ## Sincronizar numa máquina nova
 
