@@ -13,6 +13,8 @@ Três scripts em `scripts/` (Python 3 + numpy, scipy, soundfile, Pillow; m4a/aac
 | `freesound.py` | `search "<termo>"` (só CC0 por padrão) e `check <url ou usuario/id>`: licença lida da **página do som**, duração, formato e a URL `/download/` |
 | `analyze.py` | `python analyze.py <arquivos ou pastas> --png <pasta>`: formato, pico, RMS, piso de ruído, energia por faixa, eventos com início/fim, imagem por arquivo |
 | `audiokit.py` | biblioteca de edição importada pelo script de conversão do projeto (copie para a pasta de ferramentas do projeto) |
+| `tts_voice.py` | voz neural com emoção (Qwen3-TTS), ver seção 8 |
+| `tts_chatterbox.py` | voz copiada de um WAV de referência (Chatterbox Multilingual, MIT); para pt-BR perdeu do Qwen no teste de 10/11 (seção 8) |
 
 Registre no fim de `log.md` o que aprender em cada uso (o que travou, que corte funcionou, que fonte é boa).
 
@@ -135,5 +137,26 @@ inglês americano, `serena` feminina), sem clonar pessoa real. Setup numa venv p
    e `uncle_fu` sai agudo demais (F0 de mulher). Gere 3 takes por fala e escolha medindo (Whisper, fonemas IPA, F0 na
    faixa do personagem): ver o log de 2026-11-10 e `SourceAssets/Tools/voice_neural.py` + `voice_score.py` do
    Beneath the Shroud.
-Alternativas avaliadas e descartadas: Chatterbox (só um escalar de exagero, voz padrão feminina, build quebra no
-Windows por `pkuseg`), Orpheus 3B (tags, apertado em 8 GB), Kokoro (plano), edge-tts (estilos SSML removidos).
+Alternativas avaliadas e descartadas: Orpheus 3B (tags, apertado em 8 GB), Kokoro (plano), edge-tts (estilos SSML
+removidos). **Chatterbox Multilingual** (reavaliado em 10/11/2026): agora instala no Windows (`chatterbox-tts` 0.1.7,
+venv em `D:/Tools/AIAudio/chatterbox`, receita no topo de `scripts/tts_chatterbox.py`), copia o timbre de um WAV e
+acertou o texto (WER 0), mas saiu com sotaque mais lusitano que a referência e o finetune pt-BR só carrega pela
+metade no pacote do PyPI. Fica para outras línguas ou re-teste; pt-BR continua no Qwen.
+Outras com pt e clonagem, não testadas: Voxtral TTS (Mistral, 4B, pesos CC BY-NC: não serve para jogo vendido),
+Audio8-TTS-Realistic (0,6B, Apache 2.0, out/2026, pt sem dizer se é BR).
+
+## 9. Efeito sonoro gerado por IA (quando o CC0 não tem)
+
+Ordem: CC0 gravado (seções 1 a 3) primeiro; IA só para o que não existe gravado (criatura, textura impossível) ou
+como camada. Modelo escolhido (10/11/2026): **Stable Audio 3 Small-SFX** (Stability AI, maio/2026, 433M parâmetros,
+treinado só com dados licenciados, até 120 s, estéreo 44,1 kHz, ~2 GB de VRAM e roda até na CPU; código MIT em
+`github.com/Stability-AI/stable-audio-3`, pesos em `stabilityai/stable-audio-3-small-sfx`). Licença dos pesos:
+Stability AI Community License, uso comercial grátis abaixo de US$ 1 milhão de receita anual, com cadastro em
+`stability.ai/community-license`; a saída é de quem gerou. **Os pesos são fechados por aceite no Hugging Face: o
+Gustavo precisa aceitar a licença na página do modelo e fazer `hf auth login` (nunca aceitar por ele).** Depois:
+`uv sync` no repo clonado (torch 2.7.1 cu126 instalado à mão no Windows, ver o README do repo),
+`StableAudioModel.from_pretrained("small-sfx")`, prompt curto e concreto ("wet heavy footsteps on flooded wooden
+floor, close"), 8 passos, cfg 1,0, sampler pingpong; gerar 4 a 8 variações, passar tudo pelo `analyze.py`, cortar e
+converter pelo `audiokit` como qualquer som gravado, e registrar no `CREDITS.md` "gerado com Stable Audio 3 (Stability
+AI Community License)". Descartados por licença não comercial dos pesos: Sony Woosh (CC BY-NC), MMAudio, AudioLDM 2,
+AudioGen/AudioCraft (CC BY-NC).

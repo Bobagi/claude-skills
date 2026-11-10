@@ -127,3 +127,16 @@
 - Take que dispara (pausa sem fim/balbucio) ia até 2048 tokens (~2,7 min de áudio): com a GPU dividida (ComfyUI +
   Unity abertos) um take levou 20+ min. `tts_voice.py` agora limita os tokens pelo tamanho do texto (`token_cap`:
   leitura lenta de 4 caracteres/s x1,5, mínimo 6 s). Antes de um lote, olhar quem mais usa a GPU (`nvidia-smi`).
+
+## 2026-11-10 · inventário de ferramentas (Beneath the Shroud)
+- Chatterbox Multilingual 0.1.7 instalou limpo no Windows (Python 3.12, torch 2.6.0 cu124). Pegadinha: sem
+  `setuptools<81` o watermarker Perth não importa (`pkg_resources`) e o modelo falha com "NoneType is not callable".
+- Teste pt-BR na CPU (GPU ocupada pelo ComfyUI): carga ~40 s, ~40 s por fala de 6 s; WER 0, mas marcas de sotaque PT
+  2 a 4 por fala contra 1 da referência do Qwen; nenhuma palatalização em "de dia", "noite", "tia". O T3 do finetune
+  `ResembleAI/Chatterbox-Multilingual-pt-br` carrega, o `s3gen_v3` não encaixa no `S3Gen` do pacote (usa o v2).
+- `voice_score.py` sem GPU: `whisper.load_model(..., device="cpu")` e `torch.load(map_location="cpu")` (o checkpoint
+  vem marcado cuda) e `PYTHONIOENCODING=utf-8` para imprimir os fonemas IPA no console do Windows.
+- SFX por IA: Stable Audio 3 Small-SFX é o candidato (dados licenciados, uso comercial < US$ 1 mi), mas os pesos pedem
+  aceite no Hugging Face pelo dono da conta; sem token HF nesta máquina em 10/11.
+- ffmpeg do `imageio-ffmpeg` 0.8.1 agora é o 9.0.2 (antes 7.1). Python global: numpy 2.5.4 liberado depois de tirar o
+  aider (prendia numpy 1.26.4) do ambiente global para `uv tool`.

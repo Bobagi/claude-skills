@@ -185,6 +185,25 @@ Ao criar skill/plugin novo: uma linha no `CLAUDE.md`, o detalhe aqui e no README
 > Ao criar uma skill/plugin novo, **registre-o aqui e no README de `claude-skills`**
 > para que esta política continue apontando para o conjunto certo.
 
+## Ferramentas de jogo no PC Windows (inventário de 10/11/2026)
+
+Versões conferidas contra a internet; refazer o inventário a cada 2 ou 3 meses. Ferramentas 3D (Hunyuan, TRELLIS,
+Meshy, `optimize_model.py`) e ComfyUI estão nas skills próprias (`game-3d-assets`, artes).
+
+| Ferramenta | Versão | Observação |
+|---|---|---|
+| Unity Editor | 6000.5.1f1 (última 6.5: 6000.5.11f1, 02/09) | Não atualizado. Patches que importam ao Beneath the Shroud: 5.2 (link IL2CPP com VS 2026), 5.5 (crash DX12 no `GraphicsStateCollection.WarmUpProgressively`), 5.8 (oclusão GPU com o GPU Resident Drawer não ocultava nada), 5.9 (VRAM de textura pequena não voltava no D3D12) |
+| MCP for Unity | pacote e servidor **10.3.0** (antes 10.0.0) | Tag no `manifest.json`; o servidor `mcpforunityserver` sobe pela janela do pacote na mesma versão. Depois de trocar a tag: Stop Server e Start Server na janela. 10.3 traz ponte para o BlenderMCP e aba Generative |
+| Pacotes Unity | nas versões "recommended" do editor | Usar só a recomendada pelo editor (`Client.List`, campo `versions.recommended`), não a última do registro. **Burst** só com reinício do editor |
+| Blender | 5.2.1 LTS (há 5.2.4) | Atualizar quando nenhum lote do Blender estiver rodando |
+| Python global | 3.12.10; numpy 2.5.4, scipy 1.16.3, Pillow 12.3.0, librosa 1.0.0, soundfile 0.14.0, imageio-ffmpeg 0.8.1 | aider saiu do global para `uv tool install aider-chat` (prendia numpy 1.26 e Pillow/scipy exatos) |
+| ffmpeg | 9.0.2 do `imageio-ffmpeg` (`imageio_ffmpeg.get_ffmpeg_exe()`) | Não há ffmpeg no PATH; os scripts pegam esse binário |
+| Voz (TTS) | Qwen3-TTS (`qwen-tts` 0.1.1, torch 2.11 cu128) + openai-whisper 20250625, venv `WilkinsPestControl/SourceAssets/Voice/tts/.venv` | Atual. Chatterbox Multilingual testado em 10/11 (venv `D:/Tools/AIAudio/chatterbox`): pior sotaque pt-BR, ver `game-audio` |
+| SFX por IA | Stable Audio 3 Small-SFX (escolhido, não instalado) | Pesos pedem aceite no Hugging Face pelo Gustavo + `hf auth login`; ver `game-audio` seção 9 |
+| Steamworks.NET | commit `ba71581` (SDK 1.65) | A release oficial `2025.165.0` (29/10) tem o mesmo SDK; só muda defines para Unity 7000. Trocar pela tag quando mexer no manifest |
+| git / gh / Node / uv | 2.54 (há 2.56) / 2.95 (há 2.103.3) / 24.18 / 0.11.25 | O MSI do gh pede UAC: atualizar com o Gustavo presente. Git for Windows não atualizar com sessões do Git Bash abertas |
+| blender-mcp | 1.0.2 como `uv tool` (o projeto virou `mcp-for-blender`, 2.2.x) | Não registrado no Claude Code |
+
 ## Infra pessoal (servidores do Gustavo)
 
 - **Servidor principal**: VM `servidor` no Mac mini (a VPS Hostinger foi aposentada; ver acima).
