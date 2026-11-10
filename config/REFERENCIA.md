@@ -56,6 +56,10 @@ Ao criar skill/plugin novo: uma linha no `CLAUDE.md`, o detalhe aqui e no README
   normal do original, mede contorno e sombreamento contra o original e só sobe se aparecer perda; depois importa
   na engine (checklist Unity URP) e compara no jogo. Use SEMPRE que mexer com 3D (importar/gerar modelo, trocar
   placeholder, "reduz polígonos", avaliar asset do Fab/MetaHuman).
+  Gerar: Meshy pela API (`meshy.py`; `latest` = meshy-7.1, 30 créditos com textura) ou **local** com
+  `scripts/gen3d_local.py` (TRELLIS.2, MIT, nós nativos do ComfyUI numa instância própria em
+  `C:\ComfyUIFiles	ools	rellis2`, porta 8190, ~1,5 min em 8 GB). Hunyuan3D-2mini em `tools\hunyuan3d` só para teste
+  (licença Tencent exclui UE, Reino Unido e Coreia do Sul). Tabela Meshy x local x Sketchfab na seção 0b da skill.
 - **`game-audio`** - **pipeline de sons para jogo**: busca sons sem crédito (Freesound filtrado por CC0, Kenney),
   confere a licença na página de cada um (`scripts/freesound.py`), baixa os originais pelo Chrome logado (navegando
   para cada URL `/download/`, com "perguntar onde salvar" desligado), ANALISA sem ouvir (`scripts/analyze.py`:

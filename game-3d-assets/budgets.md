@@ -256,3 +256,9 @@ Nunca importar as 4096 do Meshy direto. Metal + rugosidade viram um único mapa 
   refazer como Principled antes. (3) Recorte de scan: máscara por face combinando cor da textura (saturação) com altura sobre o
   substrato (cilindro ajustado ao tronco; quadrática ajustada ao chão) e componentes conexos; o limiar de distância à "semente"
   colorida apertado demais abre buracos onde a textura do fungo é escura.
+- 2026-11-10 (BeneathTheShroud, geradores locais, ver SKILL 0b): **afogado TRELLIS.2 1024** 300 mil -> 10.000 de primeira
+  (`creature`, contorno 0,43 px, ponto quente 0,039; a criatura inteira com alga cabe no mínimo da faixa). **Lamparina
+  TRELLIS.2 1024** 300 mil -> 2.500 (`hand`, 1024; contorno 0,67 px). O ponto quente ficou em 0,18 de 2.500 a 5.000
+  (platô): é o vidro da chaminé, que o GLB traz translúcido e o bake deixa opaco branco. Use `--max-tris` e faça o vidro
+  como peça à parte. A primeira passada saiu preta: o otimizador pegava a imagem de entrada (`*_input.png`) ao lado do
+  GLB como cor base; corrigido (GLB/glTF usa o próprio material).

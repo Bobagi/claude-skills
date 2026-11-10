@@ -570,7 +570,10 @@ def main():
         size = max(dims)
         # Keep the original's own materials when they carry textures and either there are several (one
         # texture set each) or no loose texture set was found; otherwise rebuild one from the files found.
-        if has_image_textures(high) and (len(high.data.materials) > 1 or not tex["base"]):
+        # A glTF/GLB carries its own PBR set (TRELLIS.2, Hunyuan, Sketchfab): any loose PNG beside it is not its
+        # texture (2026-11-10: the TRELLIS.2 input image beside the GLB got baked as base colour).
+        own_gltf = mesh_path.lower().endswith((".glb", ".gltf"))
+        if has_image_textures(high) and (len(high.data.materials) > 1 or not tex["base"] or own_gltf):
             tex["materials"] = [m.name for m in high.data.materials if m]
         else:
             source_material(high, tex)

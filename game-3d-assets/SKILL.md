@@ -22,6 +22,60 @@ Custos medidos/documentados: imagem 3 a 9, rigging 5, animação 3 por clipe, re
 GDD valem: prompt completo com pose e simetria, T-pose (`pose_mode`) para roupa e personagem, topologia quad para o que
 dobra. Gerar em alta, reduzir no Blender. Gasto de crédito grande (refine 4k, lotes): avisar o saldo antes e depois.
 
+**Modelo do Meshy (pesquisado 10/11/2026, docs.meshy.ai/api):** `ai_model` aceita `latest` (= **meshy-7.1**, desde
+30/10/2026), `meshy-7.1`, `meshy-6`, `meshy-6-lite`; `meshy-7` está obsoleto (ainda responde). Smart Topology
+(`model_type: smart-topology`): `meshy-t2` e `meshy-t2.5` (triângulos, partes separadas, `target_polycount` até 15 mil
+e 30 mil). Créditos de imagem para 3D: 7.1/7/6 = 20 só malha, **30 com textura 2K/4K**, 35 com 8K; 6-lite e t2/t2.5 =
+5 só malha, 15 com textura. Retexture 10, remesh 5, rigging 5, animação 3 por ação. Teste de 10/11 (lamparina, imagem
+do Juggernaut, `meshy-7.1`, `enable_pbr`, sem remesh): 30 créditos, ~4 min, 961 mil triângulos, forma mais limpa e
+simétrica que a dos geradores locais, vidro opaco leitoso. `symmetry_mode` foi descontinuado (não faz efeito).
+
+## 0b. Gerar LOCAL na GPU (desde 2026-11-10): TRELLIS.2 venceu
+
+```
+python <skill>/scripts/gen3d_local.py --image ref.png --out <pasta>/<Nome>.glb [--res 1024] [--seed 42]
+```
+Imagem com fundo neutro, objeto inteiro, vista 3/4 (o BiRefNet recorta o fundo). Sem crédito, ~1,5 min por objeto
+numa RTX 3060 Ti 8 GB. O script cuida da trava `C:\ComfyUIFiles\temp\gpu.lock` (espera a de outro agente), sobe e
+derruba o servidor próprio e grava `<Nome>.json` com tempo e VRAM. Depois, `optimize_model.py` no GLB, como sempre.
+`render_compare.py` (Blender, Cycles na CPU) + `make_sheet.py` montam a folha lado a lado de vários GLB/FBX.
+
+| Engine | Onde (neste PC) | Licença | Uso |
+|---|---|---|---|
+| **TRELLIS.2** (Microsoft, 4B), `--engine trellis2` (padrão) | nós **nativos** do ComfyUI v0.45 numa instância **separada**: `C:\ComfyUIFiles\tools\trellis2\ComfyUI` (venv Python 3.12, torch 2.14.1+cu130, porta 8190); pesos `Comfy-Org/TRELLIS.2` (`trellis_2_int8_convrot`, 2 VAEs, `dino_v3_vit_l`) + `Comfy-Org/BiRefNet` | **MIT** | pode ir para o jogo |
+| Hunyuan3D-2mini + paint v2-0-turbo (Tencent), `--engine hunyuan --texture` | `C:\ComfyUIFiles\tools\hunyuan3d` (repo oficial, venv 3.12, torch 2.14.1+cu130, transformers 4.57, diffusers 0.35; `custom_rasterizer` compilado com o CUDA 13.5 redist em `tools\hunyuan3d\cuda135`, script `build_texgen.bat`) | **Tencent Hunyuan Community: NÃO vale na UE, Reino Unido e Coreia do Sul** | **só teste**; nada dele vai para o jogo sem decisão do dono |
+
+Medido em 10/11 (lamparina e afogado, mesma imagem; folhas em `BeneathTheShroud/SourceAssets/BlenderExports/GenCompare/`):
+TRELLIS.2 512 = 40 a 48 s, **1024 = 72 a 97 s**, 1536 = 135 a 222 s (tempos com a carga do modelo); o ComfyUI enche a
+VRAM livre (pico 7,1 a 8,0 GB da placa inteira, com o Unity aberto) e descarrega o resto, sem OOM. Hunyuan 2mini = 124
+a 129 s com textura, pico torch 4,8 GB (placa 7,7 GB). Qualidade: **TRELLIS.2 1024** pega rosto, rugas, alga e o arame
+da lamparina; 1536 quase igual ao 1024 pelo dobro do tempo; 512 amolece. Hunyuan amolece o rosto (some o olho), funde
+detalhe fino, textura mais escura e borrada. Pelo `optimize_model.py`: afogado TRELLIS.2 300 mil -> **10.000**
+(`creature`, mínimo da faixa: contorno 0,43 px, ponto quente 0,039); lamparina 300 mil -> **2.500** (`hand`, contorno
+0,67 px; o ponto quente fica em 0,18 em todos os degraus por causa do vidro, ver armadilha do vidro, use `--max-tris`).
+
+**Quando usar o quê:**
+
+| Situação | Caminho |
+|---|---|
+| Prop ou criatura nova a partir de uma imagem (arte do GDD, Juggernaut), muitas iterações | **local TRELLIS.2 1024** (grátis, 1,5 min; gere 2 ou 3 seeds e escolha) |
+| Objeto rígido simétrico onde a forma limpa importa e vale 30 créditos | Meshy 7.1 (`latest`) com `enable_pbr` |
+| Personagem ou roupa que vai ganhar esqueleto (T-pose, quad, rigging, animação) | Meshy (`pose_mode`, `topology: quad`, rigging e animação na mesma API) |
+| Objeto real e comum (móvel, lâmpada, louça) | Poly Haven (CC0) ou Sketchfab (CC BY, crédito) primeiro: feito à mão, UV e topologia boas |
+| Hunyuan3D | só comparação; não usar em asset do jogo (licença) |
+
+**Armadilhas da instalação (10/11):** (1) os pesos oficiais `microsoft/TRELLIS.2-4B` pedem `facebook/dinov3-vitl16` e
+`briaai/RMBG-2.0`, ambos **fechados no Hugging Face** (login + aceite; o RMBG-2.0 ainda é não comercial). O pacote
+`Comfy-Org/TRELLIS.2` traz o DINOv3 junto e o BiRefNet é aberto, por isso o caminho é o nativo do ComfyUI, que também
+dispensa flash-attn, CuMesh, FlexGEMM, o-voxel e nvdiffrast compilados. (2) O repo oficial diz Linux e 24 GB; no
+nativo com o int8 coube em 8 GB. (3) Hunyuan: `transformers` 5.x renomeou as chaves do DINOv2 (`q_proj`) e quebra o
+carregamento: fixar 4.57 + diffusers 0.35. (4) O wheel `nvidia-cuda-nvcc` do pip no Windows não traz `nvcc.exe`; use
+os zips "redist" da NVIDIA (sem instalador, sem admin). CUDA 12.8 com o MSVC 14.51 (VS 2026) derruba o `cudafe++`
+(0xC0000005); CUDA 13.5 compila com `-allow-unsupported-compiler -Xcompiler /Zc:preprocessor` e torch cu130. (5) O
+paint turbo carrega `unet/diffusion_pytorch_model.bin` (7,3 GB); o `.safetensors` do mesmo repo tem chaves de
+IP-adapter a mais e não serve no lugar. (6) GLB de gerador traz a própria textura: o `optimize_model.py` agora usa o
+material de dentro do GLB (antes pegava a imagem de entrada que ficava na pasta como cor base e saiu tudo preto).
+
 ## 1. Orçamento (triângulos na engine, depois de triangular)
 
 | Tipo (`--type`) | Faixa | Textura padrão | Exemplos |
