@@ -58,7 +58,7 @@ Ao criar skill/plugin novo: uma linha no `CLAUDE.md`, o detalhe aqui e no README
   placeholder, "reduz polígonos", avaliar asset do Fab/MetaHuman).
   Gerar: Meshy pela API (`meshy.py`; `latest` = meshy-7.1, 30 créditos com textura) ou **local** com
   `scripts/gen3d_local.py` (TRELLIS.2, MIT, nós nativos do ComfyUI numa instância própria em
-  `C:\ComfyUIFiles	ools	rellis2`, porta 8190, ~1,5 min em 8 GB). Hunyuan3D-2mini em `tools\hunyuan3d` só para teste
+  `C:\ComfyUIFiles\tools\trellis2`, porta 8190, ~1,5 min em 8 GB). Hunyuan3D-2mini em `tools\hunyuan3d` só para teste
   (licença Tencent exclui UE, Reino Unido e Coreia do Sul). Tabela Meshy x local x Sketchfab na seção 0b da skill.
 - **`game-audio`** - **pipeline de sons para jogo**: busca sons sem crédito (Freesound filtrado por CC0, Kenney),
   confere a licença na página de cada um (`scripts/freesound.py`), baixa os originais pelo Chrome logado (navegando
