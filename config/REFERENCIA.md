@@ -1,0 +1,209 @@
+# Referência detalhada do CLAUDE.md global
+
+Conteúdo movido de `config/CLAUDE.md` em 2026-11-10 para ele caber no limite de contexto do Claude Code.
+O `CLAUDE.md` global aponta para cá (em toda máquina: `~/.claude/skills/config/REFERENCIA.md`, pelo symlink).
+Ao criar skill/plugin novo: uma linha no `CLAUDE.md`, o detalhe aqui e no README.
+
+## Skills disponíveis (repo pessoal `claude-skills`, symlinked em `~/.claude/skills`)
+- **`frontend-review`** - auditor de front-end agnóstico: screenshots multi-viewport +
+  a11y + consistência, com rubric versionada que melhora a cada uso. Use para **avaliar/revisar** UI.
+- **`security-sweep`** - **varredura de segurança agnóstica que ENCONTRA, TESTA ao vivo e CORRIGE**
+  (não só reporta): race conditions/TOCTOU, IDOR/autz, enumeração, injeção, SSRF, upload, XSS, segredos,
+  sessão/CSRF/step-up, crypto, exposição de dados, lógica financeira, OAuth/federada, trilha+anomalia de
+  login, defaults seguros, infra/headers - contra uma `rubric.md` versionada que cresce. Use em "varredura
+  de segurança"/"pentest"/"está seguro?" **e** ao fim de toda feature sensível. É NOSSA (não confie só no
+  `/security-review` estático). **Par da `app-essentials`:** aquela CONSTRÓI a feature de base, esta a BLINDA.
+- **`app-essentials`** - **implementa** (não só audita) as funcionalidades que todo sistema web sério tem:
+  login e-mail+senha, **login Google (OAuth)**, verificação de e-mail, reset de senha, sessões/cookies
+  seguros, página de conta + **exclusão hard-delete**, **Termos+Privacidade versionados com aceite
+  server-side**, **banner de cookies (LGPD) com scripts de 3º só sob consentimento**, trilha de login +
+  alerta de novo dispositivo, e-mail transacional, i18n completa, step-up. Detecta o que falta, implementa
+  adaptado à stack e **fecha com `security-sweep` (blinda) + `test-forge` (trava)** - cada item do catálogo
+  aponta a classe de segurança que o protege. Use em "adicione login com Google/termos/cookies/verificação
+  de e-mail", "o que falta pro app ficar sério/pronto pra produção?".
+- **`test-forge`** - **cria e RODA testes úteis e confiáveis** (determinísticos, que podem falhar),
+  priorizando o caminho crítico (dinheiro/auth/limites/parsers/idempotência) sobre % de cobertura; roda
+  até passar e conserta o código se um teste acha bug. Use em "crie testes"/"o projeto não tem testes"
+  **e** ao fim de toda feature crítica. Complementa `/verify` (que só confirma uma vez).
+- **`code-standards`** - audita **padrões de código e boas práticas** (consistência com o próprio repo,
+  camadas, erros, código morto, i18n completa, mágicos, linter/formatter) e aplica correções seguras. Use
+  em "está seguindo os padrões?"/"boas práticas". Complementa `/code-review` (bugs) e `/simplify`.
+- **`ai-delegate`** - **orquestra IAs gratuitas para economizar tokens do Claude**: delega tarefas
+  braçais delimitadas (boilerplate, testes de função existente, docstrings, i18n, commit msgs,
+  resumos) para Ollama local (qwen3.5:9b/4b, qwen2.5-coder:14b), Groq (gpt-oss-120b ~470 tok/s,
+  não treina; teto real 200K tokens/dia) e Gemini Flash (ctx 1M, **TREINA**: só código não
+  sensível). Fluxo: Claude escreve a spec → worker gera texto → Claude revisa e aplica (worker
+  NUNCA edita arquivo; modelos ≤14B quebram diffs). Inclui `scripts/ai.sh` (workers prontos) e o
+  **Cline CLI** (`cline -y`, headless) como executor agêntico com Groq/Ollama. Setup por máquina:
+  Ollama + modelos + keys em `~/.config/ai-workers/`. Use em "delega pra IA barata/local",
+  "economiza tokens", lotes de tarefas repetitivas.
+- **`ghostwriter`** - **escreve qualquer texto em nome do Gustavo com a voz dele** (Sobre do
+  LinkedIn, bio de app de namoro, apresentação, post, recomendação), contra um `voice.md`
+  versionado (registro por contexto, marcadores de estilo, antipadrões, corpus de textos
+  aprovados) que cresce a cada uso. Use em "escreva/refaça minha descrição/bio", "não parece
+  eu", "está formal/vendedor demais", e SEMPRE antes de gerar texto que será publicado em nome
+  dele. Par da `linkedin` (uma escreve, a outra publica no perfil).
+- **`linkedin`** - lê, edita e audita o perfil do LinkedIn via CDP no Chrome do sistema (CLI
+  único `li.mjs`, escrita dry-run por padrão, só `--commit` salva; `audit` roda 15 checagens
+  de visibilidade para recrutador). Use em "veja/altere/audite meu LinkedIn", "como aparecer
+  mais em buscas de recrutador". Texto do perfil passa antes pela `ghostwriter`.
+- **`unity-mcp-skill`** - orquestra o Unity Editor via MCP for Unity (GameObjects, scripts,
+  cenas, testes, automação do editor). Use ao trabalhar em projeto Unity numa máquina com o
+  MCP for Unity conectado.
+- **`game-3d-assets`** - **pipeline de modelos 3D para jogo**: todo modelo entra no orçamento de triângulos do
+  seu tipo (fundo 1-3 mil, mão 2-5 mil, grande ~5 mil, criatura 10-20 mil, personagem 10-30 mil) começando pelo
+  MÍNIMO; Blender em segundo plano (`scripts/optimize_model.py`) reduz, faz UV nova, assa cor/metal/rugosidade/
+  normal do original, mede contorno e sombreamento contra o original e só sobe se aparecer perda; depois importa
+  na engine (checklist Unity URP) e compara no jogo. Use SEMPRE que mexer com 3D (importar/gerar modelo, trocar
+  placeholder, "reduz polígonos", avaliar asset do Fab/MetaHuman).
+- **`game-audio`** - **pipeline de sons para jogo**: busca sons sem crédito (Freesound filtrado por CC0, Kenney),
+  confere a licença na página de cada um (`scripts/freesound.py`), baixa os originais pelo Chrome logado (navegando
+  para cada URL `/download/`, com "perguntar onde salvar" desligado), ANALISA sem ouvir (`scripts/analyze.py`:
+  níveis, piso de ruído, faixas, eventos com tempos e imagem de forma de onda + espectrograma), edita e converte
+  (`scripts/audiokit.py`: corte, separação de eventos, camadas, loop sem emenda, filtros, pitch; WAV 16 bits 48 kHz)
+  e liga no jogo (Unity: regras de importação + `SoundLibrary` por papel) conferindo em Play. Use SEMPRE que mexer
+  com áudio de jogo ("baixe os sons", "corta/converte esse áudio", "faz um loop", trocar som sintetizado por gravado).
+- **`game-visual-review`** - **olha a tela real do jogo antes de dizer que ficou pronto**: captura cada estado (Unity
+  via MCP `ScreenCapture`, web via Chrome), monta a folha de contato com a referência do usuário e a versão anterior
+  (`scripts/contact_sheet.py`: luminância, saturação, variedade de matiz, área chapada, distância de paleta), pontua a
+  `rubric.md` (primeira impressão, luz/cor, props legíveis e clicáveis, UI, fidelidade à referência) e bloqueia em nota
+  2 ou menos. Hook `PostToolUse` lembra ao gravar arquivo visual de jogo. Use SEMPRE que mexer em menu/cena/prop/luz/UI
+  e em "ficou muito ruim", "parece placeholder", "faça igual à referência". Nasceu do menu do Happy Harvest (23/10/2026).
+  **Regra permanente (24/10/2026):** em jogo, sempre pesquisar online texturas PBR, shaders e efeitos prontos (paredes,
+  chuva, sangue, faíscas, fogo, vidro) e modelos CC0 antes de fazer na mão.
+- **`web-research`** - **pesquisa na internet ANTES de diagnosticar ou decidir**: todo erro/crash/
+  travamento/log estranho de ferramenta de terceiros e toda decisão dependente de versão/preço/limite
+  começa com 2-4 buscas em paralelo (sintoma + versão exata, erro literal, release notes/issue tracker),
+  `WebFetch` nas fontes de staff/mantenedor, cruzamento com o log local, correção, nova pesquisa se não
+  resolver, fontes citadas. Use SEMPRE em "não funciona", "trava", "crasha", "erro", "fica carregando".
+- **`store-promo-video`** - **vídeo promocional da ficha da loja** (Play; base para anúncios) no padrão "dopamina":
+  grava o app REAL quadro a quadro (relógio virtual no build web, 60 fps perfeitos; scrcpy/Unity para nativo), som
+  do próprio app sincronizado ao quadro, música CC0 com o drop no gancho (`find_drop.py`), cortes no compasso,
+  zoom/tremor/flash/câmera lenta, legenda curta por idioma, fecho com o ícone animado no ComfyUI (Wan 2.2), um
+  vídeo por idioma e o link na ficha via `google-play`. Regras da Play em `reference/play-video-rules.md`. Use em
+  "faça o vídeo da loja/da Play", "vídeo promocional/trailer do app", "vídeo viciante do jogo".
+- **`servidor-dev`** - **"usa o servidor pra desenvolver X"**: de QUALQUER máquina, entrega a tarefa
+  inteira ao Claude Code do servidor (Mac mini, VM `servidor`) com o comando `srv` via Tailscale+SSH
+  (`srv start` -> `srv wait` -> resumo de até 15 linhas; `srv continue` segue a mesma conversa). Lá
+  já tem projetos, chaves, credenciais da Play e o `appbuild` (build Android/Flutter no macOS).
+  Não programe por SSH arquivo a arquivo: delegue e traga só o resumo (poupa tokens).
+- **`vps`** - gerenciar o servidor bobagi.space. **Desde 2026-11-04 o "VPS" é a VM Ubuntu `servidor`
+  no Mac mini** (OrbStack; do Mac: `orb -m servidor -u root <cmd>`), com os mesmos caminhos da VPS
+  Hostinger antiga (`/opt`, `/var/www`, `/etc/nginx`, `/root`). A VPS 46.202.144.75 foi aposentada.
+  Doc da arquitetura: `~/server/CLAUDE.md` no Mac.
+- **`resume`** - resumir um vídeo do YouTube a partir do link.
+- **`google-play`** - releases na Play Store via Play Developer API (service account): sobe
+  AAB, tracks, promoção, rollout, reviews, listing. Produção exige confirmação explícita do
+  operador. Credenciais em `~/.config/bobagi-google/` (setup único: `google-play/SETUP.md`).
+- **`chrome-web-store`** - publica extensões do Chrome na Chrome Web Store via API oficial
+  (upload de pacote .zip + publish/enviar pra revisão), como a `google-play` faz com apps. OAuth
+  próprio do dono (client "Aplicativo da Web" + refresh token escopo `chromewebstore`), credenciais
+  em `~/.config/bobagi-google/` (`cws-client.json`/`cws-token.json`/`cws-items.json`; setup único:
+  `chrome-web-store/SETUP.md`). Limites: não edita descrição longa/screenshots da ficha e a
+  publicação passa por revisão do Google; NÃO listar lojas/marcas de 3os na descrição (keyword spam).
+  Extensão padrão - Farolivro. Use em "sobe/publica/atualiza a extensão", "reenvia após rejeição".
+- **`admob`** - relatórios AdMob via API (receita, eCPM, impressões por dia/ad unit/país) +
+  inventário. OAuth do dono da conta (setup único: `admob/SETUP.md`); escrita de inventário
+  é restrita pelo Google (fallback manual).
+  **AdSense (web, warframe):** `admob/scripts/adsense.py` (mesmo OAuth client, token próprio com
+  `adsense.readonly`): status de aprovação do site, alertas, política e receita, só leitura.
+- **`google-ads`** - relatórios Google Ads via API (**somente leitura**): status/orçamento de
+  campanha, gasto por dia, CPI, conversões (instalações) por campanha/grupo. Exige developer
+  token com acesso Básico aprovado (setup único: `google-ads/SETUP.md`); reusa o OAuth client
+  do AdMob. Criar/pausar/editar campanha = operador na UI.
+- **`cloudflare`** - DNS da zona `bobagi.space` no Cloudflare via API (`scripts/cf-dns.sh`):
+  criar/alterar/remover subdomínios (A/CNAME, proxied/DNS-only) e registros **TXT**
+  (`txt`/`txt-del` - o `txt` não toca no registro A e troca o token de mesma chave em vez de
+  acumular; `delete <sub>` continua apagando TODOS os tipos do nome, cuidado). **DNS é SÓ no
+  Cloudflare** (painel Hostinger morto desde 2026-07-06 - nameservers movidos). Use ao
+  subir/derrubar serviço web no VPS ou em "crie um subdomínio"/"altere o DNS". Credenciais só
+  no servidor (`/root/.config/cloudflare/` da VM `servidor`, chmod 600); de outra máquina, via skill `vps`.
+  Subdomínio novo agora sai pelo **Cloudflare Tunnel** `mac-mini`: `cloudflared tunnel route dns
+  --overwrite-dns mac-mini <host>` no Mac (registro A para IP fixo não existe mais).
+- **`google-search-console`** - **cadastra e monitora sites no Google sem o operador abrir o
+  navegador**: pega o token de verificação, cria o TXT via `cloudflare`, verifica a posse,
+  adiciona a propriedade (`sc-domain:`), submete o sitemap e lê o desempenho de busca
+  (cliques, impressões, CTR, posição média, top queries e páginas). Reusa a **service account
+  do `google-play`** - sem consent screen, sem refresh token que expira e **sem senha do
+  operador**. Use em "cadastre o site no Google", "submeta o sitemap", "por quais buscas meu
+  site aparece", "relatório de SEO". Limite honesto: a API **não força indexação** (a Indexing
+  API oficial só vale p/ JobPosting/BroadcastEvent) - sitemap + tempo é o caminho legítimo.
+- **`product-review`** - **atua como Product Manager do portfolio inteiro do VPS**: coleta dados
+  reais de todos os produtos (tráfego do nginx separando humano/robô/ataque, usuários nos bancos,
+  receita do Google Ads/AdMob, SEO do Search Console, tráfego/estrelas do GitHub, consumo e saúde
+  do box), analisa o que tem valor / consome / é usado, e gera ou atualiza um **Artifact único**
+  (sempre republicado no mesmo link) com diagnóstico e recomendações priorizadas P0/P1/P2. Reusa as
+  skills google + o `gh` + os bancos. Roda no servidor (VM `servidor` do Mac mini); assets versionados na própria skill; diretório de
+  trabalho e doc operacional em `/opt/pm-dashboard/`. Um cron de sistema já deixa o `metrics-<data>.txt`
+  fresco (segundas), mas quem publica o Artifact é o Claude numa sessão. Use em "revisão de produto",
+  "como estão os projetos", "relatório de PM", "atualize o dashboard de produto".
+- **`game-overlay`** - **instala e configura em qualquer PC Windows o overlay de monitoramento para
+  jogos** (HWiNFO lê os sensores + RTSS/RivaTuner desenha no jogo; CapFrameX para teste; Intel
+  PresentMon opcional). `scripts/overlay.ps1 tudo` (um UAC) baixa, instala fora do Program Files,
+  configura, descobre os sensores da máquina pela memória compartilhada e **casa o layout padrão do
+  PC** (FPS, 1% Low, frametime com gráfico, CPU/GPU Busy, blocos de CPU, GPU, RAM, discos, consumo
+  estimado), registra a tarefa agendada elevada (RTSS antes do HWiNFO, sempre) e verifica lendo o
+  OSD real do RTSS (+ vkcube e screenshot). Layout, armadilhas e modelo de LEIAME em
+  `game-overlay/reference/`. Use em "instale o RivaTuner/RTSS e o HWiNFO", "overlay de FPS/uso de
+  CPU e GPU nos jogos", "replicar o overlay do PC no notebook", "sumiu o FPS do overlay".
+
+> **Limite transversal Google (Play/AdMob/Ads):** o que a API oficial não cobre (pagamentos,
+> data safety, criar ad unit/mediação, consent screen) é feito PELO OPERADOR guiado passo a
+> passo (prints em `/root/prints` ajudam a diagnosticar). **Automação de navegador logado no
+> Google (Playwright etc.): nunca na VPS** - anti-bot/2FA + risco de travar a conta dona do
+> Play/AdMob; último recurso é chrome-devtools-mcp NA MÁQUINA DO OPERADOR, com ele presente.
+> Detalhes na seção "Limites" dos `SKILL.md` de `google-play`, `admob` e `google-ads`.
+
+## Plugins instalados (marketplace `claude-plugins-official`)
+- **`frontend-design`** - direção visual/estética para **criar/redesenhar** UI nova
+  (par natural do `frontend-review`: design → review). Cuidado em apps com design system
+  já travado - restrinja aos tokens existentes; solte só em telas greenfield.
+- **`claude-md-management`** - auditar/melhorar arquivos `CLAUDE.md` e capturar
+  aprendizados de sessão. Use quando um `CLAUDE.md` crescer/desatualizar.
+- **`security-guidance`** - review de segurança de código gerado (injeção, XSS, SSRF,
+  segredos hardcoded, etc.). Especialmente relevante em apps que tocam dinheiro/credenciais.
+- **`feature-dev`** - workflow de feature com agents (code-explorer, code-architect,
+  code-reviewer) para itens grandes do backlog (ex.: billing, websockets, leader lock).
+- **`chrome-devtools-mcp`** - inspeção/automação de browser ao vivo (Chrome DevTools, **Google
+  oficial**): perf traces, network, console com source maps, a11y. Complementa o `frontend-review`.
+
+> **Ativar plugin corretamente:** use **`claude plugin install <nome>@claude-plugins-official`**
+> (ou o menu `/plugin`) - **só marcar `enabledPlugins` no JSON NÃO instala** (o `claude plugin list`
+> fica "No plugins installed" e a skill do plugin não carrega). Depois de instalar, **um restart
+> limpo** (`claude` novo) carrega; **`claude --resume` recarrega skills do repo `~/.claude/skills`
+> mas NÃO ativa plugins recém-instalados**. Conferir: `claude plugin list`.
+
+## MCP servers
+- **`claude.ai Gmail`** e **`claude.ai Google Drive`** - remotos, ligados à **conta claude.ai**;
+  reconectam sozinhos após login (nada a instalar). **`chrome-devtools`** - vem do plugin
+  `chrome-devtools-mcp`. Detalhes em `config/mcp.md` do repo.
+
+## Skills embutidas que valem lembrar (não duplique com plugin)
+`/code-review` (≈ plugin code-review) · `/simplify` (≈ code-simplifier) · `/security-review`
+· `/verify` · `/run` · `/init` · `/loop` · `/schedule`.
+
+> Ao criar uma skill/plugin novo, **registre-o aqui e no README de `claude-skills`**
+> para que esta política continue apontando para o conjunto certo.
+
+## Infra pessoal (servidores do Gustavo)
+
+- **Servidor principal**: VM `servidor` no Mac mini (a VPS Hostinger foi aposentada; ver acima).
+- **Oracle Cloud Always Free** (criada 2026-11-05): Cloud Account (tenancy) **`Bobagi1`**,
+  login com o Gmail secundário do Gustavo (o "crawler…", não o gustavoperin067), domínio
+  `Default`, em https://cloud.oracle.com, região `sa-saopaulo-1`.
+  - **VM `relay-terraria`** (desde 2026-11-08): VM.Standard.E2.1.Micro (1 GB, Ubuntu 24.04),
+    **relay do servidor de Terraria, substituiu o playit.gg**. Jogador -> TCP 7777 no IP público
+    **reservado** da VM -> túnel WireGuard (`wg-quick@wg0`, iniciado pelo Mac, atravessa o CGNAT)
+    -> container `relay` no Mac mini (socat com `nodelay`) -> tmodloader. O endereço dos jogadores é
+    o que aparece em terraria.bobagi.space.
+  - Gerenciada **do Mac mini**: CLI `oci` (`~/.oci/`), SSH `ubuntu@<IP>` com a chave do Mac. Doc
+    completa (arquitetura, rollback para o playit, armadilhas) na seção "Relay na Oracle" de
+    `~/server/CLAUDE.md` no Mac mini. IP, OCIDs e caminho de chave **nunca neste repo** (público):
+    ficam lá e na memória local.
+  - Armadilhas: a imagem Ubuntu da Oracle tem iptables próprio com REJECT (regras novas entram
+    com `-I` acima dele, via PostUp do WireGuard); o security list da VCN bloqueia ICMP (ping no IP
+    público não responde, o jogo sim); A1.Flex vive sem capacidade em São Paulo.
+  > ⚠ A conta anterior (`bobagi`, de 2023) foi **encerrada pela Oracle em 02/2024** por
+  > inatividade, por isso o nome novo. A Oracle recupera instâncias Always Free ociosas
+  > (~7 dias com CPU/rede/memória baixas) e o relay quase não usa CPU: converter a conta para
+  > Pay As You Go (segue grátis dentro do Always Free) evita isso. Pendente com o Gustavo.

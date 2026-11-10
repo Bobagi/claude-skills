@@ -1,353 +1,102 @@
 # CLAUDE.md - global (Gustavo Perin / Bobagi)
 
-Este arquivo carrega em **todos os projetos** desta máquina. Regras de máquina e de
-projeto específicas continuam em `/root/CLAUDE.md`, `/opt/CLAUDE.md` e nos
-`CLAUDE.md` de cada repo - este aqui é só a política transversal.
+Carrega em **todos os projetos**. Regras de máquina/projeto ficam em `/root/CLAUDE.md`, `/opt/CLAUDE.md` e no
+`CLAUDE.md` de cada repo; aqui só a política transversal. **Fonte de verdade:** `Bobagi/claude-skills`
+(`config/CLAUDE.md`), instalado como `~/.claude/CLAUDE.md` pelo `sync.sh`. **Detalhe de cada skill, plugins,
+MCP e infra pessoal: `~/.claude/skills/config/REFERENCIA.md`** (ler quando o assunto aparecer). Mantenha este
+arquivo curto: detalhe novo vai para a REFERENCIA, não para cá.
 
-> **Fonte de verdade:** este arquivo é versionado em
-> [`Bobagi/claude-skills`](https://github.com/Bobagi/claude-skills) (`config/CLAUDE.md`)
-> e instalado como `~/.claude/CLAUDE.md` pelo `sync.sh`. Edite-o no repo (ou edite o
-> local e rode `sync.sh`/commit) para propagar pra todas as máquinas. Ver seção
-> **Sincronizar numa máquina nova** no fim.
+## ★★ Proibido em dash e en dash (U+2014, U+2013), todo projeto
 
-## ★★ Estilo de escrita: PROIBIDO o em dash (travessão longo, U+2014), regra dura, todo projeto
+Nunca em nada que você produzir (UI, copy, erros, comentários, docs, `CLAUDE.md`, commits, PRs, chat; pedido
+de 2026-07-26). Use vírgula, dois-pontos, parênteses, ponto ou hífen simples; separador de título: `·`. Ao editar
+arquivo que já tenha, troque de passagem. Um hook `PostToolUse` (`~/.claude/no-em-dash-check.sh`) barra o arquivo
+gravado com código 2. Ao varrer projeto: conteúdo derivado (banco, build, índice) guarda cópia, reprocessar e
+conferir a página renderizada. Verificar: `grep -rnP "\x{2014}" <dir>`.
 
-**Nunca use o em dash (o traço longo, ponto de código Unicode U+2014) em NADA que você
-produzir:** texto de UI, copy de marketing, mensagens de erro, comentários de código,
-documentação, `CLAUDE.md`, mensagens de commit, descrições de PR e respostas no chat. É uma
-preferência firme do Gustavo (pedido explícito 2026-07-26: "remova COMPLETAMENTE e nunca mais
-use, em nenhuma máquina ou projeto"). No lugar dele, use vírgula, dois-pontos, parênteses, ponto
-final, ou reescreva a frase; se precisar mesmo de um traço, use o hífen simples "-". A mesma
-proibição vale para o en dash (U+2013). Ao **editar** um arquivo que já contenha um em dash,
-troque a ocorrência pela pontuação adequada de passagem. Verificação rápida num projeto (usa o
-code point pra não digitar o caractere): `grep -rnP "\x{2014}" <dir>` deve dar vazio no que você
-escreveu.
+## ★★ Não rebaixe escopo para "limite conhecido"
 
-**ISTO É EXECUTADO, não só documentado (2026-08-01):** um hook `PostToolUse` em
-`Write|Edit|NotebookEdit` roda `~/.claude/no-em-dash-check.sh` no arquivo que você acabou de
-gravar; se houver travessão ele sai com **código 2** e devolve as linhas ofensoras como feedback,
-te obrigando a corrigir antes de seguir. Ele olha SÓ o arquivo tocado (arquivo legado com
-travessão não vira ruído) e ignora binário. **Separador de título:** prefira `·` em vez de hífen.
-**Atenção ao varrer um projeto:** conteúdo derivado (banco, build, índice de busca) guarda uma
-CÓPIA do texto - trocar o fonte não basta, é preciso reprocessar o pipeline e conferir a página
-renderizada.
+Entregar parte e chamar o resto de "limitação honesta" é escopo cortado sem autorização. "Adicione o idioma X"
+inclui o conteúdo escrito à mão; "faça o site funcionar" inclui a página de erro; "cadastre no Google" inclui o
+sitemap. Só é legítimo se for **tecnicamente impossível** ou **decisão de produto do dono**, dito com a medição na
+mão. "É muito trabalho" não é motivo: faça, e se não couber na sessão, diga quanto falta e continue.
 
-## ★★ NÃO REBAIXE ESCOPO PARA "LIMITE CONHECIDO" (regra dura, aprendida na marra)
+## ★★ Pesquise na internet sempre
 
-Quando uma parte do pedido dá trabalho, a tentação é entregar o resto e listar aquilo como
-"limitação honesta" ou "projeto à parte". **Isso não é honestidade, é escopo cortado sem
-autorização** - e o Gustavo cobra, com razão ("obviamente é pra fazer, por que não fez antes?").
+Todo problema (erro, crash, travamento, "fica carregando", log estranho, regressão) e toda decisão que depende de
+informação que muda (versão, preço, limite, API, política de loja) começa com `WebSearch` **na primeira rodada**,
+em paralelo com os logs locais, sem esperar o Gustavo mandar (cobrado em 2026-10-23). Carregue `WebSearch`/`WebFetch`
+pelo `ToolSearch` se estiverem diferidas; sintoma + produto + versão exata, erro literal, release notes/issue
+tracker; `WebFetch` nas fontes de staff/mantenedor; pesquise de novo se não resolver; cite as fontes. Skill
+`web-research`. Só pule se o problema é 100% do código do projeto e o stack trace aponta a linha.
 
-- Se o pedido é "adicione o idioma X", **conteúdo escrito à mão (artigos, ajuda, FAQ) faz parte**.
-  Se é "faça o site funcionar", a página de erro faz parte. Se é "cadastre no Google", o sitemap
-  faz parte.
-- Rebaixar escopo só é legítimo quando algo é **tecnicamente impossível** (o dado não existe em
-  lugar nenhum) ou **decisão de produto do dono** - e aí você diz por que, com a medição na mão.
-- "É muito trabalho" e "é conteúdo, não código" **não são** motivos. Faça, e se for grande demais
-  para uma sessão, diga quanto falta e continue.
-- Antes de escrever "limite honesto" num relatório, releia o pedido original: se aquilo estava
-  dentro dele, apague a frase e vá fazer.
+## ★★ Assuma a máquina: clique você mesmo em janelas de app (2026-11-04)
 
-## ★★ PESQUISE NA INTERNET SEMPRE (regra dura, todo projeto, cobrada várias vezes)
+Janela de app nativo esperando escolha (instalador, "Allow"/"Continue"): clique você. Ordem: (1) `computer-use`;
+(2) AppleScript/System Events pelo Bash (`get entire contents of window 1`, achar o botão, `click button N of group
+M of window "<nome>"`, conferir que mudou); (3) só então peça a ele, dizendo qual opção e por quê. Nunca digite
+senha de login/admin, aceite termos ou conceda permissão de sistema sem ele pedir aquilo.
 
-**Todo problema (erro, crash, travamento, "fica carregando", log estranho, regressão) e toda
-decisão que depende de informação que muda (versão, preço, limite, API, política de loja,
-biblioteca) começa com `WebSearch`, na PRIMEIRA rodada, em paralelo com a leitura dos logs
-locais.** Não esgote hipóteses locais (limpar cache, reinstalar, atualizar) antes de pesquisar,
-e nunca espere o Gustavo mandar ("PESQUISE NA INTERNET, vc nunca pesquisa os problemas",
-2026-10-23).
+## ★★ claude-skills: sempre commit + push (2026-11-04)
 
-- Se `WebSearch`/`WebFetch` estiverem diferidas, carregue com `ToolSearch` logo no início.
-- Busque o sintoma + produto + **versão exata**, a mensagem de erro literal e as release notes /
-  issue tracker oficial; abra as fontes boas com `WebFetch` (staff, mantenedor, tracker).
-- Se a correção encontrada não resolver, **pesquise de novo** com o que aprendeu.
-- Cite as fontes na resposta. Fluxo completo na skill **`web-research`**.
-- Só pule quando o problema é 100% do código do próprio projeto e o stack trace já aponta a linha.
+Toda alteração no repo `Bobagi/claude-skills` termina com commit + push na hora, sem perguntar. Antes de editar,
+`git pull --ff-only`; depois copie `config/CLAUDE.md` para `~/.claude/CLAUDE.md` (ou `sync.sh`). Adicione só os
+arquivos que mexeu (nada de `git add -A`).
 
-## ★★ ASSUMA A MÁQUINA: clique você mesmo em janelas de app (regra dura, pedido 2026-11-04)
+## ★★ Todo projeto vai para o GitHub (2026-11-05)
 
-Quando um app nativo do Mac abrir uma janela esperando escolha (assistente de instalação, tela de
-boas-vindas, "Allow"/"Continue", seleção de opção), **não devolva para o Gustavo clicar**: clique
-você mesmo. Ordem de tentativa:
-1. Ferramentas de controle de tela (`computer-use`), se existirem na sessão.
-2. **AppleScript / System Events** pelo Bash: liste a janela com
-   `osascript -e 'tell application "System Events" to tell process "<App>" to get entire contents of window 1'`,
-   identifique o botão pela `position`/`description` comparando com o print, e clique com
-   `click button N of group M of window "<nome>"`. Confira depois que a janela mudou.
-   (Funcionou no assistente do OrbStack: o terminal já tem permissão de Acessibilidade.)
-3. Só se as duas falharem, peça para ele clicar, dizendo exatamente qual opção e por quê.
+Projeto sem repositório: `gh repo create Bobagi/<nome> --source . --push`, sem perguntar, em qualquer máquina.
+Público por padrão; privado só com segredo ou dado de terceiro. Trabalho terminado em repo existente: commit + push
+na hora. `gh` deslogado: peça `! gh auth login` no começo. Publicar em loja (Steam, Play, Chrome Web Store) **não**
+entra: isso é com o Gustavo.
 
-Limites que continuam valendo: não digite senha de login/admin (nem se ele mandar no chat), não
-aceite termos/consentimentos nem conceda permissões de sistema sem ele pedir aquilo.
+## ★ Skill-first (todo pedido)
 
-## ★★ claude-skills: SEMPRE commit + push (regra dura, pedido 2026-11-04)
+Antes de qualquer tarefa, olhe as skills nos `<system-reminder>`/ferramenta `Skill` e os plugins; se alguma
+encaixar, mesmo parcialmente, **invoque-a** em vez de fazer ad-hoc. Combine quando fizer sentido (`frontend-design`
+-> `frontend-review` -> `simplify`/`code-review` -> `security-sweep` -> `verify`). O hook `UserPromptSubmit`
+(`~/.claude/skill-first-reminder.txt`) reinjeta isso a cada prompt.
 
-Toda alteração no repo `Bobagi/claude-skills` (este `CLAUDE.md`, skills, rubrics, scripts) termina
-com `git commit` + `git push` na mesma hora, **sem perguntar**. Antes de editar, `git pull --ff-only`
-(a cópia local costuma estar atrás). Depois, copie `config/CLAUDE.md` para `~/.claude/CLAUDE.md` (ou
-rode `sync.sh`). Commit parcial: adicione só os arquivos que você mexeu (nada de `git add -A`).
+## ★★ Segurança e testes sempre
 
-## ★★ TODO PROJETO VAI PARA O GITHUB (regra dura, pedido 2026-11-05)
+Ao terminar feature nova/alterada que toque **auth, dinheiro, limites/quotas, permissões, input do usuário,
+upload, fetch de URL server-side ou dados sensíveis**: rode `security-sweep` escopada nela antes de encerrar
+(encontra, TESTA ao vivo e CORRIGE; um review estático já deixou passar uma race condition financeira real).
+`/security-review` e o plugin `security-guidance` complementam. Junto: `test-forge` no caminho crítico e, em
+feature grande, `code-standards` + `/code-review` + `/simplify`.
 
-Projeto novo, separado ou que ainda não tem repositório: crie o repo na conta **Bobagi**
-(`gh repo create Bobagi/<nome> --source . --push`) e dê push **sem perguntar**, em qualquer
-sessão e em qualquer máquina. Público por padrão; privado só se tiver segredo ou dado de
-terceiro. Trabalho terminado em repo que já existe: commit + push na hora. Se o `gh` estiver
-deslogado, peça `! gh auth login` logo no começo, não no fim. Publicar em loja (Steam
-Workshop, Play, Chrome Web Store) **não** entra nesta regra: isso continua com o Gustavo
-quando ele disser que publica ("deixa que EU publico").
+## Skills do repo (uma linha cada; detalhe na REFERENCIA)
 
-## ★ Política SKILL-FIRST (vale para todo comando, em todo projeto)
+- `frontend-review` revisar UI · `frontend-design` (plugin) criar UI nova
+- `security-sweep` varredura que testa e corrige · `app-essentials` login/OAuth/termos/cookies/conta, fecha com sweep + test-forge
+- `test-forge` cria e roda testes úteis · `code-standards` padrões e boas práticas
+- `ai-delegate` tarefas braçais para IAs grátis (Ollama, Groq; Gemini treina: só código não sensível)
+- `ghostwriter` todo texto publicado em nome do Gustavo (antes da 1ª palavra) · `linkedin` perfil via CDP
+- `unity-mcp-skill` Unity Editor via MCP · `game-3d-assets` todo modelo 3D no orçamento de triângulos
+- `game-audio` sons de jogo (CC0, análise, loop) · `game-visual-review` olhar a tela real antes de dizer pronto
+- `web-research` pesquisa antes de diagnosticar · `store-promo-video` vídeo da ficha da loja
+- `servidor-dev` delegar desenvolvimento ao Claude do servidor (`srv`) · `vps` servidor bobagi.space (VM `servidor` no Mac mini)
+- `google-play` releases/reviews/ficha (produção só com confirmação) · `chrome-web-store` publicar extensão
+- `admob` (+ AdSense só leitura) · `google-ads` só leitura · `google-search-console` cadastro, sitemap, SEO
+- `cloudflare` DNS de bobagi.space (DNS **só** no Cloudflare; subdomínio novo pelo Tunnel `mac-mini`)
+- `product-review` PM do portfolio (Artifact único) · `game-overlay` HWiNFO + RTSS · `resume` vídeo do YouTube
 
-**Antes de executar qualquer tarefa, procure ativamente uma skill ou plugin que ajude
-e use-o.** Não trate skills como último recurso - são o primeiro lugar a olhar.
+Regras que valem fora das skills:
+- **Jogo**: sempre pesquisar online texturas PBR, shaders, efeitos prontos e modelos CC0 antes de fazer na mão (24/10).
+- **Google (Play/AdMob/Ads)**: o que a API não cobre é feito pelo operador guiado; automação de navegador logado
+  no Google **nunca na VPS** (último recurso: chrome-devtools-mcp na máquina dele, com ele presente).
+- **Plugin**: instalar com `claude plugin install <nome>@claude-plugins-official` (marcar `enabledPlugins` não
+  instala) e reiniciar limpo (`--resume` não ativa plugin novo).
+- Skill/plugin novo: uma linha aqui, detalhe na REFERENCIA e no README.
 
-Fluxo obrigatório em cada pedido:
-1. **Olhe a lista de skills** nos `<system-reminder>` e na ferramenta `Skill`, e os
-   **plugins habilitados** (ver abaixo).
-2. **Se alguma encaixar - mesmo parcialmente - invoque-a** (via `Skill` ou o slash-command),
-   em vez de fazer o trabalho ad-hoc.
-3. **Só pule** quando nenhuma for de fato relevante. Se pular, é por não haver match,
-   nunca por ter esquecido de olhar.
-4. **Combine skills** quando fizer sentido (ex.: `frontend-design` cria a UI →
-   `frontend-review` audita → `simplify`/`code-review` limpam → `security-sweep` testa+corrige → `verify` confirma).
+## Infra pessoal
 
-Um **hook `UserPromptSubmit`** (`~/.claude/settings.json` → `cat "$HOME/.claude/skill-first-reminder.txt"`)
-reinjeta esse lembrete a cada prompt. Para revisar/desligar: comando `/hooks`.
-
-## ★★ Política SEGURANÇA-SEMPRE (obrigatória, todo projeto)
-Ao **terminar qualquer feature nova ou alterada** que toque **autenticação, dinheiro/cobrança,
-limites/quotas, permissões, input do usuário, upload, fetch de URL server-side ou dados sensíveis**,
-rode a skill **`security-sweep`** escopada na feature ANTES de encerrar - ela **encontra, TESTA ao vivo
-(dispara o ataque de verdade) e CORRIGE**, não só reporta. Isso é não-negociável, como a regra de front.
-Quando o usuário disser **"faça uma varredura de segurança" / "pentest" / "está seguro?"**, invoque
-`security-sweep` (varredura completa da app). Complementos: `/security-review` (review estático do diff) e
-o plugin `security-guidance` (lente) - rode-os junto, mas a `security-sweep` é a que **fecha o loop
-testando e consertando**. Motivo desta política: um review estático já **deixou passar** uma race condition
-financeira real - só o teste adversarial ao vivo pega esse tipo de falha.
-
-**Junto com segurança, ao fim de feature crítica:** rode **`test-forge`** (trava o comportamento com um
-teste confiável que roda e pode falhar - priorize o caminho do dinheiro) e, em features grandes,
-**`code-standards`** (consistência/boas práticas) + `/code-review` (bugs) + `/simplify`. Gatilhos diretos:
-"crie testes" → `test-forge`; "está seguindo os padrões?"/"boas práticas" → `code-standards`.
-
-### Skills disponíveis (repo pessoal `claude-skills`, symlinked em `~/.claude/skills`)
-- **`frontend-review`** - auditor de front-end agnóstico: screenshots multi-viewport +
-  a11y + consistência, com rubric versionada que melhora a cada uso. Use para **avaliar/revisar** UI.
-- **`security-sweep`** - **varredura de segurança agnóstica que ENCONTRA, TESTA ao vivo e CORRIGE**
-  (não só reporta): race conditions/TOCTOU, IDOR/autz, enumeração, injeção, SSRF, upload, XSS, segredos,
-  sessão/CSRF/step-up, crypto, exposição de dados, lógica financeira, OAuth/federada, trilha+anomalia de
-  login, defaults seguros, infra/headers - contra uma `rubric.md` versionada que cresce. Use em "varredura
-  de segurança"/"pentest"/"está seguro?" **e** ao fim de toda feature sensível. É NOSSA (não confie só no
-  `/security-review` estático). **Par da `app-essentials`:** aquela CONSTRÓI a feature de base, esta a BLINDA.
-- **`app-essentials`** - **implementa** (não só audita) as funcionalidades que todo sistema web sério tem:
-  login e-mail+senha, **login Google (OAuth)**, verificação de e-mail, reset de senha, sessões/cookies
-  seguros, página de conta + **exclusão hard-delete**, **Termos+Privacidade versionados com aceite
-  server-side**, **banner de cookies (LGPD) com scripts de 3º só sob consentimento**, trilha de login +
-  alerta de novo dispositivo, e-mail transacional, i18n completa, step-up. Detecta o que falta, implementa
-  adaptado à stack e **fecha com `security-sweep` (blinda) + `test-forge` (trava)** - cada item do catálogo
-  aponta a classe de segurança que o protege. Use em "adicione login com Google/termos/cookies/verificação
-  de e-mail", "o que falta pro app ficar sério/pronto pra produção?".
-- **`test-forge`** - **cria e RODA testes úteis e confiáveis** (determinísticos, que podem falhar),
-  priorizando o caminho crítico (dinheiro/auth/limites/parsers/idempotência) sobre % de cobertura; roda
-  até passar e conserta o código se um teste acha bug. Use em "crie testes"/"o projeto não tem testes"
-  **e** ao fim de toda feature crítica. Complementa `/verify` (que só confirma uma vez).
-- **`code-standards`** - audita **padrões de código e boas práticas** (consistência com o próprio repo,
-  camadas, erros, código morto, i18n completa, mágicos, linter/formatter) e aplica correções seguras. Use
-  em "está seguindo os padrões?"/"boas práticas". Complementa `/code-review` (bugs) e `/simplify`.
-- **`ai-delegate`** - **orquestra IAs gratuitas para economizar tokens do Claude**: delega tarefas
-  braçais delimitadas (boilerplate, testes de função existente, docstrings, i18n, commit msgs,
-  resumos) para Ollama local (qwen3.5:9b/4b, qwen2.5-coder:14b), Groq (gpt-oss-120b ~470 tok/s,
-  não treina; teto real 200K tokens/dia) e Gemini Flash (ctx 1M, **TREINA**: só código não
-  sensível). Fluxo: Claude escreve a spec → worker gera texto → Claude revisa e aplica (worker
-  NUNCA edita arquivo; modelos ≤14B quebram diffs). Inclui `scripts/ai.sh` (workers prontos) e o
-  **Cline CLI** (`cline -y`, headless) como executor agêntico com Groq/Ollama. Setup por máquina:
-  Ollama + modelos + keys em `~/.config/ai-workers/`. Use em "delega pra IA barata/local",
-  "economiza tokens", lotes de tarefas repetitivas.
-- **`ghostwriter`** - **escreve qualquer texto em nome do Gustavo com a voz dele** (Sobre do
-  LinkedIn, bio de app de namoro, apresentação, post, recomendação), contra um `voice.md`
-  versionado (registro por contexto, marcadores de estilo, antipadrões, corpus de textos
-  aprovados) que cresce a cada uso. Use em "escreva/refaça minha descrição/bio", "não parece
-  eu", "está formal/vendedor demais", e SEMPRE antes de gerar texto que será publicado em nome
-  dele. Par da `linkedin` (uma escreve, a outra publica no perfil).
-- **`linkedin`** - lê, edita e audita o perfil do LinkedIn via CDP no Chrome do sistema (CLI
-  único `li.mjs`, escrita dry-run por padrão, só `--commit` salva; `audit` roda 15 checagens
-  de visibilidade para recrutador). Use em "veja/altere/audite meu LinkedIn", "como aparecer
-  mais em buscas de recrutador". Texto do perfil passa antes pela `ghostwriter`.
-- **`unity-mcp-skill`** - orquestra o Unity Editor via MCP for Unity (GameObjects, scripts,
-  cenas, testes, automação do editor). Use ao trabalhar em projeto Unity numa máquina com o
-  MCP for Unity conectado.
-- **`game-3d-assets`** - **pipeline de modelos 3D para jogo**: todo modelo entra no orçamento de triângulos do
-  seu tipo (fundo 1-3 mil, mão 2-5 mil, grande ~5 mil, criatura 10-20 mil, personagem 10-30 mil) começando pelo
-  MÍNIMO; Blender em segundo plano (`scripts/optimize_model.py`) reduz, faz UV nova, assa cor/metal/rugosidade/
-  normal do original, mede contorno e sombreamento contra o original e só sobe se aparecer perda; depois importa
-  na engine (checklist Unity URP) e compara no jogo. Use SEMPRE que mexer com 3D (importar/gerar modelo, trocar
-  placeholder, "reduz polígonos", avaliar asset do Fab/MetaHuman).
-- **`game-audio`** - **pipeline de sons para jogo**: busca sons sem crédito (Freesound filtrado por CC0, Kenney),
-  confere a licença na página de cada um (`scripts/freesound.py`), baixa os originais pelo Chrome logado (navegando
-  para cada URL `/download/`, com "perguntar onde salvar" desligado), ANALISA sem ouvir (`scripts/analyze.py`:
-  níveis, piso de ruído, faixas, eventos com tempos e imagem de forma de onda + espectrograma), edita e converte
-  (`scripts/audiokit.py`: corte, separação de eventos, camadas, loop sem emenda, filtros, pitch; WAV 16 bits 48 kHz)
-  e liga no jogo (Unity: regras de importação + `SoundLibrary` por papel) conferindo em Play. Use SEMPRE que mexer
-  com áudio de jogo ("baixe os sons", "corta/converte esse áudio", "faz um loop", trocar som sintetizado por gravado).
-- **`game-visual-review`** - **olha a tela real do jogo antes de dizer que ficou pronto**: captura cada estado (Unity
-  via MCP `ScreenCapture`, web via Chrome), monta a folha de contato com a referência do usuário e a versão anterior
-  (`scripts/contact_sheet.py`: luminância, saturação, variedade de matiz, área chapada, distância de paleta), pontua a
-  `rubric.md` (primeira impressão, luz/cor, props legíveis e clicáveis, UI, fidelidade à referência) e bloqueia em nota
-  2 ou menos. Hook `PostToolUse` lembra ao gravar arquivo visual de jogo. Use SEMPRE que mexer em menu/cena/prop/luz/UI
-  e em "ficou muito ruim", "parece placeholder", "faça igual à referência". Nasceu do menu do Happy Harvest (23/10/2026).
-  **Regra permanente (24/10/2026):** em jogo, sempre pesquisar online texturas PBR, shaders e efeitos prontos (paredes,
-  chuva, sangue, faíscas, fogo, vidro) e modelos CC0 antes de fazer na mão.
-- **`web-research`** - **pesquisa na internet ANTES de diagnosticar ou decidir**: todo erro/crash/
-  travamento/log estranho de ferramenta de terceiros e toda decisão dependente de versão/preço/limite
-  começa com 2-4 buscas em paralelo (sintoma + versão exata, erro literal, release notes/issue tracker),
-  `WebFetch` nas fontes de staff/mantenedor, cruzamento com o log local, correção, nova pesquisa se não
-  resolver, fontes citadas. Use SEMPRE em "não funciona", "trava", "crasha", "erro", "fica carregando".
-- **`store-promo-video`** - **vídeo promocional da ficha da loja** (Play; base para anúncios) no padrão "dopamina":
-  grava o app REAL quadro a quadro (relógio virtual no build web, 60 fps perfeitos; scrcpy/Unity para nativo), som
-  do próprio app sincronizado ao quadro, música CC0 com o drop no gancho (`find_drop.py`), cortes no compasso,
-  zoom/tremor/flash/câmera lenta, legenda curta por idioma, fecho com o ícone animado no ComfyUI (Wan 2.2), um
-  vídeo por idioma e o link na ficha via `google-play`. Regras da Play em `reference/play-video-rules.md`. Use em
-  "faça o vídeo da loja/da Play", "vídeo promocional/trailer do app", "vídeo viciante do jogo".
-- **`servidor-dev`** - **"usa o servidor pra desenvolver X"**: de QUALQUER máquina, entrega a tarefa
-  inteira ao Claude Code do servidor (Mac mini, VM `servidor`) com o comando `srv` via Tailscale+SSH
-  (`srv start` -> `srv wait` -> resumo de até 15 linhas; `srv continue` segue a mesma conversa). Lá
-  já tem projetos, chaves, credenciais da Play e o `appbuild` (build Android/Flutter no macOS).
-  Não programe por SSH arquivo a arquivo: delegue e traga só o resumo (poupa tokens).
-- **`vps`** - gerenciar o servidor bobagi.space. **Desde 2026-11-04 o "VPS" é a VM Ubuntu `servidor`
-  no Mac mini** (OrbStack; do Mac: `orb -m servidor -u root <cmd>`), com os mesmos caminhos da VPS
-  Hostinger antiga (`/opt`, `/var/www`, `/etc/nginx`, `/root`). A VPS 46.202.144.75 foi aposentada.
-  Doc da arquitetura: `~/server/CLAUDE.md` no Mac.
-- **`resume`** - resumir um vídeo do YouTube a partir do link.
-- **`google-play`** - releases na Play Store via Play Developer API (service account): sobe
-  AAB, tracks, promoção, rollout, reviews, listing. Produção exige confirmação explícita do
-  operador. Credenciais em `~/.config/bobagi-google/` (setup único: `google-play/SETUP.md`).
-- **`chrome-web-store`** - publica extensões do Chrome na Chrome Web Store via API oficial
-  (upload de pacote .zip + publish/enviar pra revisão), como a `google-play` faz com apps. OAuth
-  próprio do dono (client "Aplicativo da Web" + refresh token escopo `chromewebstore`), credenciais
-  em `~/.config/bobagi-google/` (`cws-client.json`/`cws-token.json`/`cws-items.json`; setup único:
-  `chrome-web-store/SETUP.md`). Limites: não edita descrição longa/screenshots da ficha e a
-  publicação passa por revisão do Google; NÃO listar lojas/marcas de 3os na descrição (keyword spam).
-  Extensão padrão - Farolivro. Use em "sobe/publica/atualiza a extensão", "reenvia após rejeição".
-- **`admob`** - relatórios AdMob via API (receita, eCPM, impressões por dia/ad unit/país) +
-  inventário. OAuth do dono da conta (setup único: `admob/SETUP.md`); escrita de inventário
-  é restrita pelo Google (fallback manual).
-  **AdSense (web, warframe):** `admob/scripts/adsense.py` (mesmo OAuth client, token próprio com
-  `adsense.readonly`): status de aprovação do site, alertas, política e receita, só leitura.
-- **`google-ads`** - relatórios Google Ads via API (**somente leitura**): status/orçamento de
-  campanha, gasto por dia, CPI, conversões (instalações) por campanha/grupo. Exige developer
-  token com acesso Básico aprovado (setup único: `google-ads/SETUP.md`); reusa o OAuth client
-  do AdMob. Criar/pausar/editar campanha = operador na UI.
-- **`cloudflare`** - DNS da zona `bobagi.space` no Cloudflare via API (`scripts/cf-dns.sh`):
-  criar/alterar/remover subdomínios (A/CNAME, proxied/DNS-only) e registros **TXT**
-  (`txt`/`txt-del` - o `txt` não toca no registro A e troca o token de mesma chave em vez de
-  acumular; `delete <sub>` continua apagando TODOS os tipos do nome, cuidado). **DNS é SÓ no
-  Cloudflare** (painel Hostinger morto desde 2026-07-06 - nameservers movidos). Use ao
-  subir/derrubar serviço web no VPS ou em "crie um subdomínio"/"altere o DNS". Credenciais só
-  no servidor (`/root/.config/cloudflare/` da VM `servidor`, chmod 600); de outra máquina, via skill `vps`.
-  Subdomínio novo agora sai pelo **Cloudflare Tunnel** `mac-mini`: `cloudflared tunnel route dns
-  --overwrite-dns mac-mini <host>` no Mac (registro A para IP fixo não existe mais).
-- **`google-search-console`** - **cadastra e monitora sites no Google sem o operador abrir o
-  navegador**: pega o token de verificação, cria o TXT via `cloudflare`, verifica a posse,
-  adiciona a propriedade (`sc-domain:`), submete o sitemap e lê o desempenho de busca
-  (cliques, impressões, CTR, posição média, top queries e páginas). Reusa a **service account
-  do `google-play`** - sem consent screen, sem refresh token que expira e **sem senha do
-  operador**. Use em "cadastre o site no Google", "submeta o sitemap", "por quais buscas meu
-  site aparece", "relatório de SEO". Limite honesto: a API **não força indexação** (a Indexing
-  API oficial só vale p/ JobPosting/BroadcastEvent) - sitemap + tempo é o caminho legítimo.
-- **`product-review`** - **atua como Product Manager do portfolio inteiro do VPS**: coleta dados
-  reais de todos os produtos (tráfego do nginx separando humano/robô/ataque, usuários nos bancos,
-  receita do Google Ads/AdMob, SEO do Search Console, tráfego/estrelas do GitHub, consumo e saúde
-  do box), analisa o que tem valor / consome / é usado, e gera ou atualiza um **Artifact único**
-  (sempre republicado no mesmo link) com diagnóstico e recomendações priorizadas P0/P1/P2. Reusa as
-  skills google + o `gh` + os bancos. Roda no servidor (VM `servidor` do Mac mini); assets versionados na própria skill; diretório de
-  trabalho e doc operacional em `/opt/pm-dashboard/`. Um cron de sistema já deixa o `metrics-<data>.txt`
-  fresco (segundas), mas quem publica o Artifact é o Claude numa sessão. Use em "revisão de produto",
-  "como estão os projetos", "relatório de PM", "atualize o dashboard de produto".
-- **`game-overlay`** - **instala e configura em qualquer PC Windows o overlay de monitoramento para
-  jogos** (HWiNFO lê os sensores + RTSS/RivaTuner desenha no jogo; CapFrameX para teste; Intel
-  PresentMon opcional). `scripts/overlay.ps1 tudo` (um UAC) baixa, instala fora do Program Files,
-  configura, descobre os sensores da máquina pela memória compartilhada e **casa o layout padrão do
-  PC** (FPS, 1% Low, frametime com gráfico, CPU/GPU Busy, blocos de CPU, GPU, RAM, discos, consumo
-  estimado), registra a tarefa agendada elevada (RTSS antes do HWiNFO, sempre) e verifica lendo o
-  OSD real do RTSS (+ vkcube e screenshot). Layout, armadilhas e modelo de LEIAME em
-  `game-overlay/reference/`. Use em "instale o RivaTuner/RTSS e o HWiNFO", "overlay de FPS/uso de
-  CPU e GPU nos jogos", "replicar o overlay do PC no notebook", "sumiu o FPS do overlay".
-
-> **Limite transversal Google (Play/AdMob/Ads):** o que a API oficial não cobre (pagamentos,
-> data safety, criar ad unit/mediação, consent screen) é feito PELO OPERADOR guiado passo a
-> passo (prints em `/root/prints` ajudam a diagnosticar). **Automação de navegador logado no
-> Google (Playwright etc.): nunca na VPS** - anti-bot/2FA + risco de travar a conta dona do
-> Play/AdMob; último recurso é chrome-devtools-mcp NA MÁQUINA DO OPERADOR, com ele presente.
-> Detalhes na seção "Limites" dos `SKILL.md` de `google-play`, `admob` e `google-ads`.
-
-### Plugins instalados (marketplace `claude-plugins-official`)
-- **`frontend-design`** - direção visual/estética para **criar/redesenhar** UI nova
-  (par natural do `frontend-review`: design → review). Cuidado em apps com design system
-  já travado - restrinja aos tokens existentes; solte só em telas greenfield.
-- **`claude-md-management`** - auditar/melhorar arquivos `CLAUDE.md` e capturar
-  aprendizados de sessão. Use quando um `CLAUDE.md` crescer/desatualizar.
-- **`security-guidance`** - review de segurança de código gerado (injeção, XSS, SSRF,
-  segredos hardcoded, etc.). Especialmente relevante em apps que tocam dinheiro/credenciais.
-- **`feature-dev`** - workflow de feature com agents (code-explorer, code-architect,
-  code-reviewer) para itens grandes do backlog (ex.: billing, websockets, leader lock).
-- **`chrome-devtools-mcp`** - inspeção/automação de browser ao vivo (Chrome DevTools, **Google
-  oficial**): perf traces, network, console com source maps, a11y. Complementa o `frontend-review`.
-
-> **Ativar plugin corretamente:** use **`claude plugin install <nome>@claude-plugins-official`**
-> (ou o menu `/plugin`) - **só marcar `enabledPlugins` no JSON NÃO instala** (o `claude plugin list`
-> fica "No plugins installed" e a skill do plugin não carrega). Depois de instalar, **um restart
-> limpo** (`claude` novo) carrega; **`claude --resume` recarrega skills do repo `~/.claude/skills`
-> mas NÃO ativa plugins recém-instalados**. Conferir: `claude plugin list`.
-
-### MCP servers
-- **`claude.ai Gmail`** e **`claude.ai Google Drive`** - remotos, ligados à **conta claude.ai**;
-  reconectam sozinhos após login (nada a instalar). **`chrome-devtools`** - vem do plugin
-  `chrome-devtools-mcp`. Detalhes em `config/mcp.md` do repo.
-
-### Skills embutidas que valem lembrar (não duplique com plugin)
-`/code-review` (≈ plugin code-review) · `/simplify` (≈ code-simplifier) · `/security-review`
-· `/verify` · `/run` · `/init` · `/loop` · `/schedule`.
-
-> Ao criar uma skill/plugin novo, **registre-o aqui e no README de `claude-skills`**
-> para que esta política continue apontando para o conjunto certo.
-
-## Infra pessoal (servidores do Gustavo)
-
-- **Servidor principal**: VM `servidor` no Mac mini (a VPS Hostinger foi aposentada; ver acima).
-- **Oracle Cloud Always Free** (criada 2026-11-05): Cloud Account (tenancy) **`Bobagi1`**,
-  login com o Gmail secundário do Gustavo (o "crawler…", não o gustavoperin067), domínio
-  `Default`, em https://cloud.oracle.com, região `sa-saopaulo-1`.
-  - **VM `relay-terraria`** (desde 2026-11-08): VM.Standard.E2.1.Micro (1 GB, Ubuntu 24.04),
-    **relay do servidor de Terraria, substituiu o playit.gg**. Jogador -> TCP 7777 no IP público
-    **reservado** da VM -> túnel WireGuard (`wg-quick@wg0`, iniciado pelo Mac, atravessa o CGNAT)
-    -> container `relay` no Mac mini (socat com `nodelay`) -> tmodloader. O endereço dos jogadores é
-    o que aparece em terraria.bobagi.space.
-  - Gerenciada **do Mac mini**: CLI `oci` (`~/.oci/`), SSH `ubuntu@<IP>` com a chave do Mac. Doc
-    completa (arquitetura, rollback para o playit, armadilhas) na seção "Relay na Oracle" de
-    `~/server/CLAUDE.md` no Mac mini. IP, OCIDs e caminho de chave **nunca neste repo** (público):
-    ficam lá e na memória local.
-  - Armadilhas: a imagem Ubuntu da Oracle tem iptables próprio com REJECT (regras novas entram
-    com `-I` acima dele, via PostUp do WireGuard); o security list da VCN bloqueia ICMP (ping no IP
-    público não responde, o jogo sim); A1.Flex vive sem capacidade em São Paulo.
-  > ⚠ A conta anterior (`bobagi`, de 2023) foi **encerrada pela Oracle em 02/2024** por
-  > inatividade, por isso o nome novo. A Oracle recupera instâncias Always Free ociosas
-  > (~7 dias com CPU/rede/memória baixas) e o relay quase não usa CPU: converter a conta para
-  > Pay As You Go (segue grátis dentro do Always Free) evita isso. Pendente com o Gustavo.
+Servidor principal = VM `servidor` no Mac mini (VPS Hostinger aposentada). Oracle Cloud Always Free (tenancy
+`Bobagi1`, VM `relay-terraria`): detalhes e armadilhas na REFERENCIA. IP, OCIDs e chaves nunca neste repo (público).
 
 ## Sincronizar numa máquina nova
 
-Toda a config do Claude (skills, comandos, plugins, este `CLAUDE.md`, `settings.json` e o
-hook skill-first) é versionada em **`Bobagi/claude-skills`** e aplicada por um único script
-idempotente, `sync.sh`. Numa máquina nova (com `git` + Claude Code instalados):
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/Bobagi/claude-skills/main/sync.sh | bash
-```
-
-Ou, se quiser pedir pra IA: **"sincronize meu Claude com o repo github.com/Bobagi/claude-skills"**
-→ ela acha o `sync.sh` e roda. Já com o repo presente, dá pra rodar de novo a qualquer momento
-com `/sync-claude` (ou `bash <repo>/sync.sh`). O que o sync faz: clona/atualiza o repo, cria os
-symlinks `~/.claude/skills` e `~/.claude/commands`, copia `CLAUDE.md`/`settings.json`/o hook (com
-backup do que existia), e instala o marketplace + todos os plugins. Depois, **reinicie o Claude**
-(`claude` novo) pra carregar os plugins. Não toca em `settings.local.json` (perms por máquina).
+`curl -fsSL https://raw.githubusercontent.com/Bobagi/claude-skills/main/sync.sh | bash` (ou pedir "sincronize meu
+Claude com o repo github.com/Bobagi/claude-skills"; já com o repo: `/sync-claude`). Clona/atualiza, cria os
+symlinks `~/.claude/skills` e `~/.claude/commands`, copia `CLAUDE.md`/`settings.json`/hooks (com backup) e instala
+os plugins. Depois, reinicie o `claude`. Não toca em `settings.local.json`.
