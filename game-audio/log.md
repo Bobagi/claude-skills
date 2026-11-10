@@ -124,3 +124,6 @@
   take por regra -> filtro (gravador/rádio) depois. Filtro de gravador suavizado (220 a 4200 Hz, drive 1,9).
 - Velocidade nesta máquina com o editor da Unity aberto dividindo a GPU: ~1,8 s de cálculo por segundo de fala;
   VoiceDesign (3,5 GB a mais) ~6 s por segundo de fala e timbre muda entre falas: não serve para personagem fixo.
+- Take que dispara (pausa sem fim/balbucio) ia até 2048 tokens (~2,7 min de áudio): com a GPU dividida (ComfyUI +
+  Unity abertos) um take levou 20+ min. `tts_voice.py` agora limita os tokens pelo tamanho do texto (`token_cap`:
+  leitura lenta de 4 caracteres/s x1,5, mínimo 6 s). Antes de um lote, olhar quem mais usa a GPU (`nvidia-smi`).

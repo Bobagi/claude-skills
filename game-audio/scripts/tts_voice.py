@@ -117,6 +117,12 @@ def postprocess(wav, sr, rate, pitch, tempo, pad=0.06):
     return np.concatenate([z, d, z])
 
 
+def token_cap(text, hz=12.5, slowest_chars_per_s=4.0, floor_s=6.0):
+    """Upper bound of codec tokens for a line: a take that runs away (endless pause, babble) stops near the slowest
+    plausible reading instead of at 2048 tokens (~2.7 min of audio, 10+ min of GPU when the card is shared)."""
+    return int(hz * max(floor_s, len(text) / slowest_chars_per_s * 1.5))
+
+
 class Engine:
     """Lazy holder for the two Qwen3-TTS models so a run that only needs one never downloads the other."""
 
@@ -152,7 +158,7 @@ class Engine:
             torch.cuda.manual_seed_all(seed)
         kw = dict(do_sample=True, temperature=float(line["temperature"]), top_k=int(line["top_k"]),
                   top_p=float(line["top_p"]), repetition_penalty=float(line["repetition_penalty"]),
-                  max_new_tokens=int(line["max_new_tokens"]))
+                  max_new_tokens=min(int(line["max_new_tokens"]), token_cap(line["text"])))
         if line.get("speaker"):
             wavs, sr = self.custom().generate_custom_voice(
                 text=line["text"], speaker=str(line["speaker"]).lower(), language=line["language"],
