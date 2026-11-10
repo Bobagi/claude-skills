@@ -123,12 +123,17 @@ inglês americano, `serena` feminina), sem clonar pessoa real. Setup numa venv p
 `qwen-tts`): ver a docstring do script. Fluxo:
 1. JSON de falas com `id`, `text` e `delivery` por linha (e opcionalmente `speaker`, `pitch` em semitons, `tempo`).
    Personagem mais velho: pitch -2 a -3 semitons e tempo 0,85.
-2. `python tts_voice.py --lines falas.json --out raw/` gera WAV 48 kHz mono 16 bits e um manifesto por linha.
+2. `python tts_voice.py falas.json --out raw/` gera WAV 48 kHz mono 16 bits e um manifesto por linha.
 3. Filtro de rádio/telefone SÓ depois, e suave (banda 250 a 4000 Hz, saturação leve x1,6): filtro agressivo
    (350 a 3200 Hz, tanh x4) comeu 4 dB de fator de crista e achatou a emoção.
 4. Conferir sem ouvir: `analyze.py` (pico -1 dB, piso de ruído, sem silêncio nas pontas) e, se houver Whisper
    na venv, transcrever e comparar palavra a palavra com o texto. O F0 mediano por linha deve seguir a entrega
    (grito mais agudo, frieza mais grave).
 5. Retake de uma linha: ajustar a frase do `delivery` ou a seed e regenerar só aquele id.
+6. **Outra língua** (ex.: português do Brasil, `language: "Portuguese"`): o sotaque depende do falante. Em pt-BR use
+   `aiden` (homem), `ono_anna`/`vivian` (mulher), com o sotaque descrito na `voice`; `ryan`/`serena` saem de Portugal
+   e `uncle_fu` sai agudo demais (F0 de mulher). Gere 3 takes por fala e escolha medindo (Whisper, fonemas IPA, F0 na
+   faixa do personagem): ver o log de 2026-11-10 e `SourceAssets/Tools/voice_neural.py` + `voice_score.py` do
+   Beneath the Shroud.
 Alternativas avaliadas e descartadas: Chatterbox (só um escalar de exagero, voz padrão feminina, build quebra no
 Windows por `pkuseg`), Orpheus 3B (tags, apertado em 8 GB), Kokoro (plano), edge-tts (estilos SSML removidos).

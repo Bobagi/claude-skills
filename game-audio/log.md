@@ -105,3 +105,22 @@
 ## 2026-10-27 · Wilkins Pest Control, toque do rádio e som de carregar repetido
 - "Som de carregamento repetindo": o `breech_load.wav` era a gravação INTEIRA de 22 s (42 cartuchos) copiada sem corte pelo `make_audio.py`. Antes de mexer em código, rode `analyze.py` no arquivo: muitos eventos num one-shot denunciam isso na hora. Vale varrer one-shots com duração > 2,5 s.
 - Chamada de rádio realista montada por camadas (sem nada pronto em CC0 com esse nome): squelch abrindo (magnuswaker 522164) + chiado AM (harrisonlace 812929, banda 300 a 3400 Hz, -7 dB) + dois bipes de roger (bruce965 321906, -11 dB: tom puro a -3 dB domina tudo) + rabo do squelch (LukaCafuka 760245). Buscas vazias: "radio incoming call", "two way radio chirp", "police radio squelch".
+
+## 2026-11-10 · Beneath the Shroud, vozes em português do Brasil (troca do SAPI)
+- Qwen3-TTS fala português com `language: "Portuguese"`, mas o SOTAQUE depende do falante: `ryan` e `serena` saem com
+  cara de Portugal (vogais reduzidas ɨ, coda "s" chiada: "deʃkupɨ", "kriaturaʃ"); `aiden`, `ono_anna` e `vivian` saem
+  brasileiros com a instrução certa. A instrução que funcionou (em inglês): "a Brazilian from São Paulo speaking
+  Brazilian Portuguese with a paulistano accent: open unreduced vowels, 'de' and 'te' pronounced 'dji' and 'tchi'".
+  Pedir "Rio de Janeiro" traz o "s" chiado carioca (fica parecido com Portugal na medição): use São Paulo.
+- `uncle_fu` em português sai com F0 de 200 a 260 Hz (registro de mulher) apesar de "mature male low": medir o F0
+  (librosa.pyin) de todo take; homem adulto 85 a 160 Hz. O ranking passou a penalizar F0 fora da faixa do personagem.
+- Medir sotaque sem ouvir: `facebook/wav2vec2-lv-60-espeak-cv-ft` (fonemas IPA; decodificar com o vocab.json na mão,
+  sem o pacote phonemizer) e contar tʃ/dʒ e vogal final plena (BR) contra ɨ e "ʃ" antes de consoante (PT/Rio). É
+  enviesado para PT (o SAPI Maria, brasileiro, deu ɨ também): vale como comparação entre takes, não como absoluto.
+  O classificador `rmayormartins/speech-accent-pt-br-classifier` NÃO serve: separou por voz/gênero, não por sotaque.
+- Whisper `large-v3-turbo` (multilíngue, 1,5 GB) transcreve pt bem; sem ffmpeg no PATH, passar o array a 16 kHz.
+  WER precisa converter dígitos ("95%", "2014") para extenso antes de comparar.
+- Fluxo que ficou: 3 takes por fala (sementes diferentes) -> Whisper + fonemas + F0 + pausa + sílabas/s -> o melhor
+  take por regra -> filtro (gravador/rádio) depois. Filtro de gravador suavizado (220 a 4200 Hz, drive 1,9).
+- Velocidade nesta máquina com o editor da Unity aberto dividindo a GPU: ~1,8 s de cálculo por segundo de fala;
+  VoiceDesign (3,5 GB a mais) ~6 s por segundo de fala e timbre muda entre falas: não serve para personagem fixo.
