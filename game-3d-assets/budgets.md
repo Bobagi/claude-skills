@@ -236,3 +236,12 @@ Nunca importar as 4096 do Meshy direto. Metal + rugosidade viram um único mapa 
   ficou 3.000 (0,24 px, 0,085) por olho. Trama fina (palha 5,6 mm) assada com as 4 amostras do otimizador saiu
   chuviscada: `optimize_blend.py` (roda o otimizador num .blend, mantém nós procedurais) assa com 64 amostras e a
   trama foi engrossada para 6,6 mm para caber em 1024. Métrica não pega peça pequena de detalhe (laço) virando ruído.
+- 2026-11-10 (BeneathTheShroud, itens de coleta): **Bandage** (latinha de primeiros socorros com rolo de gaze preso por
+  tira; Meshy text-to-image 3 cr + image-to-3d 30 cr, 928 mil) travou no collapse em 14,2 mil e foi pelo remesh em voxel.
+  A 2.000 e a 2.500 as métricas passaram (contorno 0,33/0,14 px, ponto quente 0,04/0,03), mas a `_compare.png` mostrou
+  a tira da gaze com um fecho de metal/rasgo onde ela dobra sobre a borda da tampa: a malha leve afundou abaixo da tira
+  (mais que o cage de 1%) e o bake pegou a borda da lata por baixo. 4.000 com `--remesh-res 360` limpou (0,11 px, 0,022).
+  Tira fina sobre aresta saliente pede triângulos; só o olho pegou. **AmmoBox357** (caixa de papelão .357, 117,5 x 61,5 x
+  40,5 mm): feita por script (atlas do rótulo genérico pintado em PIL a 8 px/mm com desgaste por ruído 3D contínuo entre
+  as faces + malha alta em voxel com ruga, canto esmagado, bandeja recuada e entalhe de polegar, 288 mil) e reduzida a
+  999 de primeira (contorno 0,49 px, ponto quente 0,017): caixa não precisa nem do mínimo de `hand`.
