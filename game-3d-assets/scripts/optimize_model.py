@@ -31,6 +31,7 @@
 # Budgets per --type (triangles in the engine, i.e. after triangulation). Sources in budgets.md.
 import argparse, glob, json, math, os, shutil, sys, tempfile, zipfile
 
+import bmesh
 import bpy
 import numpy as np
 from mathutils import Matrix, Vector
@@ -64,6 +65,8 @@ def parse():
     p.add_argument("--no-metal", action="store_true", help="zero the metallic map (AI tools often guess metal on skin, cloth, plastic)")
     p.add_argument("--pivot", choices=("bottom", "center", "keep"), default="bottom",
                    help="keep = leave the source's origin where it is (a door leaf pivoting on its hinge edge)")
+    p.add_argument("--no-weld", action="store_true",
+                   help="keep a GLB's vertices split at the UV seams (by default they are welded back before decimating)")
     p.add_argument("--previews", help="folder for the comparison image and the report (default: --out)")
     p.add_argument("--samples", type=int, default=24)
     p.add_argument("--smooth-angle", type=float, default=40.0,
@@ -142,7 +145,23 @@ def import_mesh(path):
     bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
     if len(parts) > 1:
         bpy.ops.object.join()
-    return bpy.context.view_layer.objects.active
+    obj = bpy.context.view_layer.objects.active
+    if ext in (".glb", ".gltf") and WELD:
+        # glTF stores one vertex per UV-chart corner, so the importer splits the mesh along every UV seam. A scan's
+        # atlas has hundreds of charts: the collapse keeps every chart border as a boundary, the charts shrink apart
+        # and the light mesh opens cracks along the seams (dark crack pattern all over the Polyporus bracket fungus,
+        # 10/11). Welding coincident vertices back keeps the UVs (they live per face corner).
+        bm = bmesh.new()
+        bm.from_mesh(obj.data)
+        n0 = len(bm.verts)
+        co = np.array([v.co for v in bm.verts]) if n0 else np.zeros((1, 3))
+        diag = float(np.linalg.norm(co.max(0) - co.min(0))) or 1.0
+        bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=diag * 1e-6)
+        print("WELD", n0, "->", len(bm.verts), "vertices", flush=True)
+        bm.to_mesh(obj.data)
+        bm.free()
+        obj.data.update()
+    return obj
 
 
 def select_only(*objs):
@@ -261,6 +280,7 @@ def preview_material(obj, base_img, normal_img):
 # ---------------------------------------------------------------- decimation and silhouettes
 
 SMOOTH_ANGLE = 40.0
+WELD = True
 
 
 def decimated_copy(high, tris, remesh_voxel=None):
@@ -524,9 +544,10 @@ def fresh_uvs(obj):
 # ---------------------------------------------------------------- main
 
 def main():
-    global SMOOTH_ANGLE
+    global SMOOTH_ANGLE, WELD
     a = parse()
     SMOOTH_ANGLE = a.smooth_angle
+    WELD = not a.no_weld
     a.out = os.path.abspath(a.out)
     a.previews = os.path.abspath(a.previews) if a.previews else None
     lo_budget, hi_budget, tex_default = BUDGETS[a.type]

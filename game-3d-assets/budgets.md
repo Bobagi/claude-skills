@@ -245,3 +245,14 @@ Nunca importar as 4096 do Meshy direto. Metal + rugosidade viram um único mapa 
   40,5 mm): feita por script (atlas do rótulo genérico pintado em PIL a 8 px/mm com desgaste por ruído 3D contínuo entre
   as faces + malha alta em voxel com ruga, canto esmagado, bandeja recuada e entalhe de polegar, 288 mil) e reduzida a
   999 de primeira (contorno 0,49 px, ponto quente 0,017): caixa não precisa nem do mínimo de `hand`.
+- 2026-11-10 (Beneath the Shroud, 5 fungos/vermes do Sketchfab, CC BY, recortados e com pivô por `SourceAssets/Tools/scan_prep.py`):
+  OysterCluster 1,45 mi -> 3.000 (travou no collapse, voxel remesh; contorno 0,60, ponto quente 0,032), BracketFungus 50 mil
+  (recortado de 227 mil, sem o tronco) -> 2.000 (contorno 0,44, ponto quente 0,019), BonnetCluster 1.728 (mantido),
+  PuffballCluster 23 mil (recortado de 300 mil, sem o chão) -> 3.000 (0,60 / 0,046), RiftiaColony 39 mil -> 4.999 (large;
+  0,70 / 0,113; 6.250 deu o mesmo, platô). Lições: (1) **GLB separa os vértices em cada costura de UV**: no scan do Polyporus o
+  collapse deixou rachaduras escuras pela peça inteira e o contorno empacou em 1,8 px até 4 mil (cage maior não mudou nada, remesh
+  em voxel de casca aberta destruiu a peça: 59 px); soldar os vértices coincidentes no import resolveu já no mínimo (2 mil, 0,44 px).
+  Com a solda, o PuffballCluster caiu de 5.000 para 3.000. (2) Material unlit de scan (Emission + Light Path) não é lido pelo bake:
+  refazer como Principled antes. (3) Recorte de scan: máscara por face combinando cor da textura (saturação) com altura sobre o
+  substrato (cilindro ajustado ao tronco; quadrática ajustada ao chão) e componentes conexos; o limiar de distância à "semente"
+  colorida apertado demais abre buracos onde a textura do fungo é escura.
