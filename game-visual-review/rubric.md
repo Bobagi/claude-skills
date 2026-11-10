@@ -120,3 +120,11 @@ Pontue 1 a 5 em cada item, com uma frase de evidência tirada da captura. 2 ou m
   iluminada), não em noite preta nem em dia claro; (3) conferir se o zoom pedido entrou de fato
   (`Main.GameZoomTarget` via mod não aplicou; comparar tamanho do personagem entre capturas);
   (4) nunca alterar o produto para o print ficar bonito: o print mostra o produto como ele é.
+- 2026-11-10, Conjuration (mod de Terraria): o dono reprovou duas vezes a arte do Fire Atronach ("muito ruim,
+  nada parecido com Terraria"): primeiro pixel art desenhada em codigo, depois ComfyUI (SDXL + Pixel Art XL +
+  Qwen-Image-Edit) reduzida para a grade 2x2. Arte gerada nunca leu como Terraria. O que funcionou: desenhar o
+  personagem com o PROPRIO renderizador do jogo (Player falso vestido com itens e cores vanilla, como o Manequim;
+  `Main.PlayerRenderer.DrawPlayer`), e exportar folha de town NPC quadro a quadro. Regra: em mod de jogo, antes de
+  gerar arte, procurar como o jogo/modders reaproveitam o estilo da engine (templates, renderizador, helpers como
+  o Player Renderer); so gerar do zero se nada servir, e sempre comparar lado a lado com sprites vanilla NA MESMA
+  captura (personagem do jogador e NPCs ao lado) antes de dizer pronto.
