@@ -25,3 +25,14 @@ Imagem: `examples/beneath-the-shroud/historico_v1_a_v4.jpg`.
   o de imagens da descricao. Truque: capturar o `change` desse input e redisparar `dragenter/dragover/drop` com um
   `DataTransfer` em `#game_image_drop`; depois escolher o tipo de cada imagem no select e clicar Upload. A janela
   "Graphical Asset Rules" (declaracoes) e do dono: o sistema de permissoes bloqueia o agente de marcar.
+
+## Wilkins Pest Control, capa do itch v7 (11/11/2026)
+- Pedido: "faca ela IGUAL como esta agora, mas com plantacao e ceu mais parecidos com a anterior" + a pessoa "parece
+  colagem de revista, abaixada numa pose nada a ver": silhueta aterrorizada fugindo.
+- O Z-Image com ControlNet (Union 2.1) troca a torre real por uma torre generica mesmo a 0,7. Saida que funcionou:
+  gerar SO o fundo (mapa sem a torre e sem o feixe no ceu, prompt sem a palavra "tower": ate "no towers" ou "away from
+  the tower" fez o modelo pintar uma torre) e colar por cima a torre e o feixe da versao aprovada, com mascara do alfa
+  do render MENOS o ceu vermelho da pintura antiga (a pintura nao bate pixel a pixel com o render) e o feixe pela
+  luminancia. Sem torre no mapa o modelo ignora horizonte e escala a 0,6; a 0,85 obedece.
+- Pessoa: corpo desenhado em capsulas (inclinado, braco contra a luz, pernas no passo, canelas somem na cevada),
+  mapa borrado; o modelo pinta borda macia e meio transparente, nada de recorte.
