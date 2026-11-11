@@ -133,3 +133,13 @@ Pontue 1 a 5 em cada item, com uma frase de evidência tirada da captura. 2 ou m
   no Z-Image foi recusada na hora ("homem claramente feito por IA"), mesmo com métricas melhores que a anterior. Rosto
   realista gerado por IA é nota 1. Preferir silhueta, ícone e paleta chapada de 2 a 3 cores (padrão das capas de horror
   indie na Steam: Iron Nest, Iron Sanctuary, The Windows Are Gone).
+- **Arte de loja: luz que sai da fonte, olhos discretos, sem posterizar** (11/11/2026, Wilkins Pest Control, capa v4
+  recusada: "desalinhamento da luz com o elemento da torre que emite luz", "olhos absurdamente grandes e chamativos",
+  "parece que fizeram no Paint"). Toda imagem com feixe, cone ou raio: confira se a boca do feixe esta NA lente e no
+  eixo do emissor (medir: retas das bordas extrapoladas ate a lente dao a largura da lente e centro no eixo; nenhuma
+  luz forte no ceu fora do cone). Para garantir, desenhe a geometria em codigo e passe por ControlNet (Z-Image Union
+  2.1, modo Gray, forca 0,6; 0,5 ja solta o feixe). Olhos que brilham em arte de loja: poucos, pontos de 1 a 2 px no
+  tamanho final, sem halo grande. Nunca reduza uma pintura a 4 a 6 cores "para parecer serigrafia": vira Paint.
+  Cena larga com area vazia (banner): o modelo inventa uma segunda torre ali; gere o vazio a parte com prompt sem o
+  objeto. Olhe a imagem em 100% e em miniatura antes de publicar; o teste automatico tambem deixa passar coisa
+  (o primeiro teste de alinhamento aprovou um banner com dois feixes).
