@@ -1,6 +1,6 @@
 ---
 name: google-play
-description: Gerencia apps na Google Play via Play Developer API com service account — subir/lançar AAB em qualquer track (internal/beta/production), promover release (sempre a 100%), ver/responder avaliações, ler/editar a ficha da loja (listing) e checar status de versões. Use quando o usuário pedir para lançar/subir/publicar uma versão na Play Store, promover ou pausar um rollout, responder reviews, mexer no texto/título da loja, ou ver em que estado está uma release. App padrão - Tic Tac Verse (com.bobagi.tictacverse).
+description: Gerencia apps na Google Play via Play Developer API com service account: subir/lançar AAB em qualquer track (internal/beta/production), promover release (sempre a 100%), ver/responder avaliações, ler/editar a ficha da loja (listing) e checar status de versões. Use quando o usuário pedir para lançar/subir/publicar uma versão na Play Store, promover ou pausar um rollout, responder reviews, mexer no texto/título da loja, ou ver em que estado está uma release. App padrão - Tic Tac Verse (com.bobagi.tictacverse).
 allowed-tools: Bash, Read
 ---
 
@@ -43,7 +43,7 @@ python3 $S images-upload --lang pt-BR --image-type featureGraphic --files featur
 ```
 
 > `contactWebsite` (em `details`) é **onde o rastreador do AdMob procura o
-> app-ads.txt** — precisa apontar p/ um domínio que sirva o arquivo na raiz.
+> app-ads.txt**: precisa apontar p/ um domínio que sirva o arquivo na raiz.
 
 Outro app: `--package com.exemplo.app` (padrão: `com.bobagi.tictacverse`).
 
@@ -51,7 +51,7 @@ Outro app: `--package com.exemplo.app` (padrão: `com.bobagi.tictacverse`).
 
 1. **Track `production` só com confirmação explícita do operador NA CONVERSA**
    (pergunta direta, resposta afirmativa). Só então exporte
-   `GPLAY_CONFIRM_PROD=yes` no comando — o script bloqueia sem isso.
+   `GPLAY_CONFIRM_PROD=yes` no comando; o script bloqueia sem isso.
    Tracks de teste (`internal`, `alpha`, `beta`) não precisam de confirmação.
 2. **Produção é SEMPRE a 100% (`--rollout 1.0`), ordem do operador em 2026-10-04,
    vale para todos os apps.** Nada de rollout gradual (0.2, 0.5): ele deixou 80% da
