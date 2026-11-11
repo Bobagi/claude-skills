@@ -285,3 +285,4 @@ Nomes de serviço e de tipo trocados por genéricos, o repo é público.
   o porquê técnico em uma frase; (c) **dizer o limite do efeito** (luz aditiva some no sol
   forte) na própria página, mesmo padrão de "dizer o que é provisório". Ainda **não
   validado pela reação dele**.
+- 2026-11-11 · Ficha de jogo no itch.io (Red Zone, One Way Fly): inglês primeiro e um bloco curto em PT abaixo; abrir pela história real do projeto (trabalho de faculdade com o colega, jam), regras em lista concreta, piada leve no meio ("a little game sounded a lot more fun than slides", "a sun that really does not want visitors", "'You Felt!' finally became 'You fell!'"), créditos em itálico no fim. Sem adjetivo de vendedor. Aguardando o retorno dele sobre o tom.
