@@ -70,7 +70,7 @@ Outro app: `--package com.exemplo.app` (padrão: `com.bobagi.tictacverse`).
 > (medido no One Way Fly em 2026-11-11). Ou cria com `--status draft` e o operador lança no Console, ou o
 > operador conclui o primeiro lançamento pelo Console antes.
 
-## Limites — o que a API NÃO cobre (explicar ao operador, não tentar contornar)
+## Limites: o que a API NÃO cobre (explicar ao operador, não tentar contornar)
 
 Ficam **manuais na Play Console, feitos pelo operador** (guie com passo a passo
 e peça prints em `/root/prints` se precisar diagnosticar):
@@ -82,9 +82,9 @@ e peça prints em `/root/prints` se precisar diagnosticar):
 - Conta do desenvolvedor: pagamentos/payout, identidade, configurações da conta.
 - **Keystore/assinatura**: a upload key fica na máquina; nunca sai dela.
 - Envio p/ revisão quando o commit responder `changesNotSentForReview`
-  (managed publishing) — o script avisa; o operador clica em "Send for review".
+  (managed publishing); o script avisa; o operador clica em "Send for review".
 
-## Automação de navegador (Playwright etc.) — política
+## Automação de navegador (Playwright etc.): política
 
 **NÃO automatizar login/navegação na conta Google a partir da VPS.** Motivos:
 anti-bot/2FA do Google quebram o fluxo, viola ToS, e o risco real é **travar a
