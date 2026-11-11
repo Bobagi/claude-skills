@@ -39,9 +39,12 @@ senha de login/admin, aceite termos ou conceda permissão de sistema sem ele ped
 
 ## ★★ Navegador: sempre o da máquina da sessão (2026-11-11)
 
-Claude in Chrome com vários navegadores conectados: use **sempre o Chrome da máquina onde a sessão roda** (Windows ->
-o "Browser" Windows, Mac -> o macOS), via `select_browser` com o deviceId dele, **sem perguntar** (cobrado em 11/11:
-"é pra abrir NESSA MÁQUINA, SEMPRE"). Só pergunte se nenhum conectado for desta máquina.
+Claude in Chrome com vários navegadores conectados: use **sempre o navegador da máquina onde a sessão roda** (no PC de
+casa é o **Brave**, não o Chrome), **sem perguntar** (cobrado em 11/11: "é pra abrir NESSA MÁQUINA, SEMPRE"). O nome
+("Browser 1") e o "isLocal" não identificam a máquina (o notebook também é Windows): confira o deviceId registrado na
+memória do projeto; se o navegador daqui não estiver na lista, abra o Brave do usuário (perfil normal, nunca um
+perfil novo) e rode `list_connected_browsers` de novo: o que conectar logo depois é o desta máquina. Nunca
+`switch_browser` (manda pedido para todos os navegadores, inclusive os de outras máquinas).
 
 ## ★★ claude-skills: sempre commit + push (2026-11-04)
 
