@@ -27,7 +27,21 @@ def main():
         f"{out}/vertical_capsule_748x896.jpg", quality=93)
     put_logo(vignette(crop(va, (600, 900), 0.5, 0.52), 0.4), 0.9, 0.5, 0.39, big_top=True).save(
         f"{out}/library_capsule_600x900.jpg", quality=93)
-    crop(art, (3840, 1240), 0.5, 0.48).save(f"{out}/library_hero_3840x1240.jpg", quality=90)
+    # casa acima da barra do PLAY na biblioteca (pedido 11/11)
+    # hero: casa centralizada (zoom 1,12) e acima da barra do PLAY; janelas viram brilho continuo, porque o detector
+    # de texto da Steam recusou a fileira de janelas acesas ("hero appears to contain text or a logo", 11/11)
+    import numpy as np
+    from PIL import ImageFilter
+    a = np.asarray(art).astype(np.float32)
+    xs = np.where(((a[..., 0] > 110) & (a[..., 0] > a[..., 2] * 1.3)).any(axis=0))[0]
+    hx = (xs.min() + xs.max()) / 2 / art.width if xs.size else 0.5
+    hero = crop(art, (3840, 1240), hx, 0.69, zoom=1.12)
+    b = np.asarray(hero).astype(np.float32)
+    w = (b[..., 0] > 45) & (b[..., 0] > b[..., 2] * 1.15) & (b[..., 0] > b[..., 1] * 1.05)
+    m = Image.fromarray((w * 255).astype(np.uint8)).filter(ImageFilter.MedianFilter(5)).filter(
+        ImageFilter.MaxFilter(41)).filter(ImageFilter.GaussianBlur(30))
+    Image.composite(hero.filter(ImageFilter.GaussianBlur(28)), hero, m).save(
+        f"{out}/library_hero_3840x1240.jpg", quality=90)
     bg = crop(art, (1438, 810), 0.5, 0.5)
     ImageEnhance.Brightness(bg).enhance(0.55).save(f"{out}/page_background_1438x810.jpg", quality=90)
     lg = logo_img()

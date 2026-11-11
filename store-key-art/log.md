@@ -36,3 +36,8 @@ Imagem: `examples/beneath-the-shroud/historico_v1_a_v4.jpg`.
   luminancia. Sem torre no mapa o modelo ignora horizonte e escala a 0,6; a 0,85 obedece.
 - Pessoa: corpo desenhado em capsulas (inclinado, braco contra a luz, pernas no passo, canelas somem na cevada),
   mapa borrado; o modelo pinta borda macia e meio transparente, nada de recorte.
+- **Library hero recusado pelo detector da Steam** ("Store data failed to save... hero image appears to contain text or
+  a logo") quando a fileira de janelas acesas ficou inteira no recorte: o OCR do Windows lia "iiii•ii" nela. Suavizar
+  so a grade nao bastou; passou quando as janelas viraram brilho continuo (mascara quente dilatada + blur 28) e a casa
+  foi centralizada com zoom 1,12. Testar o hero com OCR local antes de subir (`ocr.ps1` com Windows.Media.Ocr).
+- A posicao do logo na biblioteca e do dono (Placement Tool); a imagem de fundo nao se move la: reexportar o hero.
