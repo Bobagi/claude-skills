@@ -151,3 +151,11 @@ Pontue 1 a 5 em cada item, com uma frase de evidência tirada da captura. 2 ou m
   como Sunless Sea / Still Wakes the Deep / The Sinking City. Logo em area limpa, nada atravessando as letras; testar
   a vitrine em cinza borrado: logo creme sobre azul medio sumia (mesma luminancia) e so leu apos escurecer o ceu atras
   dele. Sempre baixar 20+ capas do genero (CDN da Steam) e comparar na grade antes de mostrar.
+- **Arte de loja com o objeto real do jogo** (11/11/2026, Wilkins Pest Control, capa v5: "a torre que vc fez n parece
+  com a nossa, a janela esta do lado errado e o canhao tbm, e ate a luz"; "os olhos nao dao medo"). Antes de pintar
+  um objeto do jogo, leia as medidas no codigo que o constroi (Blender/builder) e renderize o modelo real na pose do
+  jogo (o que gira junto, para onde aponta), e use o render como mapa do ControlNet; confira janela, arma e luz contra
+  o modelo, nao contra a ideia. O modelo de imagem inventa segunda torre e segundo canhao: teste automatico para
+  janela acesa fora da silhueta real e olho humano no resto. Olhos de medo: reflexo de tapetum pequeno (amarelo
+  esverdeado), poucos, tamanhos pela distancia, um par de cabeca inclinada perto de quem olha; nada de pontos de cor
+  pura (ciano, neon) espalhados.
