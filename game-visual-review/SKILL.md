@@ -14,6 +14,9 @@ antes de fechar a tarefa. Esta skill é esse olhar, com régua.
 A inteligência mora em **`rubric.md`** (a checklist que cresce a cada uso). Leia-a inteira antes de
 julgar e acrescente o que aprendeu no fim.
 
+Arte de loja (capsula, capa, banner, key art) tem fluxo proprio: skill **`store-key-art`** (pesquisa, grade de
+referencias, passes da engine e `audit_capsules.py`). Esta rubric continua valendo por cima.
+
 ## Quando rodar (obrigatório, não opcional)
 - Mexeu em qualquer coisa visível: cena, menu, HUD, prop, material, luz, shader, pós-processo, fonte.
 - Vai dizer "ficou pronto", "ficou bom", "melhorei o visual". Primeiro a nota, depois a frase.

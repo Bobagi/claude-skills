@@ -83,6 +83,7 @@ feature grande, `code-standards` + `/code-review` + `/simplify`.
 - `ghostwriter` todo texto publicado em nome do Gustavo (antes da 1ª palavra) · `linkedin` perfil via CDP
 - `unity-mcp-skill` Unity Editor via MCP · `game-3d-assets` todo modelo 3D no orçamento de triângulos
 - `game-audio` sons de jogo (CC0, análise, loop) · `game-visual-review` olhar a tela real antes de dizer pronto
+- `store-key-art` toda arte de loja/capa/banner: pesquisa + grade com capas de sucesso + mundo real do jogo + `audit_capsules.py` antes de mostrar
 - `web-research` pesquisa antes de diagnosticar · `store-promo-video` vídeo da ficha da loja
 - `servidor-dev` delegar desenvolvimento ao Claude do servidor (`srv`) · `vps` servidor bobagi.space (VM `servidor` no Mac mini)
 - `google-play` releases/reviews/ficha (produção só com confirmação) · `chrome-web-store` publicar extensão

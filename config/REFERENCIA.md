@@ -67,6 +67,12 @@ Ao criar skill/plugin novo: uma linha no `CLAUDE.md`, o detalhe aqui e no README
   (`scripts/audiokit.py`: corte, separação de eventos, camadas, loop sem emenda, filtros, pitch; WAV 16 bits 48 kHz)
   e liga no jogo (Unity: regras de importação + `SoundLibrary` por papel) conferindo em Play. Use SEMPRE que mexer
   com áudio de jogo ("baixe os sons", "corta/converte esse áudio", "faz um loop", trocar som sintetizado por gravado).
+- **`store-key-art`** - **arte de loja sem 4 rodadas de frustracao** (11/11/2026): capsulas Steam, capa itch/Play,
+  banner, key art. Regras duras tiradas da capa do Beneath the Shroud (pesquisar e montar grade de 20+ capas do genero
+  antes; mundo/personagem reais, nunca rosto de IA; nunca modelo 3D cru, compor por passes em silhueta; ceu de
+  tempestade CC0 + luz quente forte; letreiro sempre por cima; mudar so o que o dono apontou). `scripts/audit_capsules.py`
+  confere tamanhos, mede contra as referencias do genero, testa o logo em 120x45 e gera a vitrine colorida/cinza;
+  bloqueia antes de mostrar. `log.md` guarda o historico v1 a v4.
 - **`game-visual-review`** - **olha a tela real do jogo antes de dizer que ficou pronto**: captura cada estado (Unity
   via MCP `ScreenCapture`, web via Chrome), monta a folha de contato com a referência do usuário e a versão anterior
   (`scripts/contact_sheet.py`: luminância, saturação, variedade de matiz, área chapada, distância de paleta), pontua a

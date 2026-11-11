@@ -1,0 +1,53 @@
+var outPath = @"C:\Users\Gusta\AppData\Local\Temp\claude\3f86890063b11cdd\5ec50a8f-c289-4ee1-a5a2-4eea6b394ff7\scratchpad\keyart\OUTNAME.png";
+var old = GameObject.Find("__CapsuleShot"); if (old) UnityEngine.Object.DestroyImmediate(old);
+var root = new GameObject("__CapsuleShot");
+var ten = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/Creatures/Tentacle.prefab");
+// x, z, escala, yaw, curvatura(graus por osso)
+var specs = new float[][] { TENTS };
+foreach (var s in specs) {
+  var t = (GameObject)UnityEditor.PrefabUtility.InstantiatePrefab(ten); t.transform.SetParent(root.transform);
+  t.transform.position = new Vector3(s[0], -3.5f, s[1]); t.transform.localScale = Vector3.one * s[2];
+  t.transform.rotation = Quaternion.Euler(0, s[3], 0) * Quaternion.Euler(-90, 0, 0);
+  var smr = t.GetComponentInChildren<SkinnedMeshRenderer>();
+  var ax = t.transform.right;
+  for (int i = 1; i < smr.bones.Length; i++) smr.bones[i].Rotate(ax, (i < 5 ? -0.6f * s[4] : s[4] * (0.5f + 0.15f * (i - 5))), Space.World);
+  smr.updateWhenOffscreen = true;
+}
+var lampGo = new GameObject("lamp"); lampGo.transform.SetParent(root.transform); lampGo.transform.position = new Vector3(LAMPPOS);
+var lamp = lampGo.AddComponent<Light>(); lamp.type = LightType.Point; lamp.color = new Color(1f, 0.55f, 0.22f); lamp.intensity = LAMPI; lamp.range = 9f; lamp.shadows = LightShadows.Soft;
+var camGo = new GameObject("cam"); camGo.transform.SetParent(root.transform);
+var cam = camGo.AddComponent<Camera>(); cam.fieldOfView = FOV; cam.nearClipPlane = 0.3f; cam.farClipPlane = 3000;
+var ad = camGo.AddComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>(); ad.renderPostProcessing = true;
+camGo.transform.position = new Vector3(CAMPOS); camGo.transform.LookAt(new Vector3(LOOKAT));
+var lt = GameObject.Find("FloodedHouse_Generated/Lighting/Lightning").GetComponent<Light>(); float oldI = lt.intensity; var oldR = lt.transform.rotation;
+lt.intensity = LIGHTI; lt.transform.rotation = Quaternion.Euler(20, LIGHTYAW, 0);
+var sky = RenderSettings.skybox; float oldExp = sky.GetFloat("_Exposure"); var oldTint = sky.GetColor("_Tint");
+sky.SetFloat("_Exposure", SKYEXP); sky.SetColor("_Tint", new Color(SKYTINT));
+float oldFog = RenderSettings.fogDensity; RenderSettings.fogDensity = FOGD;
+var rt = new RenderTexture(RW, RH, 24, RenderTextureFormat.ARGB32); rt.antiAliasing = 8;
+var house = GameObject.Find("FloodedHouse_Generated"); int mode = PASSMODE; bool mask = mode == 3;
+// partes "predio" (tudo menos paisagem/luz) para os passes de silhueta
+var bld = new System.Collections.Generic.List<GameObject>();
+foreach (Transform ch in house.transform) { var n = ch.name; if (n != "Exterior" && n != "Lighting" && n != "PostProcessing" && n != "ReflectionProbes" && ch.gameObject.activeSelf) bld.Add(ch.gameObject); }
+var tents = new System.Collections.Generic.List<GameObject>(); for (int k = 0; k < root.transform.childCount; k++) { var g = root.transform.GetChild(k).gameObject; if (g.GetComponentInChildren<SkinnedMeshRenderer>()) tents.Add(g); }
+if (mode == 1) { foreach (var g in bld) g.SetActive(false); foreach (var g in tents) g.SetActive(false); }
+if (mode == 2) { foreach (var g in tents) g.SetActive(false); }
+var cols = new Color[] { Color.red, Color.green, Color.blue, Color.white };
+if (mask) { house.SetActive(false); cam.clearFlags = CameraClearFlags.SolidColor; cam.backgroundColor = Color.black; ad.renderPostProcessing = false; RenderSettings.fog = false;
+  for (int k = 0; k < tents.Count; k++) { var um = new Material(Shader.Find("Universal Render Pipeline/Unlit")); um.SetColor("_BaseColor", cols[k % 4]); var rr = tents[k].GetComponentInChildren<SkinnedMeshRenderer>(); var ms = new Material[rr.sharedMaterials.Length]; for (int j = 0; j < ms.Length; j++) ms[j] = um; rr.sharedMaterials = ms; } }
+var hidden = new System.Collections.Generic.List<Renderer>(); var swapped = new System.Collections.Generic.List<Renderer>(); var oldMats = new System.Collections.Generic.List<Material[]>();
+if (mode == 4) { foreach (var g in tents) g.SetActive(false); cam.clearFlags = CameraClearFlags.SolidColor; cam.backgroundColor = Color.black; ad.renderPostProcessing = false; RenderSettings.fog = false;
+  var wm = new Material(Shader.Find("Universal Render Pipeline/Unlit")); wm.SetColor("_BaseColor", Color.white);
+  var bm = new Material(Shader.Find("Universal Render Pipeline/Unlit")); bm.SetColor("_BaseColor", Color.black);
+  foreach (var r in house.GetComponentsInChildren<Renderer>()) { if (!r.enabled) continue; bool gl = r.name.Contains("Glass") && !r.name.Contains("Tank"); oldMats.Add(r.sharedMaterials); swapped.Add(r); var ms = new Material[r.sharedMaterials.Length]; for (int j = 0; j < ms.Length; j++) ms[j] = gl ? wm : bm; r.sharedMaterials = ms; }
+  foreach (var r in GameObject.Find("FloodedHouse_Generated/Exterior/Sea").GetComponentsInChildren<Renderer>()) { r.enabled = false; hidden.Add(r); } }
+cam.targetTexture = rt; cam.Render(); cam.Render();
+for (int q = 0; q < swapped.Count; q++) swapped[q].sharedMaterials = oldMats[q]; foreach (var r in hidden) r.enabled = true; if (mode == 4) RenderSettings.fog = true;
+if (mask) { house.SetActive(true); RenderSettings.fog = true; }
+foreach (var g in bld) g.SetActive(true);
+RenderTexture.active = rt; var tex = new Texture2D(RW, RH, TextureFormat.RGB24, false); tex.ReadPixels(new Rect(0, 0, RW, RH), 0, 0); tex.Apply(); RenderTexture.active = null;
+System.IO.File.WriteAllBytes(outPath, tex.EncodeToPNG());
+cam.targetTexture = null; rt.Release();
+RenderSettings.fogDensity = oldFog; lt.intensity = oldI; lt.transform.rotation = oldR; sky.SetFloat("_Exposure", oldExp); sky.SetColor("_Tint", oldTint);
+UnityEngine.Object.DestroyImmediate(root);
+return "ok";
