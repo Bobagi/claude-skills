@@ -128,3 +128,8 @@ Pontue 1 a 5 em cada item, com uma frase de evidência tirada da captura. 2 ou m
   gerar arte, procurar como o jogo/modders reaproveitam o estilo da engine (templates, renderizador, helpers como
   o Player Renderer); so gerar do zero se nada servir, e sempre comparar lado a lado com sprites vanilla NA MESMA
   captura (personagem do jogador e NPCs ao lado) antes de dizer pronto.
+
+- **Arte de loja sem rosto humano de IA** (11/11/2026, Wilkins Pest Control): a capa com um fazendeiro sorridente gerado
+  no Z-Image foi recusada na hora ("homem claramente feito por IA"), mesmo com métricas melhores que a anterior. Rosto
+  realista gerado por IA é nota 1. Preferir silhueta, ícone e paleta chapada de 2 a 3 cores (padrão das capas de horror
+  indie na Steam: Iron Nest, Iron Sanctuary, The Windows Are Gone).
