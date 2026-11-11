@@ -37,6 +37,12 @@ Janela de app nativo esperando escolha (instalador, "Allow"/"Continue"): clique 
 M of window "<nome>"`, conferir que mudou); (3) só então peça a ele, dizendo qual opção e por quê. Nunca digite
 senha de login/admin, aceite termos ou conceda permissão de sistema sem ele pedir aquilo.
 
+## ★★ Navegador: sempre o da máquina da sessão (2026-11-11)
+
+Claude in Chrome com vários navegadores conectados: use **sempre o Chrome da máquina onde a sessão roda** (Windows ->
+o "Browser" Windows, Mac -> o macOS), via `select_browser` com o deviceId dele, **sem perguntar** (cobrado em 11/11:
+"é pra abrir NESSA MÁQUINA, SEMPRE"). Só pergunte se nenhum conectado for desta máquina.
+
 ## ★★ claude-skills: sempre commit + push (2026-11-04)
 
 Toda alteração no repo `Bobagi/claude-skills` termina com commit + push na hora, sem perguntar. Antes de editar,
