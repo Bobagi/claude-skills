@@ -344,6 +344,9 @@ def cmd_promote(args):
     rel.pop("userFraction", None)
     if args.rollout < 1 and rel["status"] == "inProgress":
         rel["userFraction"] = args.rollout
+    notes = _release_notes(args)  # sem --notes/--notes-file, mantém as notas da origem
+    if notes:
+        rel["releaseNotes"] = notes
     api(
         "PUT",
         f"/{args.package}/edits/{edit}/tracks/{args.to_track}",
@@ -563,6 +566,8 @@ def main():
     pr.add_argument("--rollout", type=float, default=1.0)
     pr.add_argument("--status", choices=["draft", "completed", "inProgress", "halted"], default=None,
                     help="força o status da release (app rascunho exige 'draft')")
+    pr.add_argument("--notes", default=None, help="nota nova (mesmo formato do upload); omitido = mantém a da origem")
+    pr.add_argument("--notes-file", default=None, help="JSON por idioma ou texto puro, igual ao upload")
 
     ro = sub.add_parser("rollout")
     ro.add_argument("--fraction", type=float, required=True)

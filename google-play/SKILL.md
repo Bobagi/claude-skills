@@ -28,6 +28,7 @@ python3 $S tracks                       # o que está em cada track (status/roll
 python3 $S bundles                      # versionCodes já enviados
 python3 $S upload --aab dist/app.aab --track internal --notes "Correções de bugs"
 python3 $S promote --from-track internal --to-track production --rollout 1.0
+python3 $S promote --from-track internal --to-track alpha --notes-file notas.json  # notas novas (omitido = copia as da origem)
 python3 $S rollout --fraction 1.0 --track production
 python3 $S reviews --limit 10
 python3 $S reviews-reply --review-id XYZ --text "Obrigado! Corrigido na v1.0.5."
@@ -63,6 +64,11 @@ Outro app: `--package com.exemplo.app` (padrão: `com.bobagi.tictacverse`).
    de repositório. Se vazar: revogar a chave no GCP e gerar outra.
 5. Depois de publicar, lembre o operador de manter o `pubspec.yaml` do
    repositório em sincronia com o versionCode publicado.
+
+> **App novo ainda em rascunho (nunca publicado):** o track `internal` aceita release `completed`, mas
+> `alpha`/`beta`/`production` respondem `400 Only releases with status draft may be created on draft app.`
+> (medido no One Way Fly em 2026-11-11). Ou cria com `--status draft` e o operador lança no Console, ou o
+> operador conclui o primeiro lançamento pelo Console antes.
 
 ## Limites — o que a API NÃO cobre (explicar ao operador, não tentar contornar)
 
