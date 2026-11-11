@@ -159,3 +159,9 @@ Pontue 1 a 5 em cada item, com uma frase de evidência tirada da captura. 2 ou m
   janela acesa fora da silhueta real e olho humano no resto. Olhos de medo: reflexo de tapetum pequeno (amarelo
   esverdeado), poucos, tamanhos pela distancia, um par de cabeca inclinada perto de quem olha; nada de pontos de cor
   pura (ciano, neon) espalhados.
+- **Arte de loja de terror: ceu e luz contam mais que o modelo** (11/11/2026, Beneath the Shroud, v3 recusada): ceu liso
+  "sem nada" e janelas fracas mataram a atmosfera, e mudar o layout que o dono ja tinha aprovado (casa embaixo, letreiro
+  logo acima) foi erro: mude so o que ele apontou. O que resolveu (v4, `compose_keyart_v4.py`): foto CC0 de tempestade
+  com relampago recolorida para a paleta do jogo, brilho forte atras das silhuetas (sem ele a criatura escura some no
+  ceu escuro), passe so dos vidros para acender TODAS as janelas com caixilho, nucleo quente e halo grande, e o letreiro
+  por cima da criatura (nunca a criatura por cima das letras).
