@@ -143,3 +143,11 @@ Pontue 1 a 5 em cada item, com uma frase de evidência tirada da captura. 2 ou m
   Cena larga com area vazia (banner): o modelo inventa uma segunda torre ali; gere o vazio a parte com prompt sem o
   objeto. Olhe a imagem em 100% e em miniatura antes de publicar; o teste automatico tambem deixa passar coisa
   (o primeiro teste de alinhamento aprovou um banner com dois feixes).
+- **Arte de loja a partir da engine: silhueta + passes, nunca o modelo cru** (11/11/2026, Beneath the Shroud). Capa 1 (rosto
+  de IA que nao era o personagem) e capa 2 (render direto da cena: casa com texturas pobres visiveis, tentaculo
+  passando NA FRENTE das letras) recusadas. O que funcionou: renderizar passes separados na Unity (ceu, casa, mascara
+  colorida por tentaculo, completo) e compor em 2D (`SourceAssets/Tools/trailer/compose_keyart.py`): casa e criatura
+  em silhueta contra ceu iluminado, contorno de luz, nevoa por profundidade, uma luz quente (janela), chuva e grao,
+  como Sunless Sea / Still Wakes the Deep / The Sinking City. Logo em area limpa, nada atravessando as letras; testar
+  a vitrine em cinza borrado: logo creme sobre azul medio sumia (mesma luminancia) e so leu apos escurecer o ceu atras
+  dele. Sempre baixar 20+ capas do genero (CDN da Steam) e comparar na grade antes de mostrar.
