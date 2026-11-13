@@ -174,3 +174,13 @@ Pontue 1 a 5 em cada item, com uma frase de evidência tirada da captura. 2 ou m
   do jogo que acendem a cena, `PowerGrid.Emergency(true)` (lampadas a 35%) e o relampago chamado por reflexao
   (`LightningStorm.SetFlash(0,8)`) no mesmo `execute_code` do `FrameRecorder.Still`, nunca mexer no GameTuning para a
   foto. (3) Conferir a media de luminancia dos quadros (PIL) antes de encodar: mp4 de 30 KB para 420 quadros e preto.
+- **Casa escura com lanterna: medir fração de preto, julgar pátio e texturas, não a média** (13/11/2026, Beneath the Shroud,
+  revisão geral "muito conteúdo mal feito"). (1) Subir ambiente ou ligar SSGI não muda a captura: a exposição automática
+  normaliza a média; compare a fração de pixels abaixo de 8 e a presença de textura nas sombras. (2) O que lia como
+  "mal feito" eram placeholders (caixas do Blender), uma textura 1k esticada em 2,2 m (papel machê), um set de reboco com
+  manchas de 1 m repetidas a cada 1,8 m e um relâmpago forte demais (fachada e árvore brancas, céu preto porque o skybox
+  não acendia). Checar sempre: resolução por metro (px/mm) das superfícies grandes, repetição visível (hex tiling
+  resolve sem trocar textura), e no clarão o céu tem de acender junto. (3) Antes de culpar material ou shader por um decalque
+  invisível, conferir se a caixa do projetor pega a parede de verdade (raycast) e que o angle fade está em graus.
+  (4) Capturas por posição fixa: duas posições herdadas caíam dentro de uma escada; conferir a primeira folha antes de
+  medir 18 ângulos.
