@@ -165,3 +165,12 @@ Pontue 1 a 5 em cada item, com uma frase de evidência tirada da captura. 2 ou m
   com relampago recolorida para a paleta do jogo, brilho forte atras das silhuetas (sem ele a criatura escura some no
   ceu escuro), passe so dos vidros para acender TODAS as janelas com caixilho, nucleo quente e halo grande, e o letreiro
   por cima da criatura (nunca a criatura por cima das letras).
+- **Captura de jogo escuro: jogador morto = camera preta; luz de emergencia e relampago no proprio quadro** (13/11/2026,
+  Beneath the Shroud, fotos e clipes de divulgacao pela ponte MCP). (1) Oito tours do FrameRecorder sairam 100% pretos
+  (media de luminancia 0,0) porque o jogador tinha morrido afogado numa foto anterior e o efeito Suffocation da camera
+  fica em preto total ate o Retry; a mascara (visor) por cima enganava: parecia "funcionou". Antes de gravar, conferir
+  `dead`/`Health` do jogador e reviver (coroutine Retry por reflexao); gravar debaixo d'agua so com o DiveGear equipado.
+  (2) Casa apagada iluminada so pela lanterna da area plana 0,6 a 0,8 (quadro preto com um disco): usar estados reais
+  do jogo que acendem a cena, `PowerGrid.Emergency(true)` (lampadas a 35%) e o relampago chamado por reflexao
+  (`LightningStorm.SetFlash(0,8)`) no mesmo `execute_code` do `FrameRecorder.Still`, nunca mexer no GameTuning para a
+  foto. (3) Conferir a media de luminancia dos quadros (PIL) antes de encodar: mp4 de 30 KB para 420 quadros e preto.
