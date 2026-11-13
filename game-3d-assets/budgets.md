@@ -262,3 +262,28 @@ Nunca importar as 4096 do Meshy direto. Metal + rugosidade viram um único mapa 
   (platô): é o vidro da chaminé, que o GLB traz translúcido e o bake deixa opaco branco. Use `--max-tris` e faça o vidro
   como peça à parte. A primeira passada saiu preta: o otimizador pegava a imagem de entrada (`*_input.png`) ao lado do
   GLB como cor base; corrigido (GLB/glTF usa o próprio material).
+- 2026-11-13 (BeneathTheShroud, placeholders da casa trocados por modelos reais; Sketchfab CC BY baixado pelo Brave logado,
+  OldKitchenSet já no projeto): WashingMachine 5.168 (mantido; ponto quente 0,16 em todos os degraus = vidro da escotilha
+  assado opaco, platô), Bathtub 4.748 (mantido), Toilet 3.038 -> 1.998 (`hand`, 0,12 px / 0,033), Washbasin 4.160 -> 2.000
+  (0,09 px / 0,028), Wardrobe 136.080 -> 5.000 (0,11 px / 0,056), BoatPlaceholder 8.358 -> 5.000 (0,05 px / 0,085),
+  KitchenBase 369, KitchenSink 1.026, KitchenWall 106 (peças do kit, abaixo do mínimo, ficam). Lições: (1) **kit em
+  arranjo 2-D** (peças espalhadas no chão e umas penduradas sobre as outras): agrupar as partes soltas por caixa que se
+  toca em XY E em Z, não só ao longo de x (`SourceAssets/Tools/kit_pieces.py` do BeneathTheShroud, modo `list` com um
+  render por grupo). (2) **Kit com portas abertas**: cada porta é o grupo de partes que avança além do plano da frente;
+  eixo principal (PCA) no plano em que ela gira (XY para porta lateral, YZ para tampa basculante), dobradiça = ponta
+  mais perto do plano da frente, giro rígido até ficar rente e, se a porta não chega ao meio, alarga a partir da
+  dobradiça (`--front-y`, `--fill-doors`); porta de escotilha que afunda no vão fica só com o giro (`--no-flush`).
+  (3) Peça de kit em tamanho exato de encaixe (fiada de 1 m): `--target W D H` não uniforme (0,39 x 0,55 passou
+  despercebido em porta de armário); a torneira que o kit não tinha é tubo por script com imagem uniforme 16x16 (senão
+  o bake sai cinza). (4) Orientação por render 3/4 engana (pia "frente -Y" era +X): conferir na `_compare.png` a vista
+  "front" do otimizador (câmera em -Y) antes de dar por pronto; o barco veio com a proa em -Y, não +Y.
+- 2026-11-13 (BeneathTheShroud, porta dupla arqueada da frente, 1,8 x 2,75 m): nenhum modelo CC do Sketchfab tinha arco
+  redondo com almofadas e maçaneta de latão ("Large Wooden Double Door" de dudecon é porta de tábuas e baixa demais para o
+  vão). **Z-Image-Turbo (832x1216, "the door fills the image", proporção pedida no prompt) + TRELLIS.2 1024** deu a porta da
+  arte da Dayse em 4,3 min, com almofadas e maçanetas nos DOIS lados (o gerador espelhou a frente). O TRELLIS normaliza pelo
+  maior lado: 0,62 x 0,10 x 1,0; encaixe por `--target 2.0 0.16 2.85` (não uniforme, 13% mais larga que a imagem, arco
+  quase imperceptivelmente elíptico; aro cobre 10 cm além do vão). 300 mil -> 5.000 (`large`, contorno 0,175 px); o ponto
+  quente ficou em 0,147 de 5.000 a 8.000 (platô: não é contagem, é o latão das maçanetas e o veio escuro), então
+  `--max-tris 5000`. Lições: (1) pedir a proporção no prompt não basta, a imagem sai como o modelo quer (1,63 em vez de
+  1,46): medir o GLB e corrigir com `--target`; (2) `gen3d_local.py` sem `--keep-server` deixou o servidor 8190 vivo com
+  4 GB de VRAM ao terminar a segunda seed: conferir a porta 8190 depois do lote e matar o python dela.

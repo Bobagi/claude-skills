@@ -161,6 +161,9 @@ barbatana, alça) justifica subir triângulos. Referências e contas em `budgets
 - **Vidro do Meshy** vem opaco na textura: para frasco/vidro de verdade, gere a peça de vidro à parte
   (malha simples) com material transparente, ou deixe o vidro opaco-sujo se a leitura funcionar.
 - **GLB do Sketchfab**: peças sob nós girados desmontam no otimizador; rode antes `scripts/flatten_model.py <in.glb> <out.glb>` e confira a `_compare.png` de olho (as duas linhas saem igualmente erradas). Vidro translúcido vira opaco no bake: o ponto quente de sombreamento não cai com mais triângulos, use `--max-tris`. **GLB vem com os vértices separados em cada costura de UV**: num scan (atlas com centenas de ilhas) o collapse abria rachaduras escuras por toda a peça e travava; desde 10/11 o otimizador solda os vértices coincidentes ao importar GLB (`WELD a -> b` no log; `--no-weld` desliga). Scan com chão/tronco: recorte antes com `SourceAssets/Tools/scan_prep.py` do BeneathTheShroud (máscara por face + matriz de rotação/escala/pivô, refaz material unlit como Principled).
+- **Kit do Sketchfab em arranjo 2-D com portas abertas** (cozinha, armários): `SourceAssets/Tools/kit_pieces.py` do
+  BeneathTheShroud lista as peças (grupos de partes que se tocam em XY e Z, um render por grupo), extrai uma, fecha as
+  portas (lateral ou basculante) e escala ao tamanho de encaixe; ver Registro de 13/11 em `budgets.md`.
 - **Poly Haven**: FBX às vezes com a malha na raiz em escala 100; LODs com transição padrão desenham LOD0
   longe. Para fundo, só o LOD mais leve e fora da sombra.
 - **Criatura que dobra**: gerar em Quad no Meshy, peça única, depois remesh em quads + UV nova + bake +
