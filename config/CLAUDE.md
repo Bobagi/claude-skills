@@ -90,6 +90,7 @@ feature grande, `code-standards` + `/code-review` + `/simplify`.
 - `admob` (+ AdSense só leitura) · `google-ads` só leitura · `google-search-console` cadastro, sitemap, SEO
 - `cloudflare` DNS de bobagi.space (DNS **só** no Cloudflare; subdomínio novo pelo Tunnel `mac-mini`)
 - `product-review` PM do portfolio (Artifact único) · `game-overlay` HWiNFO + RTSS · `resume` vídeo do YouTube
+- `whatsapp-export` exportar conversa do WhatsApp Web + transcrever áudios (projeto `Bobagi/whatsapp-export`, não refazer)
 
 Regras que valem fora das skills:
 - **Jogo**: sempre pesquisar online texturas PBR, shaders, efeitos prontos e modelos CC0 antes de fazer na mão (24/10).

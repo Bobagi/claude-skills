@@ -102,6 +102,11 @@ Ao criar skill/plugin novo: uma linha no `CLAUDE.md`, o detalhe aqui e no README
   Hostinger antiga (`/opt`, `/var/www`, `/etc/nginx`, `/root`). A VPS 46.202.144.75 foi aposentada.
   Doc da arquitetura: `~/server/CLAUDE.md` no Mac.
 - **`resume`** - resumir um vídeo do YouTube a partir do link.
+- **`whatsapp-export`** - exportar uma conversa do WhatsApp Web (texto, áudios, mídia) de um período e
+  transcrever os áudios com faster-whisper na GPU. Usa o projeto pronto `Bobagi/whatsapp-export`
+  (`D:\Projetos\whatsapp-export` no PC de casa): `exporter.js` injetado no WhatsApp Web pelo Claude in Chrome
+  baixa um JSON; `process.py` gera `conversas/<chat>/<data>/conversa.md`. Dados saem por download (o
+  `javascript_tool` bloqueia retorno com cara de cookie). Conversas ficam fora do Git e de IA externa.
 - **`google-play`** - releases na Play Store via Play Developer API (service account): sobe
   AAB, tracks, promoção, rollout, reviews, listing. Produção exige confirmação explícita do
   operador. Credenciais em `~/.config/bobagi-google/` (setup único: `google-play/SETUP.md`).
