@@ -184,3 +184,10 @@ Pontue 1 a 5 em cada item, com uma frase de evidência tirada da captura. 2 ou m
   invisível, conferir se a caixa do projetor pega a parede de verdade (raycast) e que o angle fade está em graus.
   (4) Capturas por posição fixa: duas posições herdadas caíam dentro de uma escada; conferir a primeira folha antes de
   medir 18 ângulos.
+- **Planta nova em cena noturna: julgar no Play, sem luz de inspeção** (18/11/2026, Beneath the Shroud, juncos da Dayse).
+  Na captura do editor com uma luz de lanterna posta na câmera, os juncos liam bem; no Play, com a lanterna real (que
+  atrasa e aponta para o lado logo depois do teleporte), eles sumiam no jardim preto, enquanto o concept tinha o miolo
+  dos botões aceso. Correção: emissão só na cor quente da textura (filtro por matiz, 2% dos texels), valor no
+  GameTuning. Lições: (1) capturar no Play com a luz do jogo antes de dar nota em A3; (2) conferir de perto se pontos
+  acesos lêem como olhos (aqui não: o brilho fica na base do botão e nas pontas, como no concept); (3) câmera de
+  editor com GPU Resident Drawer precisa de alguns `Render()` antes de ler, senão o occlusion culling some com objetos.
