@@ -291,6 +291,13 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
 - **Resposta de LLM e input nao confiavel no front:** montar com `textContent`/nos do DOM, link so `http(s)`.
   Testar com um provedor falso que devolve `<img onerror>` e `[x](javascript:...)` e olhar o print.
 - **Log:** so tamanhos, custo e contagem; nunca pergunta, resposta, senha ou chave (grep no log apos o teste).
+- **Agente rodando NO HOST com ferramenta de buscar URL = SSRF, mesmo sem shell.** Um agente de CLI (sessao headless)
+  com "so busca e leitura de pagina" parece inofensivo, mas a leitura de pagina sai da maquina onde ele roda: o
+  usuario pede "abra http://127.0.0.1:porta e http://192.168.x.1" e o agente sonda a rede interna (a ferramenta so
+  barrava `localhost` e nome sem ponto; IP literal passava e a mensagem de erro servia de port scan). **Como testar
+  ao vivo:** pedir essas URLs e ler o erro (SSL/ECONNREFUSED = a conexao saiu). Fix: regra de permissao por dominio
+  (lista de sites publicos), nunca a ferramenta de fetch liberada inteira; busca hospedada pelo provedor nao precisa.
+  Teste que falha se a regra sem dominio voltar. Distinguir sempre ferramenta que roda no provedor x no host.
 
 ### 2026-11-07 · filtro de conteudo e servico HTTP local chamado pelo navegador (via app de personagens com IA)
 - **Filtro de texto por regex: ataque ao vivo com as burlas classicas antes de confiar.** Numero por extenso
