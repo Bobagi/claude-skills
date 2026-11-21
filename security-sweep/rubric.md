@@ -272,6 +272,26 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
 ---
 
 ## Learnings log (append-only, geral)
+### 2026-11-21 · caixa de perguntas a um LLM paga pelo dono (via pagina de status de servidor de jogo)
+- **Endpoint que chama LLM pago = superficie de "denial of wallet": o teto tem que ser em dinheiro, no servidor,
+  e sobreviver a restart.** Limite por IP sozinho nao protege a fatura. Camadas a exigir: porta de entrada
+  (senha/sessao) com lockout, tamanho maximo da pergunta, 1 chamada por vez por IP, teto de concorrencia global,
+  limite por IP por hora, teto de turnos por conversa aplicado NO SERVIDOR (id desconhecido ou esgotado vira
+  conversa nova e vazia, nunca estende contexto), e orcamento diario + mensal em USD somado a partir do `usage`
+  que a API devolve, gravado em disco.
+- **Chamada abortada nao devolve `usage`, mas e cobrada.** Com streaming, o cliente fecha a conexao no meio e o
+  servidor nunca recebe a mensagem final: se o orcamento so soma o `usage` reportado, perguntar e desistir em
+  laco gasta credito sem mexer no contador. **Como testar ao vivo:** `curl -m 0.25` no endpoint e comparar o
+  arquivo de orcamento antes/depois; tem que subir. Fix: cobrar uma estimativa fixa quando a chamada termina sem
+  resposta, e contar a pergunta nos limites ANTES de chamar o provedor (falha tambem conta).
+- **O modelo so analisa: prove pela requisicao, nao pelo prompt.** "Nao execute nada" no system prompt nao e
+  controle. O controle e a lista `tools` enviada: so ferramentas hospedadas pelo provedor (busca web), nenhuma
+  ferramenta do cliente, nada que alcance shell, arquivo ou console. Trave com um teste que falha se aparecer
+  uma tool com `input_schema`. Dado do jogo que entra no prompt (nome de jogador) e sanitizado e marcado como dado.
+- **Resposta de LLM e input nao confiavel no front:** montar com `textContent`/nos do DOM, link so `http(s)`.
+  Testar com um provedor falso que devolve `<img onerror>` e `[x](javascript:...)` e olhar o print.
+- **Log:** so tamanhos, custo e contagem; nunca pergunta, resposta, senha ou chave (grep no log apos o teste).
+
 ### 2026-11-07 · filtro de conteudo e servico HTTP local chamado pelo navegador (via app de personagens com IA)
 - **Filtro de texto por regex: ataque ao vivo com as burlas classicas antes de confiar.** Numero por extenso
   ("dezesseis", "fifteen"), digito de largura total ("１６"), caractere invisivel entre digitos (U+200B), emoji
