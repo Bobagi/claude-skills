@@ -298,6 +298,12 @@ Estas já foram implementadas/verificadas em apps nossas; a sweep deve **confirm
   ao vivo:** pedir essas URLs e ler o erro (SSL/ECONNREFUSED = a conexao saiu). Fix: regra de permissao por dominio
   (lista de sites publicos), nunca a ferramenta de fetch liberada inteira; busca hospedada pelo provedor nao precisa.
   Teste que falha se a regra sem dominio voltar. Distinguir sempre ferramenta que roda no provedor x no host.
+- **Dar "so leitura de arquivo" a um agente no host NAO e confinar.** Ferramenta de leitura com a pasta de trabalho
+  apontada para uma pasta de dados leu, ao vivo, arquivo fora dela por caminho absoluto, por `../`, por symlink, o
+  `/etc/hosts` e configs do dono. Permissao "allow Read" vale para o disco inteiro; o confinamento e uma opcao
+  separada do runtime (modo restrito/sandbox) e tem de ser provado: pedir N leituras fora da pasta e exigir N
+  negacoes, com as flags EXATAS de producao. Defesa em profundidade: a pasta so recebe copias sem segredo, refeitas a
+  cada uso (apagar o que sobrar, inclusive symlink) e filtradas (senha conhecida, IPs). Refazer o teste ao atualizar o runtime.
 
 ### 2026-11-07 · filtro de conteudo e servico HTTP local chamado pelo navegador (via app de personagens com IA)
 - **Filtro de texto por regex: ataque ao vivo com as burlas classicas antes de confiar.** Numero por extenso
